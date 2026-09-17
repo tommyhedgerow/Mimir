@@ -142,20 +142,27 @@ cat > "$STAGE/manifest.json" <<JSON
 }
 JSON
 
-# Normalise every timestamp in the staging tree.
+# Normalise every timestamp and permission in the staging tree.
 #
-# WHY THIS IS NOT COSMETIC. A zip records each entry's modification time, and the
-# staged files are copies, so their mtimes are "whenever this script last ran".
-# Two builds of an unchanged tree therefore produced two different archives, and
-# `--check` — which rebuilds and compares SHA-256 — reported "stale" on a tree
-# nothing had touched. A check that cries wolf is worse than no check: it teaches
-# you to ignore the one time it is right.
+# WHY THIS IS NOT COSMETIC. A zip records each entry's modification time and its
+# Unix mode, and the staged files are copies of whatever the working tree last
+# touched, made under whatever umask the machine happens to have. Two builds of
+# an unchanged tree therefore produced two different archives, and `--check` —
+# which rebuilds and compares SHA-256 — reported "stale" on a tree nothing had
+# touched. A check that cries wolf is worse than no check: it teaches you to
+# ignore the one time it is right. The modes also differed between a
+# contributor's Mac and the Linux runner, so the same commit produced two
+# artifacts and only one of them matched the release.
 #
-# Every entry is stamped with the same instant the manifest declares, which is
-# also what makes SOURCE_DATE_EPOCH work as the standard reproducibility knob.
-touch -t "$(epoch_as_touch "$EPOCH")" "$STAGE/manifest.json"
+# Every entry is stamped with the instant the manifest declares, and made 644 —
+# these are read-only data files, and nothing about them should depend on who
+# built them. SOURCE_DATE_EPOCH remains the standard override for the instant.
+STAMP="$(epoch_as_touch "$EPOCH")"
+touch -t "$STAMP" "$STAGE/manifest.json"
+chmod 644 "$STAGE/manifest.json"
 while IFS= read -r file; do
-  touch -t "$(epoch_as_touch "$EPOCH")" "$file"
+  touch -t "$STAMP" "$file"
+  chmod 644 "$file"
 done < <(find "$STAGE/preset" -type f)
 
 # ── verify the staged tree against the format's own rules ────────────────────
