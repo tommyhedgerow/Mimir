@@ -57,6 +57,8 @@ cd Mimir
 ./scripts/install.sh
 ```
 
+Or import just the teacher, without cloning anything: **[Mimir Tutor on Preset Square](https://dshdesktop.com/preset/p/mimir-tutor-20d96e)** is the same preset as a single `.dshpreset` file, which DSH Desktop installs from Settings → Agent presets → Import. That route gives you the teacher; the vault, the theme and the plugins come from the clone.
+
 The installer copies the preset into your DSH home and registers the Lesson pane as a profile bundle. It backs up anything it replaces rather than overwriting it.
 
 Then:
