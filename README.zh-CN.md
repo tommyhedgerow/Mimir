@@ -55,7 +55,12 @@ cd Mimir
 ./scripts/install.sh --lang zh-CN
 ```
 
-也可以只装导师，不克隆任何东西：**[Preset Square 上的 Mimir Tutor](https://dshdesktop.com/preset/p/mimir-tutor-20d96e)** 是同一个预设打包成的单个 `.dshpreset` 文件，在 DSH Desktop 的「设置 → Agent presets → 导入」里安装。那条路只给你导师；笔记库、主题和三个插件来自克隆。
+也可以只装导师，不克隆任何东西。两个预设都在 Preset Square 上，各自是单个 `.dshpreset` 文件，在 DSH Desktop 的「设置 → Agent presets → 导入」里安装：
+
+- **[Mimir Tutor](https://dshdesktop.com/preset/p/mimir-tutor-20d96e)** —— 用英文讲授。
+- **[Mimir 导师](https://dshdesktop.com/preset/p/mimir-tutor-chinese-582526)** —— 用简体中文讲授。
+
+那条路只给你导师；笔记库、主题和三个插件来自克隆。
 
 安装脚本把预设复制进你的 DSH 目录，并把课程面板注册为一个 profile bundle。它替换任何东西之前都会先备份，而不是直接覆盖。`--lang zh-CN` 装的是中文预设，不传则装英文的。
 

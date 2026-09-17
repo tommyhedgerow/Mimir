@@ -151,6 +151,16 @@ still carries all six localisations of its own listing metadata.
 both and reports each separately; `--preset mimir-tutor-zh` does one, and
 `--check` verifies without writing.
 
+**Make the two titles differ in every locale, not just the canonical one.**
+This was got wrong on the first pass and cannot now be corrected: Preset Square
+has no update or delete route — `PATCH` and `PUT` on a preset both return 404 —
+so a listing is immutable once published. The English preset carries
+`title: Mimir Tutor` and localises to `Mimir 导师` in Chinese, which is exactly
+the Chinese preset's own title, so a reader browsing the square in Chinese sees
+two entries with the same name. Give the English one a distinguishing word in
+each localization (`Mimir Tutor (English)` / `Mimir Tutor（英文）`) before
+publishing, and check every locale side by side rather than only the English.
+
 **The plugin catalog** — [`awesome-dsh-plugin`](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) —
 is for *plugins*, and Mimir is a preset, so the preset does not go there. The
 Lesson pane does, because it is a real DSH plugin: it declares `dsh.bundle` at
