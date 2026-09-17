@@ -75,17 +75,42 @@ if command -v node >/dev/null 2>&1 && [ -f "$HERE/Tools/build-lesson-pane.mjs" ]
   fi
 fi
 
+# ── the two things that differ between BSD and GNU userland ──────────────────
+#
+# This script runs on a contributor's Mac and on a Linux CI runner, and both
+# tools below spell the same operation differently. The earlier version tried
+# `stat -f %m` and fell back on failure, which is worse than it looks on Linux:
+# GNU `stat -f` means `--file-system`, so it *succeeds* and prints the mount
+# point. A silent wrong answer is not a fallback. So the platform is detected
+# once, explicitly, rather than guessed at per call.
+case "$(uname -s)" in
+  Darwin|*BSD) STAT_MTIME=(stat -f %m); EPOCH_AS_ISO=(date -u -r) ;;
+  *)           STAT_MTIME=(stat -c %Y); EPOCH_AS_ISO=(date -u -d @) ;;
+esac
+
+# Newest modification time under a directory, as epoch seconds.
+newest_mtime() {
+  local newest=0 file stamp
+  while IFS= read -r file; do
+    stamp="$("${STAT_MTIME[@]}" "$file" 2>/dev/null || echo 0)"
+    [ "$stamp" -gt "$newest" ] 2>/dev/null && newest="$stamp"
+  done < <(find "$1" -type f)
+  printf '%s' "$newest"
+}
+
+iso_from_epoch() {
+  "${EPOCH_AS_ISO[@]}" "$1" +%Y-%m-%dT%H:%M:%S.000Z 2>/dev/null \
+    || printf '1970-01-01T00:00:00.000Z'
+}
+
 # `exportedAt` would otherwise make every run produce a different file, which
-# makes "has anything changed?" unanswerable and breaks a byte-comparison in CI.
-# SOURCE_DATE_EPOCH is the standard override for exactly this; without it the
-# stamp is the source tree's last modification, which is reproducible enough.
-if [ -n "${SOURCE_DATE_EPOCH:-}" ]; then
-  EXPORTED_AT="$(date -u -r "$SOURCE_DATE_EPOCH" +%Y-%m-%dT%H:%M:%S.000Z 2>/dev/null \
-    || date -u -d "@$SOURCE_DATE_EPOCH" +%Y-%m-%dT%H:%M:%S.000Z)"
-else
-  EXPORTED_AT="$(date -u -r "$(find "$PRESET_SRC" -type f -print0 | xargs -0 stat -f '%m' 2>/dev/null | sort -n | tail -1)" +%Y-%m-%dT%H:%M:%S.000Z 2>/dev/null \
-    || date -u +%Y-%m-%dT%H:%M:%S.000Z)"
-fi
+# makes "has anything changed?" unanswerable and breaks the byte-comparison the
+# Checks workflow runs. SOURCE_DATE_EPOCH is the standard override for exactly
+# this; without it the stamp is the newest modification time in the source tree.
+# A fresh clone has no meaningful mtimes, so the value is not reproducible from
+# git alone — see the note in RELEASING.md.
+EPOCH="${SOURCE_DATE_EPOCH:-$(newest_mtime "$PRESET_SRC")}"
+EXPORTED_AT="$(iso_from_epoch "$EPOCH")"
 
 cat > "$STAGE/manifest.json" <<JSON
 {
@@ -137,8 +162,12 @@ mkdir -p "$(dirname "$OUT")"
 # because a check that overwrites the thing it is checking is not a check.
 TARGET="$OUT"
 if [ "$CHECK" -eq 1 ]; then
-  TARGET="$(mktemp -t mimir-preset).dshpreset"
-  trap 'rm -rf "$STAGE" "$TARGET"' EXIT
+  # `mktemp -t NAME` is a BSD spelling: it wants a template, and GNU mktemp
+  # rejects one without `XXXXXX` ("too few X's in template"). A temp directory
+  # works the same on both, so the file is made inside one.
+  CHECK_DIR="$(mktemp -d)"
+  TARGET="$CHECK_DIR/mimir-tutor.dshpreset"
+  trap 'rm -rf "$STAGE" "$CHECK_DIR"' EXIT
 fi
 
 build_zip() {
