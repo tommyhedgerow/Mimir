@@ -31,6 +31,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="${GITHUB_REF#refs/tags/}"
+          # Both presets, and their checksums. Listing the files explicitly is
+          # deliberate — a glob would silently ship a stray file one day — but it
+          # means this list has to be kept in step with the PRESETS the packer
+          # knows about. It was not, on the first bilingual release: the Chinese
+          # package was built, validated, and then left out of the release.
           gh release create "$tag" --title="$tag" --generate-notes \
             dist/mimir-tutor.dshpreset \
-            dist/mimir-tutor.dshpreset.sha256
+            dist/mimir-tutor.dshpreset.sha256 \
+            dist/mimir-tutor-zh.dshpreset \
+            dist/mimir-tutor-zh.dshpreset.sha256
