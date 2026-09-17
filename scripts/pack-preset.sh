@@ -75,39 +75,57 @@ if command -v node >/dev/null 2>&1 && [ -f "$HERE/Tools/build-lesson-pane.mjs" ]
   fi
 fi
 
-# ── the two things that differ between BSD and GNU userland ──────────────────
+# ── the things that differ between BSD and GNU userland ──────────────────────
 #
-# This script runs on a contributor's Mac and on a Linux CI runner, and both
-# tools below spell the same operation differently. The earlier version tried
-# `stat -f %m` and fell back on failure, which is worse than it looks on Linux:
-# GNU `stat -f` means `--file-system`, so it *succeeds* and prints the mount
-# point. A silent wrong answer is not a fallback. So the platform is detected
-# once, explicitly, rather than guessed at per call.
+# This script runs on a contributor's Mac and on a Linux CI runner, and these
+# tools spell the same operation differently. Two earlier attempts at this were
+# both wrong in ways worth recording, because both failed *quietly*:
+#
+#   1. Trying `stat -f %m` and falling back on failure. GNU `stat -f` means
+#      `--file-system`, so it succeeds and prints the mount point. A silent
+#      wrong answer is not a fallback.
+#   2. Writing the GNU form as an array of words, `(date -u -d @)`, and
+#      appending the epoch. That expands to `date -u -d @ 1789677412`, and GNU
+#      date wants the `@` attached to the value, so the call failed on every
+#      run and every package built on Linux was stamped 1970-01-01.
+#
+# So: the platform is detected once, and each branch is written out in full
+# where it is used rather than assembled from pieces that can drift apart.
 case "$(uname -s)" in
-  Darwin|*BSD) STAT_MTIME=(stat -f %m); EPOCH_AS_ISO=(date -u -r) ;;
-  *)           STAT_MTIME=(stat -c %Y); EPOCH_AS_ISO=(date -u -d @) ;;
+  Darwin|*BSD) MIMIR_STAT_STYLE=bsd ;;
+  *)           MIMIR_STAT_STYLE=gnu ;;
 esac
 
 # Newest modification time under a directory, as epoch seconds.
 newest_mtime() {
   local newest=0 file stamp
   while IFS= read -r file; do
-    stamp="$("${STAT_MTIME[@]}" "$file" 2>/dev/null || echo 0)"
-    [ "$stamp" -gt "$newest" ] 2>/dev/null && newest="$stamp"
+    if [ "$MIMIR_STAT_STYLE" = bsd ]; then
+      stamp="$(stat -f %m "$file" 2>/dev/null || echo 0)"
+    else
+      stamp="$(stat -c %Y "$file" 2>/dev/null || echo 0)"
+    fi
+    if [ "$stamp" -gt "$newest" ] 2>/dev/null; then newest="$stamp"; fi
   done < <(find "$1" -type f)
   printf '%s' "$newest"
 }
 
+# An epoch, as an ISO-8601 instant and as the CCYYMMDDhhmm.ss that `touch -t`
+# wants. `touch -t` reads UTC, so both go through UTC.
 iso_from_epoch() {
-  "${EPOCH_AS_ISO[@]}" "$1" +%Y-%m-%dT%H:%M:%S.000Z 2>/dev/null \
-    || printf '1970-01-01T00:00:00.000Z'
+  if [ "$MIMIR_STAT_STYLE" = bsd ]; then
+    date -u -r "$1" +%Y-%m-%dT%H:%M:%S.000Z 2>/dev/null || printf '1970-01-01T00:00:00.000Z'
+  else
+    date -u -d "@$1" +%Y-%m-%dT%H:%M:%S.000Z 2>/dev/null || printf '1970-01-01T00:00:00.000Z'
+  fi
 }
 
-# `touch -t` wants CCYYMMDDhhmm.ss, and wants it in UTC. POSIX, so one form
-# serves both platforms once the epoch-to-fields step is branched.
 epoch_as_touch() {
-  TZ=UTC "${EPOCH_AS_ISO[@]}" "$1" +%Y%m%d%H%M.%S 2>/dev/null \
-    || printf '197001010000.00'
+  if [ "$MIMIR_STAT_STYLE" = bsd ]; then
+    TZ=UTC date -u -r "$1" +%Y%m%d%H%M.%S 2>/dev/null || printf '197001010000.00'
+  else
+    TZ=UTC date -u -d "@$1" +%Y%m%d%H%M.%S 2>/dev/null || printf '197001010000.00'
+  fi
 }
 
 # `exportedAt` would otherwise make every run produce a different file, which
