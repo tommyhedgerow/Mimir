@@ -189,10 +189,35 @@ mirror and its pull requests are disabled.
 1. Sign in at <https://community.obsidian.md> with an Obsidian account.
 2. Connect the GitHub account that owns the repository. This is required, and it
    is a read-only check of public profile data used to verify ownership.
-3. **New plugin** — give the repository URL and the owner. **New theme** — the
-   same, plus a screenshot path (this repository's is `screenshot.png`) and the
-   supported modes (`Dark`).
+3. Add each of the four entries. What goes in the form:
+
+   | | Repository | Kind | Extra fields |
+   | --- | --- | --- | --- |
+   | 1 | `tommyhedgerow/obsidian-mimir-theme` | Theme | screenshot path `screenshot.png`; supported modes **Dark and Light** |
+   | 2 | `tommyhedgerow/obsidian-mimir-controls` | Plugin | — |
+   | 3 | `tommyhedgerow/obsidian-mimir-splash` | Plugin | — |
+   | 4 | `tommyhedgerow/obsidian-lesson-publisher` | Plugin | — |
+
+   Owner is `tommyhedgerow` for all four. The name, author and description come
+   from each `manifest.json`, so there is nothing to type for those — but the
+   form does ask for a **payment type**, and all four are **Free**.
 4. Agree to the developer policies and to continued maintenance.
+
+**Order matters a little.** Do the theme first if you want an easy rehearsal:
+it has no `main.js`, so nothing can fail the build-verification check, and it
+tells you the dashboard works before you spend a submission on a plugin.
+
+**The theme's screenshot is `screenshot.png`, at the repository root, 512×288.**
+A theme's manifest may not carry a `screenshot` key — the directory reads it from
+this form field instead, and an unknown key in the manifest is an error.
+
+**After each submission, read the scorecard.** It appears in the same dashboard
+within a few minutes and is grouped into Manifest, Releases, Source code and
+Build verification. Errors block; warnings do not, and a warning worth
+understanding is the better outcome. `lesson-publisher` will report **direct
+filesystem access**, which is correct and disclosed in its README: writing into a
+second vault is the whole feature. `mimir-splash` reads four media files from the
+vault and makes no network calls.
 
 Review is automated and runs on submission, and again **on every version after
 that**. Results normally appear within minutes; a passing entry is searchable in
