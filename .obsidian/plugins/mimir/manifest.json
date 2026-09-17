@@ -1,7 +1,7 @@
 {
   "id": "mimir-controls",
   "name": "Mimir Controls",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "minAppVersion": "1.5.0",
   "description": "Step the reading size and switch between light and dark from the note header, without opening settings.",
   "author": "tommyhedgerow",

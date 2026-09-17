@@ -181,6 +181,7 @@ The lesson file's shape — every field optional, and only ever the *current* qu
 
 ```json
 {
+  "lang": "en",
   "updated": "2026-09-17T14:20:00Z",
   "quiz": {
     "question": "Which of these is an unconditional truth about Mediterranean-climate plants?",
@@ -196,6 +197,7 @@ The lesson file's shape — every field optional, and only ever the *current* qu
 }
 ```
 
+- **`lang`** — the language of the pane's own chrome: its tab labels, buttons and placeholders, not the lesson's content. A BCP 47 tag. Omit it and the pane falls back to English, so nothing breaks if you leave it out; the Chinese preset always writes `"zh-CN"`. Only the pane's furniture changes — what you write into the vault is in whatever language you are teaching in, either way.
 - **`quiz`** — the question to publish, exactly as you are asking it with `ask_user_question`. Options are bare claims, by the rules above. Publish it **in the same turn you ask**, so the pane is already carrying it when the composer card appears. Replace it with the next question when the next one comes; the pane drops a question as soon as it is no longer the one in the file.
 - **`visuals`** — filenames in `Learn/Viz/` that this lesson turns on, in the order they should meet them. The pane renders the SVGs at full width. Name a file here whenever you have had a diagram made; the reading column cannot show an SVG embed at all, so a drawing you do not list is a drawing they will not see.
 - **`spine`** — the dependency map's nodes as a glanceable list, `state` one of `held`, `learning`, `fragile`, `planned`. Keep it to the nodes the current session runs on, and update it as nodes land: it is the one place they can see where they are without leaving the lesson.

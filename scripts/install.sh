@@ -5,6 +5,7 @@
 #   ./scripts/install.sh              install, or update an existing install
 #   ./scripts/install.sh --dry-run    say what would happen, change nothing
 #   ./scripts/install.sh --no-pane    install the preset only, skip the Lesson pane
+#   ./scripts/install.sh --lang zh-CN install the Simplified Chinese preset
 #
 # What this does, and why each part is needed:
 #
@@ -26,20 +27,35 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PRESET_SRC="$HERE/preset"
-PRESET_ID="mimir-tutor"
 PROFILE="${MIMIR_PROFILE:-web}"
 
 DRY_RUN=0
 WITH_PANE=1
-for arg in "$@"; do
-  case "$arg" in
-    --dry-run) DRY_RUN=1 ;;
-    --no-pane) WITH_PANE=0 ;;
-    -h|--help) sed -n '2,26p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
-    *) echo "install: unknown option '$arg' (try --help)" >&2; exit 2 ;;
+LANG_CHOICE="en"
+
+# A `while` over `$#`, not a `for` over `"$@"`: `--lang` takes a value, and a
+# `for` loop iterates a list fixed when it starts, so `shift` inside it would
+# leave the value to be visited again as a stray positional argument.
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --dry-run) DRY_RUN=1; shift ;;
+    --no-pane) WITH_PANE=0; shift ;;
+    --lang) LANG_CHOICE="${2:-}"; shift 2 ;;
+    --lang=*) LANG_CHOICE="${1#--lang=}"; shift ;;
+    -h|--help) sed -n '2,25p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) echo "install: unknown option '$1' (try --help)" >&2; exit 2 ;;
   esac
 done
+
+# Two presets ship: the same teacher, in English and in Simplified Chinese. They
+# are separate presets rather than one, because the language of instruction is a
+# property of the persona, and a session cannot be half in each.
+case "$LANG_CHOICE" in
+  en|english)     PRESET_SRC="$HERE/preset";    PRESET_ID="mimir-tutor";    PRESET_LABEL="English" ;;
+  zh|zh-CN|zh-Hans|chinese)
+                  PRESET_SRC="$HERE/preset-zh"; PRESET_ID="mimir-tutor-zh"; PRESET_LABEL="简体中文" ;;
+  *) echo "install: unknown language '$LANG_CHOICE' (use --lang en or --lang zh-CN)" >&2; exit 2 ;;
+esac
 
 say() { printf '%s\n' "$*"; }
 run() { if [ "$DRY_RUN" -eq 1 ]; then say "  would run: $*"; else "$@"; fi }
@@ -80,6 +96,7 @@ say "Mimir Tutor installer"
 say "  repo        $HERE"
 say "  dsh home    $DSH_HOME_RESOLVED"
 say "  preset      $PRESET_DEST"
+say "  language    $PRESET_LABEL"
 say "  profile     $PROFILE"
 [ "$DRY_RUN" -eq 1 ] && say "  (dry run — nothing will be written)"
 say ""
@@ -97,6 +114,19 @@ run mkdir -p "$PRESET_DEST"
 # `/.` copies the contents; the destination itself is created above so that a
 # pre-existing empty directory is filled rather than nested inside.
 run cp -R "$PRESET_SRC/." "$PRESET_DEST/"
+
+# The Lesson pane travels with whichever preset is installed, and only one copy of
+# it is ever authored. `preset/lesson-pane` is the copy; the Chinese preset stages
+# it in rather than keeping a second one, because two committed copies of a
+# generated bundle is exactly the shape that drifts.
+if [ ! -d "$PRESET_DEST/lesson-pane" ]; then
+  if [ -d "$HERE/preset/lesson-pane" ]; then
+    say "   staging the Lesson pane in from preset/lesson-pane"
+    run cp -R "$HERE/preset/lesson-pane" "$PRESET_DEST/lesson-pane"
+  else
+    echo "install: no preset/lesson-pane to stage in — the pane will not mount." >&2
+  fi
+fi
 
 if [ "$DRY_RUN" -eq 0 ]; then
   COUNT="$(find "$PRESET_DEST/skills" -name SKILL.md 2>/dev/null | wc -l | tr -d ' ')"

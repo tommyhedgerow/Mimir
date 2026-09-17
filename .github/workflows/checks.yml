@@ -30,6 +30,13 @@ jobs:
       - name: The Lesson pane bundle is current
         run: node Tools/build-lesson-pane.mjs --check
 
+      - name: The two languages still agree
+        run: |
+          # Every glossary pairing exists, every Chinese wikilink resolves, and
+          # the two presets carry the same skills and the same composition rows.
+          # A second language rots quietly, so it gets a check like everything else.
+          node Tools/check-bilingual.mjs
+
       - name: The plugin copies match the lock
         run: |
           # The three plugins are vendored into .obsidian/plugins so a fresh

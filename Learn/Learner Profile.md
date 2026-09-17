@@ -8,6 +8,8 @@ updated:
 
 # Learner profile
 
+> **English** · [简体中文](学习者档案.md)
+
 > The teacher's running picture of me: what I hold, where my edges are, what has misled me, and how I like to be taught. Updated at the end of every session. Newest evidence wins over old.
 >
 > This starts empty and is filled only from sessions. Nothing is recorded here in advance of evidence, and nothing is inferred from what people like me are supposed to know.

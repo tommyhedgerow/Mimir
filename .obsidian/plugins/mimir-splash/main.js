@@ -34,7 +34,97 @@
  */
 
 const obsidian = require('obsidian')
-const { Plugin } = obsidian
+const { Plugin, getLanguage } = obsidian
+
+/* The words, in a module of their own so that both languages sit in one place. The
+ * require is written on one line and in one shape because `build.mjs` looks for exactly
+ * this line and inlines the module in its place — the release ships a single file, so
+ * there is nowhere beside `main.js` for a sibling module to live. */
+const { tableFor } = (function () {
+  const module = { exports: {} }
+'use strict'
+/*
+ * The words this plugin says, in the two languages it says them in.
+ *
+ * WHY BOTH TABLES ARE IN ONE FILE. The rules the community directory lints with know a
+ * locale file by its name — `en.js`, `en.json`, `en/**` — and expect one file per
+ * language. That layout is for a plugin with a book of strings, where loading the wrong
+ * two is waste. This plugin has four, and the thing that keeps two languages in step is
+ * reading them side by side on one screen; two files drift apart, and a drifted
+ * translation is worse than none.
+ *
+ * WHAT THE LOCALE RULES CAN AND CANNOT SEE. `obsidianmd/ui/sentence-case-locale-module`
+ * reads a table only when the file is named `en*` AND the table is exported —
+ * `export default { … }` or `export const en = { … }`. This plugin is CommonJS on
+ * purpose, with no bundler and no build step that could change that, so the rule has
+ * nothing to read here whatever this file were called. The English below is therefore
+ * written to that rule's standard by hand, and the test harness holds the two tables
+ * against each other so that neither can lose a key quietly.
+ *
+ * WHICH LANGUAGE, AND WHICH CHINESE. The tag comes from Obsidian's own `getLanguage()` —
+ * the interface language chosen in the app — and from nowhere else. Not
+ * `navigator.language`, which follows the machine rather than the app, and not a setting
+ * of this plugin's: the interface language is Obsidian's decision, and a second place to
+ * set it is a second place to be wrong. A Chinese tag selects the table below only when
+ * it is not Traditional: Obsidian treats Traditional as a language in its own right, and
+ * a reader who chose it is better served by English than by a script they did not ask
+ * for.
+ */
+
+/**
+ * English, and the table that every tag but Simplified Chinese falls back to.
+ */
+const EN = {
+  commandPlay: 'Play the startup animation',
+  commandToggleOpen: 'Play the startup animation when the vault opens',
+  noticeOn: 'The startup animation plays when the vault opens.',
+  noticeOff: 'The startup animation is off. Run the command again to bring it back.',
+}
+
+/**
+ * Simplified Chinese.
+ *
+ * 库 is Obsidian's own word for a vault, and 启动动画 is what the piece is: the animation
+ * that plays as the app starts. Both command names say what the press does and neither
+ * says the plugin's name — the command palette already shows which plugin a command
+ * belongs to.
+ */
+const ZH = {
+  commandPlay: '播放启动动画',
+  commandToggleOpen: '打开库时播放启动动画',
+  noticeOn: '打开库时会播放启动动画。',
+  noticeOff: '启动动画已关闭。再次运行该命令即可重新打开。',
+}
+
+/**
+ * The subtags that mean Traditional Chinese: the script where it is written, and the
+ * regions that write it.
+ */
+const TRADITIONAL = ['hant', 'tw', 'hk', 'mo']
+
+/**
+ * The table for one interface-language tag, English for anything unmatched.
+ *
+ * The match is on the PRIMARY subtag, so `zh`, `zh-CN`, `zh-Hans` and `zh-SG` all land on
+ * the same table; the rest of the tag is read only to keep Traditional out of it. Case is
+ * not trusted and the separator is not assumed — Obsidian hands back tags like `zh-CN`,
+ * but `ZH_cn` means the same thing and should not fall to English over a spelling.
+ *
+ * @param tag - a BCP 47 tag, or nothing at all on an app older than `getLanguage()`.
+ */
+function tableFor (tag) {
+  const parts = String(tag == null ? '' : tag).toLowerCase().split(/[-_]/)
+  if (parts[0] !== 'zh') return EN
+  if (parts.some((part) => TRADITIONAL.includes(part))) return EN
+  return ZH
+}
+
+/* `TABLES` is here for the test harness, which holds the two side by side and fails if
+ * one has a key the other has not: a string only one language carries prints `undefined`
+ * at the user, and nothing else in the build would notice. */
+module.exports = { TABLES: { en: EN, zh: ZH }, tableFor }
+  return module.exports
+})()
 
 /** The one library. Both surfaces read from here; nothing is copied into this folder. */
 const DIR = 'Tools/splash'
@@ -105,18 +195,28 @@ class MimirSplash extends Plugin {
     this.urls = []
     this.timers = []
 
+    /* Which table this load speaks, chosen once and kept for the two notices the toggle
+     * writes. The interface language cannot change while the app is running, so there is
+     * nothing later to re-read.
+     *
+     * `getLanguage()` arrived in Obsidian 1.8.7 and this plugin's declared floor is
+     * lower, so an app without it is read rather than called: a missing function is not a
+     * language, and the table that comes back for `undefined` is English — which is what
+     * this plugin said before it said anything in Chinese. */
+    this.strings = tableFor(typeof getLanguage === 'function' ? getLanguage() : undefined)
+
     this.settings = Object.assign({ playOnOpen: true }, await this.loadData())
 
     // The commands are the whole interface. The vault's own rule is that a control earns
     // its place in the bar by being switched often, and this one is switched once.
     this.addCommand({
       id: 'play',
-      name: 'Play the startup animation',
+      name: this.strings.commandPlay,
       callback: () => { void this.play() }
     })
     this.addCommand({
       id: 'toggle-open',
-      name: 'Play the startup animation when the vault opens',
+      name: this.strings.commandToggleOpen,
       callback: () => { void this.toggleOpen() }
     })
 
@@ -139,9 +239,7 @@ class MimirSplash extends Plugin {
   async toggleOpen() {
     this.settings.playOnOpen = !this.settings.playOnOpen
     await this.saveData(this.settings)
-    new obsidian.Notice(this.settings.playOnOpen
-      ? 'The startup animation plays when the vault opens.'
-      : 'The startup animation is off. Run the command again to bring it back.')
+    new obsidian.Notice(this.settings.playOnOpen ? this.strings.noticeOn : this.strings.noticeOff)
   }
 
   /**

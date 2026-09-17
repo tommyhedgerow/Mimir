@@ -439,7 +439,9 @@ function makePlatform(options) {
         sessionId: body.sessionId,
         vault: 'Lesson',
         hasLesson: body.sessionId === platform.current && options.hasLesson === true,
-        lesson: options.hasLesson === true ? LESSON : null,
+        // The lesson is the caller's when the caller names one: the language checks below
+        // need the same pane reading files that differ only in their `lang`.
+        lesson: options.hasLesson === true ? (options.lesson ?? LESSON) : null,
         answers: [],
         notes: '',
         visuals: [{ name: 'mediterranean-map.svg' }],
@@ -854,6 +856,45 @@ const stylesCss = (() => {
     .join('\n')
 })()
 const sourceText = fs.readFileSync(sourcePath, 'utf8')
+
+/* ── the string tables ──────────────────────────────────────────────────────────
+ *
+ * WHAT THE FALLBACK CHAIN PROMISES IS "NEVER A BLANK". A label the pane asks for and cannot
+ * find falls through to English; one that neither table carries renders as its own key. Only
+ * two things can produce either, and both are invisible in a rendered pane until the very
+ * language that needed the row is on screen: a key the code misspells, and a row one table
+ * has and the other does not. So the rows are read out of the source by their shape — and
+ * the shape is the one the file writes, two quoted keys per row at four spaces, each table
+ * opening at two. If the table is ever reformatted, this is the check that has to be
+ * rewritten with it, which is the honest cost of asking the question at all.
+ */
+function tableKeys(marker) {
+  const lines = sourceText.split('\n')
+  const start = lines.findIndex((line) => line.trim() === marker)
+  if (start < 0) return []
+  const keys = []
+  for (let index = start + 1; index < lines.length; index += 1) {
+    if (lines[index] === '  },') break
+    const found = /^ {4}'([^']+)':/.exec(lines[index])
+    if (found !== null) keys.push(found[1])
+  }
+  return keys
+}
+const rowsAsked = [...new Set([...sourceText.matchAll(/\bt\('([^']+)'/g)].map((match) => match[1]))]
+const rowsEn = tableKeys('en: {')
+const rowsZh = tableKeys("'zh-CN': {")
+check('both string tables were found, so the checks below are about something',
+  rowsEn.length > 30 && rowsZh.length > 30,
+  `en ${rowsEn.length} rows, zh-CN ${rowsZh.length} rows`)
+check('every label the pane asks for has a row in both tables, so nothing falls through to a key',
+  rowsAsked.length > 30 && rowsAsked.every((key) => rowsEn.includes(key) && rowsZh.includes(key)),
+  `asked for ${rowsAsked.length}; missing: ${JSON.stringify(rowsAsked.filter((key) => !rowsEn.includes(key) || !rowsZh.includes(key)))}`)
+check('the two tables carry the same rows, so neither can drift from the other',
+  rowsEn.length === rowsZh.length && rowsEn.every((key) => rowsZh.includes(key)),
+  `en only: ${JSON.stringify(rowsEn.filter((key) => !rowsZh.includes(key)))} / zh-CN only: ${JSON.stringify(rowsZh.filter((key) => !rowsEn.includes(key)))}`)
+check('and no row is left in a table that no label asks for',
+  rowsEn.every((key) => rowsAsked.includes(key)),
+  `never asked for: ${JSON.stringify(rowsEn.filter((key) => !rowsAsked.includes(key)))}`)
 
 check('the bundle registers under its package name', probe.registration?.id === 'dsh-mimir-lesson-pane', String(probe.registration?.id))
 check('the factory returns a plugin with a callable apply', typeof probe.moduleExports?.apply === 'function')
@@ -1330,6 +1371,157 @@ check('the report says what was missing', reports.some((call) => String(call.bod
   JSON.stringify(reports.map((call) => call.body.error)))
 check('the console also carries it, for whoever is looking at devtools',
   seatless.calls.consoleErrors.some((line) => line.includes('no slots service')), JSON.stringify(seatless.calls.consoleErrors))
+
+/* ── the pane's own language ────────────────────────────────────────────────────
+ *
+ * THE PANE DOES NOT DETECT A LANGUAGE. It renders a file the teacher writes, and the teacher
+ * is the one thing that knows which language the session is in, so the file carries an
+ * optional `lang` and the pane's own chrome follows it. What has to hold is the whole chain,
+ * and every rung here is a rendered pane rather than a decision read out of the source: a
+ * file that names Simplified gets Chinese, a file that names Traditional or names nothing
+ * the pane can serve gets English, and every label is filled either way.
+ */
+
+/** One applied pane, bound to its own session feed: `{ platform, bundle, seat }`. */
+async function applyLesson(lesson) {
+  const platform = makePlatform({
+    declared: declaredList, present: SEATS, hasLesson: true, entries: ENTRIES, hasMore: false, lesson,
+  })
+  const bundle = loadBundle(platform)
+  bundle.moduleExports.apply(platform.ctx)
+  await flush()
+  for (const timer of platform.calls.timers) timer.fn()
+  await flush(20)
+  bundle.moduleExports.bindSessionFeed(platform.ctx.get('sessions'))
+  return { platform, bundle, seat: platform.registered.get('sidebar.right.pane.tab') }
+}
+
+/** Draw the docked pane for one lesson and hand back its markup, in its own bundle. */
+async function drawLesson(lesson) {
+  const { seat } = await applyLesson(lesson)
+  return renderToStaticMarkup(React.createElement(seat))
+}
+
+if (renderToStaticMarkup === null) {
+  notes.push('react-dom/server was not loadable, so the language checks were skipped')
+} else {
+  const chinese = await drawLesson({ ...LESSON, lang: 'zh-CN' })
+  check('a lesson written in Simplified Chinese renders the pane in Chinese',
+    chinese.includes('lang="zh-CN"')
+      && chinese.includes('>对话<') && chinese.includes('>测验<') && chinese.includes('>插图<')
+      && chinese.includes('>主干<') && chinese.includes('>笔记<'),
+    'the tab strip is not in Chinese')
+  check('and the question is asked in Chinese down to its controls and its placeholder',
+    chinese.includes('>题目<')
+      && chinese.includes('或者用自己的话')
+      && chinese.includes('用你自己的说法写，不必照选项的口气。')
+      && chinese.includes('暂时放一放')
+      && chinese.includes('>作答<'),
+    'part of the question is still English')
+  check('with no English label left behind anywhere the learner reads',
+    !chinese.includes('Or in your own words')
+      && !chinese.includes('>Quiz<') && !chinese.includes('>Visuals<') && !chinese.includes('>Notes<')
+      && !chinese.includes('Open in a window')
+      && !chinese.includes('Set aside for now'),
+    'an English label survived the switch')
+  check('and the column declares the language it is written in, so a screen reader is told too',
+    chinese.includes('lang="zh-CN"'), 'the pane does not carry a lang attribute')
+  /* The docked tabs are a narrow strip, and the reason the Chinese tab labels were chosen
+     short: two or three characters each. Read out of the rendered strip rather than the
+     table, because that is where the width actually has to hold. */
+  const tabLabels = [...chinese.matchAll(/<span class="mm-tab-mark">[\s\S]*?<\/span><span>([^<]*)<\/span>/g)]
+    .map((match) => match[1])
+  check('every label in the docked tab strip stays short enough for a narrow column',
+    tabLabels.length === 5 && tabLabels.every((label) => label.length > 0 && label.length <= 3 && /[\u4e00-\u9fff]/.test(label)),
+    JSON.stringify(tabLabels))
+
+  const traditional = await drawLesson({ ...LESSON, lang: 'zh-TW' })
+  check('a lesson written in Traditional Chinese is given English rather than Simplified',
+    traditional.includes('lang="en"')
+      && traditional.includes('>Quiz<')
+      && traditional.includes('Or in your own words')
+      && !traditional.includes('>测验<'),
+    'Traditional was served the Simplified table')
+  check('and a Traditional label is nowhere in that pane',
+    !/[\u4e00-\u9fff]/.test(traditional), 'a Chinese label reached a Traditional reader')
+
+  const older = await drawLesson(LESSON)
+  check('a session file written before `lang` existed renders exactly as it did',
+    older.includes('lang="en"')
+      && older.includes('>Quiz<')
+      && older.includes('Open in a window')
+      && older.includes('Or in your own words'),
+    'an older session file lost its English')
+
+  const unknown = await drawLesson({ ...LESSON, lang: 'fr' })
+  check('a language the pane cannot serve falls back to English, not to a blank',
+    unknown.includes('lang="en"') && unknown.includes('Or in your own words'),
+    'an unserved tag did not fall back')
+
+  /* One line per tag, because the subtags are where the decision is actually made: what
+     selects the Simplified table, and what deliberately does not. */
+  const tagCases = [
+    ['zh', 'zh-CN'], ['zh-CN', 'zh-CN'], ['ZH-CN', 'zh-CN'], ['zh-Hans', 'zh-CN'], ['zh-SG', 'zh-CN'], ['zh_CN', 'zh-CN'],
+    ['zh-TW', 'en'], ['zh-HK', 'en'], ['zh-Hant', 'en'], ['zh-Hant-HK', 'en'],
+    ['en', 'en'], ['fr', 'en'], ['', 'en'], [null, 'en'],
+  ]
+  for (const [tag, expected] of tagCases) {
+    const markup = await drawLesson({ ...LESSON, lang: tag })
+    check(`lang ${JSON.stringify(tag)} is served the ${expected} table`,
+      markup.includes('lang="' + expected + '"'),
+      `the pane did not declare lang="${expected}"`)
+  }
+}
+
+/* ── the docked chat ────────────────────────────────────────────────────────────
+ *
+ * THE FIRST TAB OF THE DOCKED PANE OPENED AN EMPTY COLUMN. The strip has always offered Chat
+ * whenever the pane is docked — the note above `tabRows` in the pane says why: the window
+ * splits the dialogue into a column of its own, and docked there is no such column, so the
+ * chat is exactly what that tab is for. The body drew quiz, viz, spine and notes and nothing
+ * at all for chat, so pressing the first tab emptied the column.
+ *
+ * DRAWING IT IN THE TAB BODY WOULD HAVE BEEN THE WRONG FIX, and these checks hold both halves
+ * of the right one. `ChatView` owns its scroller and its pinned rail, and both only work where
+ * it is a flex child of a height-constrained column; wrapped in `mm-body` there would be two
+ * scrollbars, its rail would scroll away with the first message, and the pin to the newest
+ * message would stop working — the element it scrolls would no longer be the element that
+ * scrolls. So the dialogue is mounted beside the tab strip, and both facts are asserted here:
+ * that it is drawn, and that it is the column rather than prose inside the tab body.
+ */
+if (renderToStaticMarkup === null) {
+  notes.push('react-dom/server was not loadable, so the docked-chat checks were skipped')
+} else {
+  const docked = await applyLesson(LESSON)
+  const chatTab = hostByLabel(walkHosts(React.createElement(docked.seat)), 'Chat', 'button')
+  check('the docked pane offers the dialogue on a tab of its own, and the tab can be pressed',
+    chatTab !== null && typeof chatTab.onClick === 'function', 'no Chat tab in the docked strip')
+  if (chatTab !== null) chatTab.onClick()
+  const dockedHtml = renderToStaticMarkup(React.createElement(docked.seat))
+  check('and opening it draws the dialogue rather than an empty column',
+    dockedHtml.includes('Ask me something about the map.')
+      && dockedHtml.includes('class="mm-pane-chat"')
+      && dockedHtml.includes('class="mm-chat"')
+      && dockedHtml.includes('Working: hidden'),
+    'the docked Chat tab drew no dialogue')
+  check('and the dialogue is the column itself, not prose inside the tab body\'s scroller',
+    !dockedHtml.includes('class="mm-body"'),
+    'the chat was wrapped in the tab body, where its scroller and its pinned rail stop working')
+  /* Its companion, and the reason the two are checked together: the window is the one chrome
+     that must NOT grow a Chat tab, because there the dialogue already stands beside the
+     lesson in a column of its own. */
+  const windowed = await applyLesson(LESSON)
+  const windowElement = windowed.platform.roots[windowed.platform.roots.length - 1]?.element
+  const windowHtml = windowElement === undefined
+    ? null
+    : renderToStaticMarkup(React.createElement(windowElement.type, windowElement.props))
+  check('while the window draws the dialogue as a column of its own and offers no Chat tab',
+    typeof windowHtml === 'string'
+      && windowHtml.includes('class="mm-pane-chat"')
+      && !windowHtml.includes('>Chat</span>')
+      && windowHtml.includes('>Quiz</span>'),
+    'the two chromes collapsed into each other')
+}
 
 /* ── the controls, pressed for real ───────────────────────────────────────────── */
 

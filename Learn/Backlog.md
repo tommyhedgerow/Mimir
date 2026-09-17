@@ -6,6 +6,8 @@ tags:
 
 # Backlog
 
+> **English** · [简体中文](学习清单.md)
+
 > What I want to learn, and what the sessions have added. The teacher reads this at the start of a session and proposes what to do next; I decide.
 
 ## Wanted

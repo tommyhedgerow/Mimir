@@ -90,10 +90,25 @@ vendored file by hand, that check fails, and it is right to.
 ```sh
 node Tools/check-tokens.mjs             # one palette, five files
 node Tools/vault-map.mjs                # the spines validate
+node Tools/check-bilingual.mjs          # the two languages still agree
 node Tools/build-lesson-pane.mjs --check # all three host copies agree
-./scripts/pack-preset.sh                # rebuild dist/mimir-tutor.dshpreset
-./scripts/pack-preset.sh --check
+./scripts/pack-preset.sh                # rebuild both .dshpreset files
+./scripts/pack-preset.sh --check        # and prove they are current
 ```
+
+`check-bilingual.mjs` is the one that matters most after any edit to either
+language. It reads the pairing table out of `docs/zh-CN-glossary.md`, so the
+glossary is not just documentation — it is the list of what has to exist on both
+sides. Add a document to one language and the check fails until its twin exists.
+It also resolves every Chinese wikilink, verifies that each `![[X.base#View]]`
+names a view that base actually defines, and compares the two presets' skills and
+composition rows. That last pair is what catches a translation that quietly
+dropped a specialist or a tool permission.
+
+The Chinese preset needs no separate pane build: `preset-zh/` holds no
+`lesson-pane/`, and both the installer and the packer stage the shared one in
+from `preset/lesson-pane`. Two committed copies of a generated bundle is the
+shape that drifts, so there is only ever one.
 
 Then tag. The vault's release carries the `.dshpreset` and its SHA-256, which is
 the teacher as a single importable file.
@@ -124,6 +139,17 @@ BCP 47 `contentLanguage`, and localisations for `zh, en, ja, ru, es, pt`. Its ow
 publishing skill is at
 `https://dshdesktop.com/preset/skills/preset-square/SKILL.md`, and that document
 is the authority; this paragraph is a pointer to it, not a substitute.
+
+**Two presets are published, as two listings.** `mimir-tutor` has
+`contentLanguage: en`; `mimir-tutor-zh` has `contentLanguage: zh-CN`. They are
+separate listings rather than one package with two localisations, because the
+difference is not the *listing* language — it is the language the teacher
+teaches in, which lives in the persona and cannot be switched per session. Each
+still carries all six localisations of its own listing metadata.
+
+`scripts/pack-preset.sh` builds and validates both. With no argument it does
+both and reports each separately; `--preset mimir-tutor-zh` does one, and
+`--check` verifies without writing.
 
 **The plugin catalog** — [`awesome-dsh-plugin`](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) —
 is for *plugins*, and Mimir is a preset, so the preset does not go there. The
@@ -187,3 +213,19 @@ entire job — which is why its README discloses it and why it is desktop-only.
   letter, a full stop at the end, and no character outside
   `A-Za-z0-9` plus space and `.,!?'"-`. No emoji, no parentheses, no colons.
 - **The `id` may not contain `obsidian` or `plugin`**, in any position.
+
+## Provenance of the artwork
+
+Everything in `assets/` is generated, not drawn. A Python renderer builds the
+pixel art from the same cyan and magenta ramps the theme uses, over an 8×8 Bayer
+dither and a fixed 57-colour table; the marks and rules are the same geometry at
+other sizes. Nothing is traced, sampled or downloaded, and all of it is MIT like
+the rest of the repository.
+
+**One illustration the project used while it was private is deliberately not
+here.** It was a supplied early-20th-century-looking printed plate, used as the
+source for a title card while the vault was the author's own. Its provenance and
+licence were never established, so it was left out rather than shipped with a
+question mark over it. If it is ever wanted in a release, the artist and the
+publication have to be identified first, and that is a job for a person, not a
+render.

@@ -125,6 +125,245 @@ window.__ModuleLoader__.load({
 		 */
 		const inject = ['timer', 'slots', 'sessions', 'sidebarRight', 'sidebarRightTabs']
 
+		/* ── the pane's words, in the two languages it speaks ───────────────────────────
+		 *
+		 * THE PANE DOES NOT DETECT THE LANGUAGE, AND THAT IS THE DESIGN. It renders a file the
+		 * teacher writes, and the teacher is the one thing in the room that knows which language
+		 * the session is in. A browser preference, a locale or the app's own setting would each be
+		 * a guess about the person reading; the lesson file is a fact about the lesson. So the file
+		 * carries an optional `lang` — a BCP 47 tag — and the pane selects its table from that and
+		 * from nothing else.
+		 *
+		 * WHY THE TABLES LIVE IN THIS FILE. The wrapper that turns this module into the page's
+		 * CommonJS factory satisfies exactly three specifiers — react, react/jsx-runtime and
+		 * react-dom/client — and throws on anything else, so a `strings.mjs` next door could not be
+		 * imported without teaching that wrapper to link modules. A linker for two tables is the
+		 * worse trade: this way the tables cannot drift from the code that reads them, and the
+		 * build stays a wrapper.
+		 *
+		 * `en` IS THE FLOOR, NOT A PEER. {@link t} falls through the selected table to `en` and then
+		 * to the key itself, so a row missing from `zh-CN` reads as English rather than as a blank,
+		 * and a row missing from both reads as its own key — loud enough to be found, and never
+		 * empty. The two tables carry the same keys on purpose, and the test says so.
+		 *
+		 * ONE WORD, ONE KEY. Where the same word labels two places — a tab strip and the card
+		 * eyebrow beneath it, a chip and the strip it stands in for — it is one row, because two
+		 * rows saying 'Quiz' are two rows that can drift apart.
+		 *
+		 * THE ENGLISH COLUMN IS THE STRINGS THIS PANE ALREADY SHIPPED, CHARACTER FOR CHARACTER. A
+		 * session file written before `lang` existed must render exactly as it did, so when a label
+		 * here is edited the English value is the one that has to stay true to the screen.
+		 *
+		 * WHAT IS NOT IN HERE: HTTP methods, `data-*` values, `mm-` identifiers, dayjs format
+		 * strings, and everything written to the console. Those are the machine reading, not the
+		 * learner, and translating one of them is a bug that looks like progress.
+		 */
+		const STRINGS = {
+		  en: {
+		    // ── the chat rail: three controls, and the count beside them ──────────────
+		    'rail.work.shownAria': 'Working: shown — press to hide',
+		    'rail.work.hiddenAria': 'Working: hidden — press to show',
+		    'rail.work.shownTitle': 'The reasoning and the tools are shown. Press to fold them away.',
+		    'rail.work.hiddenTitle': 'The reasoning and the tools behind each reply are folded away. Press to show them.',
+		    'rail.size.aria': 'Reading size: {size} of {sizes} — press for the next',
+		    'rail.size.title': 'Reading size: {size} ({n} of {total}). Everything read moves together.',
+		    'rail.theme.toLight': 'Switch to the light',
+		    'rail.theme.toDark': 'Switch to the dark',
+		    'rail.theme.light': 'Light',
+		    'rail.theme.dark': 'Dark',
+		    'rail.hint.writing': 'the teacher is writing',
+		    'rail.hint.nothing': 'nothing said yet',
+		    'rail.hint.count': '{count} messages',
+		    // ── the dialogue ─────────────────────────────────────────────────────────
+		    'chat.earlier': 'Load earlier turns',
+		    'chat.empty': 'The lesson is read here. As soon as the teacher speaks, the dialogue appears in this column — questions and replies only, with the working folded away until you ask for it.',
+		    'chat.who.you': 'you',
+		    'chat.who.teacher': 'teacher',
+		    'chat.who.log': 'log',
+		    'chat.work.row': 'the working — {tools}',
+		    'chat.work.tools': 'Tools in this step',
+		    // ── the tab strip: a handful of words in a narrow docked column ───────────
+		    'tab.chat': 'Chat',
+		    'tab.quiz': 'Quiz',
+		    'tab.viz': 'Visuals',
+		    'tab.spine': 'Spine',
+		    'tab.notes': 'Notes',
+		    // ── the question ─────────────────────────────────────────────────────────
+		    'question.label': 'Question',
+		    'quiz.confirm.answered': 'Answered',
+		    'quiz.confirm.notSent': 'Not sent',
+		    'quiz.confirm.sentBody': 'Written down and sent to the chat. The teacher has it.',
+		    'quiz.confirm.failedBody': 'It could not be written down or sent. Try again below.',
+		    'quiz.again': 'Answer again',
+		    'quiz.setAside': 'Set aside',
+		    'quiz.empty.answered': 'Nothing is waiting for an answer. The next question appears here the moment it is set.',
+		    'quiz.empty.none': 'No question is set for this session yet. When one is set it appears here, and the reading stays at full height.',
+		    'quiz.custom.label': 'Or in your own words',
+		    'quiz.custom.placeholder': 'Say it the way you would say it, not the way the options do.',
+		    'quiz.send.sending': 'Sending',
+		    'quiz.send.answer': 'Answer',
+		    'quiz.setAsideNow': 'Set aside for now',
+		    'quiz.sending': 'Writing it down and sending it.',
+		    'quiz.past': 'Answered and set aside earlier',
+		    // ── the drawings ─────────────────────────────────────────────────────────
+		    'viz.empty': 'Nothing is drawn in this vault yet. Drawings open here at full width, while the reading stays where it is.',
+		    'viz.loading': 'Opening the drawing.',
+		    'viz.failed': 'This drawing could not be opened: {reason}',
+		    // ── the spine ────────────────────────────────────────────────────────────
+		    'spine.empty': 'No spine has been published for this session yet. It appears here as soon as the plan is written down.',
+		    'spine.here': 'Where this lesson rests',
+		    // ── the learner's own page ───────────────────────────────────────────────
+		    'notes.eyebrow': 'Your page',
+		    'notes.hint': 'Write before you answer. It is kept with the session, and the teacher can read it.',
+		    'notes.placeholder': 'What do you already accept that this rests on?',
+		    // ── the window's chrome ──────────────────────────────────────────────────
+		    'window.open': 'Open in a window',
+		    'window.openTitle': 'Open the lesson in a window that can go fullscreen',
+		    'window.openButton': 'Open the lesson window',
+		    'window.fill': 'Fill the screen',
+		    'window.leave': 'Leave the full screen',
+		    'window.close': 'Close the lesson',
+		    // ── the pane itself: its tab, its guide, and the title when nothing names it
+		    'pane.title': 'Lesson',
+		    'pane.guide': 'The lesson: the dialogue, the question, the drawings, the spine, and your page.',
+		    // ── what it says when it cannot read the vault ───────────────────────────
+		    'state.loading': 'Reading the lesson state.',
+		    'state.unavailable': 'The lesson state is not available: {reason}',
+		    'state.none': 'No lesson is published for this session. The teacher writes one when a lesson begins.',
+		    'state.noAnswer': 'no answer from the Host',
+		    'host.notAnswering': 'the lesson pane is not answering yet',
+		    'host.answered': 'the Host answered {status}',
+		    'notice.filled': 'Filling the page. ⌃⌘F takes the whole screen.',
+		  },
+		  'zh-CN': {
+		    // ── the chat rail: three controls, and the count beside them ──────────────
+		    'rail.work.shownAria': '过程：已展开 — 按下收起',
+		    'rail.work.hiddenAria': '过程：已收起 — 按下展开',
+		    'rail.work.shownTitle': '推理和工具现在都摊开着。按下收起。',
+		    'rail.work.hiddenTitle': '每条回复背后的推理和工具都收着。按下展开。',
+		    'rail.size.aria': '阅读字号：{size}（依次是 {sizes}）— 按下切到下一档',
+		    'rail.size.title': '阅读字号：{size}（第 {n} 档，共 {total} 档）。所有正文一起缩放。',
+		    'rail.theme.toLight': '切换到浅色',
+		    'rail.theme.toDark': '切换到深色',
+		    'rail.theme.light': '浅色',
+		    'rail.theme.dark': '深色',
+		    'rail.hint.writing': '导师正在写',
+		    'rail.hint.nothing': '还没有人说话',
+		    'rail.hint.count': '{count} 条消息',
+		    // ── the dialogue ─────────────────────────────────────────────────────────
+		    'chat.earlier': '载入更早的对话',
+		    'chat.empty': '课在这里读。导师一开口，对话就出现在这一栏——只有提问和回答，推理和工具先收着，你需要时再展开。',
+		    'chat.who.you': '你',
+		    'chat.who.teacher': '导师',
+		    'chat.who.log': '记录',
+		    'chat.work.row': '过程 — {tools}',
+		    'chat.work.tools': '这一步用到的工具',
+		    // ── the tab strip: a handful of words in a narrow docked column ───────────
+		    'tab.chat': '对话',
+		    'tab.quiz': '测验',
+		    'tab.viz': '插图',
+		    'tab.spine': '主干',
+		    'tab.notes': '笔记',
+		    // ── the question ─────────────────────────────────────────────────────────
+		    'question.label': '题目',
+		    'quiz.confirm.answered': '已作答',
+		    'quiz.confirm.notSent': '未送出',
+		    'quiz.confirm.sentBody': '已经记下，也送进了对话。导师收到了。',
+		    'quiz.confirm.failedBody': '没能记下，也没能送出。请在下面再试一次。',
+		    'quiz.again': '重新作答',
+		    'quiz.setAside': '先放一放',
+		    'quiz.empty.answered': '现在没有等你回答的题。下一题一出，就会出现在这里。',
+		    'quiz.empty.none': '这次会话还没有出题。出题后它出现在这里，正文区保持整高。',
+		    'quiz.custom.label': '或者用自己的话',
+		    'quiz.custom.placeholder': '用你自己的说法写，不必照选项的口气。',
+		    'quiz.send.sending': '送出中',
+		    'quiz.send.answer': '作答',
+		    'quiz.setAsideNow': '暂时放一放',
+		    'quiz.sending': '正在记下并送出。',
+		    'quiz.past': '先前作答或放下的',
+		    // ── the drawings ─────────────────────────────────────────────────────────
+		    'viz.empty': '这个学习库还没有画过图。图会在这里整宽打开，正文留在原处。',
+		    'viz.loading': '正在打开这张图。',
+		    'viz.failed': '这张图打不开：{reason}',
+		    // ── the spine ────────────────────────────────────────────────────────────
+		    'spine.empty': '这次会话还没有发布主干。计划一写下来，它就出现在这里。',
+		    'spine.here': '这一课立在什么之上',
+		    // ── the learner's own page ───────────────────────────────────────────────
+		    'notes.eyebrow': '你的页面',
+		    'notes.hint': '先写，再作答。它随会话保存，导师读得到。',
+		    'notes.placeholder': '你已经接受了什么，是这一课立在上面的？',
+		    // ── the window's chrome ──────────────────────────────────────────────────
+		    'window.open': '在窗口中打开',
+		    'window.openTitle': '在可以全屏的窗口里打开这一课',
+		    'window.openButton': '打开本课窗口',
+		    'window.fill': '铺满屏幕',
+		    'window.leave': '退出全屏',
+		    'window.close': '关闭这一课',
+		    // ── the pane itself: its tab, its guide, and the title when nothing names it
+		    'pane.title': '本课',
+		    'pane.guide': '这一课：对话、题目、图、主干，还有你的页面。',
+		    // ── what it says when it cannot read the vault ───────────────────────────
+		    'state.loading': '正在读取本课状态。',
+		    'state.unavailable': '读不到本课状态：{reason}',
+		    'state.none': '这次会话还没有发布本课。开课时导师会写一份。',
+		    'state.noAnswer': '宿主没有应答',
+		    'host.notAnswering': '课程面板还没有应答',
+		    'host.answered': '宿主返回了 {status}',
+		    'notice.filled': '已铺满页面。⌃⌘F 让整个应用全屏。',
+		  },
+		}
+
+		/**
+		 * Which of the tables a lesson's `lang` asks for.
+		 *
+		 * MATCH ON THE PRIMARY SUBTAG, AND TREAT TRADITIONAL AS A DIFFERENT LANGUAGE. `zh`, `zh-CN`,
+		 * `zh-Hans` and `zh-SG` all name Simplified and all select `zh-CN`. `zh-TW`, `zh-HK` and
+		 * `zh-Hant` name Traditional, which is not a variant of this table but a different written
+		 * language: a Traditional reader handed Simplified is worse off than one handed English, so
+		 * those fall back with every other tag the pane cannot serve. The returned key is also a
+		 * valid BCP 47 tag, which is what the pane declares itself to be written in.
+		 *
+		 * A script subtag outranks a region one: `zh-Hans-TW` is contradictory and rare, and the
+		 * script is the part that says which characters are written. An underscore is accepted as a
+		 * separator because a tag written by hand arrives both ways.
+		 *
+		 * @param lang - the lesson file's `lang`, or whatever else the file happened to hold.
+		 * @returns the name of a table in {@link STRINGS}: 'en' or 'zh-CN'.
+		 */
+		function languageOf(lang) {
+		  if (typeof lang !== 'string') return 'en'
+		  const parts = lang.trim().toLowerCase().split(/[-_]/).filter((part) => part !== '')
+		  if (parts[0] !== 'zh') return 'en'
+		  if (parts.includes('hans')) return 'zh-CN'
+		  if (parts.includes('hant') || parts.includes('tw') || parts.includes('hk') || parts.includes('mo')) return 'en'
+		  return 'zh-CN'
+		}
+
+		/**
+		 * One label, in the language of the lesson on screen.
+		 *
+		 * The language is read from the store rather than handed in, because every seat in the pane
+		 * — the docked tab, the window, the composer strip, the header chip — draws from that one
+		 * object, and a label that took its language from anywhere else could disagree with the
+		 * lesson beside it.
+		 *
+		 * `values` fills the `{name}` holes. A sentence with a number in the middle of it cannot be
+		 * assembled from a prefix and a suffix once the language changes — Chinese puts the count
+		 * where English does not — so the whole sentence lives in the table with a hole in it.
+		 *
+		 * @param key - the row's id.
+		 * @param values - what to put in the holes, by name.
+		 * @returns the label. Never an empty string: the fallback chain ends at the key itself.
+		 */
+		function t(key, values) {
+		  const chosen = STRINGS[state.lang] ?? STRINGS.en
+		  const text = typeof chosen[key] === 'string' && chosen[key] !== ''
+		    ? chosen[key]
+		    : typeof STRINGS.en[key] === 'string' ? STRINGS.en[key] : key
+		  if (values === undefined) return text
+		  return text.replace(/\{(\w+)\}/g, (whole, name) => (values[name] === undefined ? whole : String(values[name])))
+		}
+
 		/**
 		 * Where this mount's routes actually live.
 		 *
@@ -187,6 +426,15 @@ window.__ModuleLoader__.load({
 		  reason: '',
 		  notesDirty: false,
 		  dockNote: '',
+		  /**
+		   * The table the pane's own words come from: 'en' or 'zh-CN'.
+		   *
+		   * It is not a preference and not a detection — it is read out of the lesson file's `lang`
+		   * every time that file is read, because the teacher is what knows which language the
+		   * session is in. A session with no lesson, or a lesson with no `lang`, or a tag this pane
+		   * cannot serve, all leave it at 'en'.
+		   */
+		  lang: 'en',
 		  windowOpen: false,
 		  /** The window is filling the page, which is what this app can actually grant. */
 		  fill: false,
@@ -312,6 +560,10 @@ window.__ModuleLoader__.load({
 		  // ── the chat rail: text against text, with no frame of its own ────────────────
 		  '.mm-rail{flex:none;display:flex;align-items:center;gap:18px;padding:12px 22px;border-bottom:1px solid var(--rule);font:400 var(--mm-t-ui)/1 var(--mm-pixel-font);letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);flex-wrap:wrap}',
 		  '.mm-rail .mm-spacer{flex:1;min-width:0}',
+		  // The status lines the docked chat carries above itself — see the docked branch of
+		  // {@link PaneView}. Space, not a box: the pane separates with a gutter or one edge, and
+		  // this is the chat's own 22px gutter so the line sits over the dialogue's rail.
+		  '.mm-status{flex:none;padding:14px 22px 0}',
 		  '.mm-rail-btn{font:400 var(--mm-t-ui)/1 var(--mm-pixel-font);letter-spacing:.1em;text-transform:uppercase;background:none;border:0;padding:0;cursor:pointer;color:var(--fg-3)}',
 		  '.mm-rail-btn:hover{color:var(--accent)}',
 		  '.mm-rail-btn:focus-visible{outline:2px solid var(--mm-cyan);outline-offset:3px}',
@@ -498,7 +750,7 @@ window.__ModuleLoader__.load({
 		 */
 		async function callHost(method, args, retried = false) {
 		  const prefix = await resolvePrefix()
-		  if (prefix === null) return { failed: true, reason: 'the lesson pane is not answering yet' }
+		  if (prefix === null) return { failed: true, reason: t('host.notAnswering') }
 		  try {
 		    const response = await fetch(prefix + '/' + method, {
 		      method: 'POST',
@@ -512,7 +764,7 @@ window.__ModuleLoader__.load({
 		        livePrefix = null
 		        return callHost(method, args, true)
 		      }
-		      return { failed: true, reason: `the Host answered ${response.status}` }
+		      return { failed: true, reason: t('host.answered', { status: response.status }) }
 		    }
 		    return await response.json()
 		  } catch (error) {
@@ -1168,11 +1420,11 @@ window.__ModuleLoader__.load({
 		      'data-on': showing ? 'true' : 'false',
 		      // The name says both halves, because a symbol alone cannot: the mark is three rules,
 		      // which says "detail" and not "detail is currently shown".
-		      'aria-label': showing ? 'Working: shown — press to hide' : 'Working: hidden — press to show',
+		      'aria-label': showing ? t('rail.work.shownAria') : t('rail.work.hiddenAria'),
 		      'aria-pressed': showing ? 'true' : 'false',
 		      title: showing
-		        ? 'The reasoning and the tools are shown. Press to fold them away.'
-		        : 'The reasoning and the tools behind each reply are folded away. Press to show them.',
+		        ? t('rail.work.shownTitle')
+		        : t('rail.work.hiddenTitle'),
 		      onClick: () => {
 		        state.showWork = !showing
 		        publish()
@@ -1184,9 +1436,12 @@ window.__ModuleLoader__.load({
 		      // No field behind this one: the pips already say where in the cycle it is, and a second
 		      // indicator for the same fact was the green slab they did not want.
 		      className: 'mm-rail-btn mm-icon-btn',
-		      'aria-label': 'Reading size: ' + store.text + ' of ' + TEXT_SIZES.join(', ') + ' — press for the next',
-		      title: 'Reading size: ' + store.text + ' (' + String(TEXT_SIZES.indexOf(store.text) + 1)
-		        + ' of ' + String(TEXT_SIZES.length) + '). Everything read moves together.',
+		      'aria-label': t('rail.size.aria', { size: store.text, sizes: TEXT_SIZES.join(', ') }),
+		      title: t('rail.size.title', {
+		        size: store.text,
+		        n: TEXT_SIZES.indexOf(store.text) + 1,
+		        total: TEXT_SIZES.length,
+		      }),
 		      onClick: () => {
 		        const at = TEXT_SIZES.indexOf(state.text)
 		        state.text = TEXT_SIZES[(at + 1) % TEXT_SIZES.length]
@@ -1211,8 +1466,8 @@ window.__ModuleLoader__.load({
 		      type: 'button',
 		      className: 'mm-rail-btn mm-icon-btn',
 		      'data-theme': store.theme,
-		      'aria-label': store.theme === 'dark' ? 'Switch to the light' : 'Switch to the dark',
-		      title: store.theme === 'dark' ? 'Light' : 'Dark',
+		      'aria-label': store.theme === 'dark' ? t('rail.theme.toLight') : t('rail.theme.toDark'),
+		      title: store.theme === 'dark' ? t('rail.theme.light') : t('rail.theme.dark'),
 		      onClick: () => {
 		        state.theme = state.theme === 'dark' ? 'light' : 'dark'
 		        writePreference('mimir-lesson-theme', state.theme)
@@ -1223,8 +1478,8 @@ window.__ModuleLoader__.load({
 		    React.createElement('span', { key: 'sp', className: 'mm-spacer' }),
 		    React.createElement('span', { key: 'hint', className: 'mm-rail-hint' },
 		      talk.running
-		        ? 'the teacher is writing'
-		        : transcript.length === 0 ? 'nothing said yet' : `${transcript.length} messages`),
+		        ? t('rail.hint.writing')
+		        : transcript.length === 0 ? t('rail.hint.nothing') : t('rail.hint.count', { count: transcript.length })),
 		  ])
 
 		  if (talk.hasMore) {
@@ -1233,13 +1488,12 @@ window.__ModuleLoader__.load({
 		      type: 'button',
 		      className: 'mm-earlier',
 		      onClick: () => { void loadEarlier() },
-		    }, 'Load earlier turns'))
+		    }, t('chat.earlier')))
 		  }
 
 		  if (transcript.length === 0) {
 		    rows.push(React.createElement('div', { key: 'empty', className: 'mm-chat-body' },
-		      React.createElement('p', { className: 'mm-chat-empty' },
-		        'The lesson is read here. As soon as the teacher speaks, the dialogue appears in this column — questions and replies only, with the working folded away until you ask for it.')))
+		      React.createElement('p', { className: 'mm-chat-empty' }, t('chat.empty'))))
 		  }
 
 		  for (let index = 0; index < transcript.length; index += 1) {
@@ -1252,17 +1506,17 @@ window.__ModuleLoader__.load({
 		      'data-live': message.live === true ? 'true' : 'false',
 		    }, [
 		      React.createElement('div', { key: 'g', className: 'mm-gut' }, [
-		        React.createElement('b', { key: 'n' }, who === 'you' ? 'you' : who === 'teacher' ? 'teacher' : 'log'),
+		        React.createElement('b', { key: 'n' }, who === 'you' ? t('chat.who.you') : who === 'teacher' ? t('chat.who.teacher') : t('chat.who.log')),
 		        React.createElement('i', { key: 't' }, clockOf(message.ms)),
 		      ]),
 		      React.createElement('div', { key: 'b', className: 'mm-bubble' }, React.createElement(Markdown, { text: message.text })),
 		    ]))
 		    if (message.tools.length > 0) {
 		      rows.push(React.createElement('div', { key: 'w' + String(index), className: 'mm-work' },
-		        'the working — ' + toolLine(message.tools)))
+		        t('chat.work.row', { tools: toolLine(message.tools) })))
 		      if (store.showWork === true) {
 		        rows.push(React.createElement('div', { key: 'wb' + String(index), className: 'mm-work-body' }, [
-		          React.createElement('b', { key: 'h' }, 'Tools in this step'),
+		          React.createElement('b', { key: 'h' }, t('chat.work.tools')),
 		          toolLine(message.tools),
 		        ]))
 		      }
@@ -1400,6 +1654,10 @@ window.__ModuleLoader__.load({
 		    state.status = 'loading'
 		    state.hasLesson = false
 		    state.closedQuestion = ''
+		    // The new session has no lesson in hand yet, so nothing has named a language. Carrying
+		    // the last session's across would put Chinese empty states over a session that may never
+		    // ask for them, and English is the language every message here already has.
+		    state.lang = 'en'
 		    // A window that belongs to the session we just left is closed, not repointed: it
 		    // was opened on that lesson, and quietly swapping its contents underneath the
 		    // learner is the same failure in a new coat.
@@ -1461,7 +1719,7 @@ window.__ModuleLoader__.load({
 		      if (state.sessionId !== sessionId) return
 		      if (payload === null || payload.ready !== true) {
 		        state.status = 'unavailable'
-		        state.reason = payload === null ? 'no answer from the Host' : String(payload.reason)
+		        state.reason = payload === null ? t('state.noAnswer') : String(payload.reason)
 		        publish()
 		        return
 		      }
@@ -1469,6 +1727,10 @@ window.__ModuleLoader__.load({
 		      state.hasLesson = payload.hasLesson === true
 		      if (typeof payload.vault === 'string') state.vault = payload.vault
 		      state.lesson = payload.lesson
+		      // The one place the language is chosen. It comes off the lesson the read just landed,
+		      // so a file that changes language changes the pane with the same publication that
+		      // changed the question — and a file that names no language leaves English in place.
+		      state.lang = languageOf(payload.lesson?.lang)
 		      // The teacher has published a different question: the answer they just gave is no
 		      // longer the thing on screen, so the confirmation gives way to the next question.
 		      if (state.refreshedTarget !== null
@@ -1807,7 +2069,7 @@ window.__ModuleLoader__.load({
 		        (payload) => {
 		          const next = payload !== null && payload.ok === true
 		            ? { status: 'ok', svg: String(payload.svg) }
-		            : { status: 'failed', reason: payload === null ? 'no answer from the Host' : String(payload.reason) }
+		            : { status: 'failed', reason: payload === null ? t('state.noAnswer') : String(payload.reason) }
 		          visualCache[name] = next
 		          if (live) setEntry(next)
 		        },
@@ -1843,7 +2105,7 @@ window.__ModuleLoader__.load({
 		          dangerouslySetInnerHTML: { __html: adapted.markup },
 		        })
 		        : React.createElement('div', { key: 'msg', className: 'mm-hint' },
-		            entry.status === 'loading' ? 'Opening the drawing.' : 'This drawing could not be opened: ' + String(entry.reason)),
+		            entry.status === 'loading' ? t('viz.loading') : t('viz.failed', { reason: entry.reason })),
 		      React.createElement('figcaption', { key: 'cap', className: 'mm-cap' }, name),
 		    ])
 		  }
@@ -1858,12 +2120,12 @@ window.__ModuleLoader__.load({
 		      className: 'mm-card mm-confirm',
 		      'data-failed': sent.failed === true ? 'true' : 'false',
 		    }, [
-		      React.createElement('div', { key: 'e', className: 'mm-eyebrow' }, sent.failed === true ? 'Not sent' : 'Answered'),
+		      React.createElement('div', { key: 'e', className: 'mm-eyebrow' }, sent.failed === true ? t('quiz.confirm.notSent') : t('quiz.confirm.answered')),
 		      React.createElement('p', { key: 'q', className: 'mm-hint' }, String(sent.question)),
 		      React.createElement('p', { key: 'a', className: 'mm-sent-line' }, String(sent.line)),
 		      React.createElement('p', { key: 'h', className: 'mm-hint' }, sent.failed === true
-		        ? 'It could not be written down or sent. Try again below.'
-		        : 'Written down and sent to the chat. The teacher has it.'),
+		        ? t('quiz.confirm.failedBody')
+		        : t('quiz.confirm.sentBody')),
 		      React.createElement('div', { key: 'go', className: 'mm-actions' }, [
 		        React.createElement('button', {
 		          key: 'again',
@@ -1874,18 +2136,18 @@ window.__ModuleLoader__.load({
 		            state.refreshedTarget = null
 		            publish()
 		          },
-		        }, 'Answer again'),
-		        React.createElement('button', { key: 'later', type: 'button', className: 'mm-ghost', onClick: () => { setAside() } }, 'Set aside'),
+		        }, t('quiz.again')),
+		        React.createElement('button', { key: 'later', type: 'button', className: 'mm-ghost', onClick: () => { setAside() } }, t('quiz.setAside')),
 		      ]),
 		    ])
 
 		    if (question === null) {
 		      return React.createElement('div', null, [
 		        confirmation,
-		        React.createElement('div', { key: 'e', className: 'mm-eyebrow' }, 'Quiz'),
+		        React.createElement('div', { key: 'e', className: 'mm-eyebrow' }, t('tab.quiz')),
 		        React.createElement('p', { key: 'p', className: 'mm-hint' }, store.answers.length > 0
-		          ? 'Nothing is waiting for an answer. The next question appears here the moment it is set.'
-		          : 'No question is set for this session yet. When one is set it appears here, and the reading stays at full height.'),
+		          ? t('quiz.empty.answered')
+		          : t('quiz.empty.none')),
 		      ].filter((node) => node !== null))
 		    }
 
@@ -1908,13 +2170,13 @@ window.__ModuleLoader__.load({
 		          React.createElement('span', { key: 'l' }, label),
 		        ])
 		      })),
-		      React.createElement('label', { key: 'lab', className: 'mm-label', htmlFor: 'mm-custom' }, 'Or in your own words'),
+		      React.createElement('label', { key: 'lab', className: 'mm-label', htmlFor: 'mm-custom' }, t('quiz.custom.label')),
 		      React.createElement('textarea', {
 		        key: 'ta',
 		        id: 'mm-custom',
 		        className: 'mm-area',
 		        value: store.custom,
-		        placeholder: 'Say it the way you would say it, not the way the options do.',
+		        placeholder: t('quiz.custom.placeholder'),
 		        disabled: sending,
 		        onChange: (event) => {
 		          state.custom = event.target.value
@@ -1936,10 +2198,10 @@ window.__ModuleLoader__.load({
 		          className: 'mm-send',
 		          disabled: sending || String(store.custom).trim() === '',
 		          onClick: () => { void answerQuestion('', state.custom) },
-		        }, sending ? 'Sending' : 'Answer'),
-		        React.createElement('button', { key: 'later', type: 'button', className: 'mm-ghost', onClick: () => { setAside() } }, 'Set aside for now'),
+		        }, sending ? t('quiz.send.sending') : t('quiz.send.answer')),
+		        React.createElement('button', { key: 'later', type: 'button', className: 'mm-ghost', onClick: () => { setAside() } }, t('quiz.setAsideNow')),
 		      ]),
-		      sending ? React.createElement('p', { key: 'st', className: 'mm-hint', style: { marginTop: '10px' } }, 'Writing it down and sending it.') : null,
+		      sending ? React.createElement('p', { key: 'st', className: 'mm-hint', style: { marginTop: '10px' } }, t('quiz.sending')) : null,
 		    ]
 		    const past = store.answers.map((item, index) => {
 		      const answer = item.custom === undefined || item.custom === ''
@@ -1952,9 +2214,9 @@ window.__ModuleLoader__.load({
 		    })
 		    return React.createElement('div', null, [
 		      confirmation,
-		      React.createElement('div', { key: 'e', className: 'mm-eyebrow' }, 'Question'),
+		      React.createElement('div', { key: 'e', className: 'mm-eyebrow' }, t('question.label')),
 		      React.createElement('div', { key: 'card', className: 'mm-card' }, card.filter((node) => node !== null)),
-		      store.answers.length === 0 ? null : React.createElement('div', { key: 'pe', className: 'mm-eyebrow' }, 'Answered and set aside earlier'),
+		      store.answers.length === 0 ? null : React.createElement('div', { key: 'pe', className: 'mm-eyebrow' }, t('quiz.past')),
 		      store.answers.length === 0 ? null : React.createElement('div', { key: 'pl' }, past),
 		    ].filter((node) => node !== null))
 		  }
@@ -1971,8 +2233,8 @@ window.__ModuleLoader__.load({
 		    const names = pinned.length > 0 ? pinned : store.visuals.map((row) => row.name)
 		    if (names.length === 0) {
 		      return React.createElement('div', null, [
-		        React.createElement('div', { key: 'e', className: 'mm-eyebrow' }, 'Visuals'),
-		        React.createElement('p', { key: 'p', className: 'mm-hint' }, 'Nothing is drawn in this vault yet. Drawings open here at full width, while the reading stays where it is.'),
+		        React.createElement('div', { key: 'e', className: 'mm-eyebrow' }, t('tab.viz')),
+		        React.createElement('p', { key: 'p', className: 'mm-hint' }, t('viz.empty')),
 		      ])
 		    }
 		    return React.createElement('div', { className: 'mm-viz' }, names.slice(0, 8).map((name) =>
@@ -1984,12 +2246,12 @@ window.__ModuleLoader__.load({
 		    const spine = Array.isArray(store.lesson?.spine) ? store.lesson.spine : []
 		    if (spine.length === 0) {
 		      return React.createElement('div', null, [
-		        React.createElement('div', { key: 'e', className: 'mm-eyebrow' }, 'Spine'),
-		        React.createElement('p', { key: 'p', className: 'mm-hint' }, 'No spine has been published for this session yet. It appears here as soon as the plan is written down.'),
+		        React.createElement('div', { key: 'e', className: 'mm-eyebrow' }, t('tab.spine')),
+		        React.createElement('p', { key: 'p', className: 'mm-hint' }, t('spine.empty')),
 		      ])
 		    }
 		    return React.createElement('div', null, [
-		      React.createElement('div', { key: 'e', className: 'mm-eyebrow' }, 'Where this lesson rests'),
+		      React.createElement('div', { key: 'e', className: 'mm-eyebrow' }, t('spine.here')),
 		      React.createElement('ul', { key: 'ul', className: 'mm-spine' }, spine.map((node, index) => {
 		        const item = typeof node === 'string' ? { node, state: 'planned' } : node
 		        const label = typeof item.node === 'string' ? item.node : String(item.label ?? '')
@@ -2005,13 +2267,13 @@ window.__ModuleLoader__.load({
 		  /** The learner's own page, kept on disk beside the session it belongs to. */
 		  function NotesTab({ store }) {
 		    return React.createElement('div', null, [
-		      React.createElement('div', { key: 'e', className: 'mm-eyebrow' }, 'Your page'),
+		      React.createElement('div', { key: 'e', className: 'mm-eyebrow' }, t('notes.eyebrow')),
 		      React.createElement('p', { key: 'h', className: 'mm-hint', style: { margin: '0 0 10px' } },
-		        'Write before you answer. It is kept with the session, and the teacher can read it.'),
+		        t('notes.hint')),
 		      React.createElement('div', { key: 'sheet', className: 'mm-sheet' }, React.createElement('textarea', {
 		        className: 'mm-page mm-ruled',
 		        value: store.notes,
-		        placeholder: 'What do you already accept that this rests on?',
+		        placeholder: t('notes.placeholder'),
 		        onChange: (event) => changeNotes(event.target.value),
 		      })),
 		    ])
@@ -2071,7 +2333,7 @@ window.__ModuleLoader__.load({
 		    // the filesystem knows where the vault root is.
 		    const title = store.vault !== '' && store.vault !== undefined
 		      ? store.vault
-		      : state.root === null ? 'Lesson' : String(state.root).split('/').filter((part) => part.length > 0).pop() ?? 'Lesson'
+		      : state.root === null ? t('pane.title') : String(state.root).split('/').filter((part) => part.length > 0).pop() ?? t('pane.title')
 		    const head = [
 		      React.createElement('h2', { key: 't' }, title),
 		      React.createElement('span', { key: 'sp', className: 'mm-spacer' }),
@@ -2082,8 +2344,8 @@ window.__ModuleLoader__.load({
 		        type: 'button',
 		        className: 'mm-window-btn',
 		        onClick: () => { openLessonWindow() },
-		        title: 'Open the lesson in a window that can go fullscreen',
-		      }, 'Open in a window'))
+		        title: t('window.openTitle'),
+		      }, t('window.open')))
 		    } else {
 		      const filled = store.fill === true
 		      // Both frame controls are symbols, so what they do is read at a glance rather than
@@ -2093,16 +2355,16 @@ window.__ModuleLoader__.load({
 		        key: 'fs',
 		        type: 'button',
 		        className: 'mm-window-btn mm-icon-btn',
-		        'aria-label': filled ? 'Leave the full screen' : 'Fill the screen',
-		        title: filled ? 'Leave the full screen' : 'Fill the screen',
+		        'aria-label': filled ? t('window.leave') : t('window.fill'),
+		        title: filled ? t('window.leave') : t('window.fill'),
 		        onClick: () => { toggleLessonFullscreen() },
 		      }, cornersGlyph(filled ? 'in' : 'out')))
 		      head.push(React.createElement('button', {
 		        key: 'close',
 		        type: 'button',
 		        className: 'mm-window-btn mm-icon-btn',
-		        'aria-label': 'Close the lesson',
-		        title: 'Close the lesson',
+		        'aria-label': t('window.close'),
+		        title: t('window.close'),
 		        onClick: () => { closeLessonWindow() },
 		      }, crossGlyph()))
 		    }
@@ -2110,11 +2372,11 @@ window.__ModuleLoader__.load({
 		    const body = []
 		    if (store.status !== 'ready') {
 		      body.push(React.createElement('p', { key: 'st', className: 'mm-hint' },
-		        store.status === 'loading' ? 'Reading the lesson state.' : 'The lesson state is not available: ' + store.reason))
+		        store.status === 'loading' ? t('state.loading') : t('state.unavailable', { reason: store.reason })))
 		    }
 		    if (store.status === 'ready' && store.hasLesson !== true) {
 		      body.push(React.createElement('p', { key: 'none', className: 'mm-hint' },
-		        'No lesson is published for this session. The teacher writes one when a lesson begins.'))
+		        t('state.none')))
 		    }
 		    if (store.tab === 'quiz') body.push(React.createElement(QuizTab, { key: 'quiz', store, question }))
 		    if (store.tab === 'viz') body.push(React.createElement(VizTab, { key: 'viz', store }))
@@ -2125,8 +2387,8 @@ window.__ModuleLoader__.load({
 		    // second view of something already on screen. Docked, there is no such column and the
 		    // chat is exactly what that tab is for.
 		    const tabRows = chrome === 'window'
-		      ? [['quiz', 'Quiz'], ['viz', 'Visuals'], ['spine', 'Spine'], ['notes', 'Notes']]
-		      : [['chat', 'Chat'], ['quiz', 'Quiz'], ['viz', 'Visuals'], ['spine', 'Spine'], ['notes', 'Notes']]
+		      ? [['quiz', t('tab.quiz')], ['viz', t('tab.viz')], ['spine', t('tab.spine')], ['notes', t('tab.notes')]]
+		      : [['chat', t('tab.chat')], ['quiz', t('tab.quiz')], ['viz', t('tab.viz')], ['spine', t('tab.spine')], ['notes', t('tab.notes')]]
 		    const tabs = tabRows.map((row) =>
 		      React.createElement('button', {
 		        key: row[0],
@@ -2181,10 +2443,34 @@ window.__ModuleLoader__.load({
 		      ]))
 		    } else {
 		      children.push(rail)
-		      children.push(React.createElement('div', { key: 'body', className: 'mm-body' }, body))
+		      // THE CHAT IS A COLUMN, NOT A TAB'S WORTH OF PROSE — which is what the note above
+		      // `tabRows` has always said, and what the body never did: `chat` drew nothing, so the
+		      // first tab of the docked pane opened an empty column.
+		      //
+		      // AND IT IS NOT DRAWN INSIDE `mm-body`. `ChatView` brings its own scroller and its own
+		      // rail, and both only work where it is a flex child of a height-constrained column: put
+		      // inside that scroller there would be two of them, the rail would scroll away with the
+		      // first message, and the pin to the newest message would quietly stop working, because
+		      // the element ChatView scrolls would no longer be the element that scrolls. Mounted
+		      // here it takes the rest of the column exactly as it takes the window's left third.
+		      if (store.tab === 'chat') {
+		        // The status lines belong to the pane, not to a tab, so a pane that is still reading
+		        // or has failed keeps saying so here rather than being replaced by the dialogue.
+		        if (body.length > 0) children.push(React.createElement('div', { key: 'status', className: 'mm-status' }, body))
+		        children.push(React.createElement(ChatView, { key: 'chat', store, revision: talk.sequence }))
+		      } else {
+		        children.push(React.createElement('div', { key: 'body', className: 'mm-body' }, body))
+		      }
 		    }
 
-		    return React.createElement('div', { className: 'mm-root', 'data-narrow': narrow ? 'true' : 'false' }, children)
+		    // The language is declared on the pane's own element, not on the document: the app around
+		    // it is written in whatever language the app is in, and a screen reader has to be told
+		    // which of the two this column is.
+		    return React.createElement('div', {
+		      className: 'mm-root',
+		      'data-narrow': narrow ? 'true' : 'false',
+		      lang: store.lang,
+		    }, children)
 		  }
 
 		  /** The docked tab's body. */
@@ -2470,7 +2756,7 @@ window.__ModuleLoader__.load({
 		    }
 		    element.setAttribute('data-fill', 'on')
 		    state.fill = true
-		    sayBriefly('Filling the page. ⌃⌘F takes the whole screen.')
+		    sayBriefly(t('notice.filled'))
 		  }
 
 		  /** How long a passed-on fact stays on screen before it leaves of its own accord. */
@@ -2562,7 +2848,7 @@ window.__ModuleLoader__.load({
 		  }
 
 		  function paneTitle() {
-		    return 'Lesson'
+		    return t('pane.title')
 		  }
 
 		  /**
@@ -2579,10 +2865,22 @@ window.__ModuleLoader__.load({
 		    const question = currentQuestion()
 		    if (question === null || store.hasLesson !== true) return null
 		    return React.createElement('div', { className: 'mm-focusbar' }, [
-		      React.createElement('b', { key: 'b' }, 'Question'),
+		      React.createElement('b', { key: 'b' }, t('question.label')),
 		      React.createElement('span', { key: 's' }, question.question),
-		      React.createElement('button', { key: 'o', type: 'button', onClick: () => { openLessonWindow() } }, 'Open the lesson window'),
+		      React.createElement('button', { key: 'o', type: 'button', onClick: () => { openLessonWindow() } }, t('window.openButton')),
 		    ])
+		  }
+
+		  /**
+		   * The docked tab's own label, where the right column shows its tabs.
+		   *
+		   * It reads the store for the subscription rather than for a field: the language arrives
+		   * with the lesson, and a component that subscribes to nothing would hold the English word
+		   * it was first drawn with for as long as the tab stayed mounted.
+		   */
+		  function PaneTabTitle() {
+		    useStore()
+		    return React.createElement('span', null, t('pane.title'))
 		  }
 
 		  /** The way in: the lesson window, from anywhere in the session header. */
@@ -2597,8 +2895,8 @@ window.__ModuleLoader__.load({
 		      className: 'mm-chip',
 		      'data-waiting': waiting ? 'true' : 'false',
 		      onClick: () => { openLessonWindow() },
-		      title: 'Open the lesson window',
-		    }, waiting ? 'Question' : 'Lesson')
+		      title: t('window.openButton'),
+		    }, waiting ? t('question.label') : t('pane.title'))
 		  }
 
 		  // Declared before the seats are checked, not after: the guard below reports its own
@@ -2649,7 +2947,7 @@ window.__ModuleLoader__.load({
 		      guide: [{
 		        order: 20,
 		        title: paneTitle,
-		        description: () => 'The lesson: the dialogue, the question, the drawings, the spine, and your page.',
+		        description: () => t('pane.guide'),
 		      }],
 		    }))
 		    tabRegistered = true
@@ -2660,7 +2958,7 @@ window.__ModuleLoader__.load({
 		  disposers.push(slots.inject('sidebar.right.pane.tab', () =>
 		    slots.register({ name: 'sidebar.right.pane.tab', key: TAB_ID }, Body)))
 		  disposers.push(slots.inject('sidebar.right.pane.tab.title', () =>
-		    slots.register({ name: 'sidebar.right.pane.tab.title', key: TAB_ID }, () => React.createElement('span', null, 'Lesson'))))
+		    slots.register({ name: 'sidebar.right.pane.tab.title', key: TAB_ID }, PaneTabTitle)))
 		  disposers.push(slots.inject('conversation.session.header.utilities', () =>
 		    slots.register({ name: 'conversation.session.header.utilities', id: 'mimir-lesson', order: 30 }, HeaderChip)))
 		  disposers.push(slots.inject('conversation.input.dock', () =>
@@ -2691,6 +2989,10 @@ window.__ModuleLoader__.load({
 		          + ' preference=' + state.theme
 		          + ' text=' + state.text
 		          + ' paper=' + window.getComputedStyle(document.body).getPropertyValue('--mm-paper').trim(),
+		      // The table the pane's own words came from. Nothing else on disk records which
+		      // language a session was rendered in, and "the labels are in the wrong language" is
+		      // exactly the kind of report this file exists to settle.
+		      language: state.lang,
 		      transcript: talk.transcript.length,
 		      turns: talk.sessionId === null ? 'unbound' : 'bound',
 		    }

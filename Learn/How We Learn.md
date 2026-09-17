@@ -7,6 +7,8 @@ tags:
 
 # How we learn
 
+> **English** · [简体中文](我们如何学习.md)
+
 This is the method, written for the learner rather than for the machine. The operative version the teacher follows is the `mimir-teaching` skill; this is the same thing said plainly, so you can see what is being done to you and argue with it.
 
 > **Read this once before your first session.** Everything else in the vault — the templates, the review queue, the generated maps — is downstream of the five ideas below. If the teacher is doing something that this document does not justify, that is a bug and worth saying so.

@@ -4,30 +4,30 @@
     "mimir": {
       "kind": "plugin",
       "source": "https://github.com/tommyhedgerow/obsidian-mimir-controls",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": {
-        "main.js": "85c876fb080424ba63504c46ae458a67160addb9182a96fd0669a0c689b05fc1",
-        "manifest.json": "73f54731229672537c0bd88b519cf22c378a52332c046b5c3e6f989cb2c2d0c9",
+        "main.js": "14dc51c995d4ed0976c1d7e83f8917673e7650e48d156ada36861e06305a3a45",
+        "manifest.json": "28fcd655a8083e0bffe6543a17b2138a8f465f632447bc12ac682ccd84564e35",
         "styles.css": "74e960c3d21b69a34419962d915badb4f84b5fc8385b331546662f3a18117d7d"
       }
     },
     "mimir-splash": {
       "kind": "plugin",
       "source": "https://github.com/tommyhedgerow/obsidian-mimir-splash",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": {
-        "main.js": "4b272eb6d77f67d8deb32472429026ba227114c037de81232d4cabbc4774581b",
-        "manifest.json": "276ea1ce980ab22f8b156d08e59748a14331c5fc5b5a73be98439602c4604c55",
+        "main.js": "384e09206b66b7cb9f91e3531e56ca6177aa208a976506cbb46358ec252cc249",
+        "manifest.json": "97ccdcc39748776bce175d02011a23a89995b881d1bcae22a10a8b481aae066f",
         "styles.css": "87aff37f4d0cb07e590b85f152858f22c99151832e8def0e79b89cac869af5c3"
       }
     },
     "lesson-publisher": {
       "kind": "plugin",
       "source": "https://github.com/tommyhedgerow/obsidian-lesson-publisher",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "files": {
-        "main.js": "1dbdef2055224729e28c7b2ed5746a96679cfd1f384c2be825f4ad593b1ced13",
-        "manifest.json": "1de1e5b18461ce15cc556e1cac2c687405d45e08e6dc8ba9f657ad2ce03c3672"
+        "main.js": "aee64d241c59c6f022a90f31bf3b2465db1074415a62c92598bbc373e25a0e4f",
+        "manifest.json": "b44a4bb3c0b344fabcb9c0bd834bc377ea9c4f13d2147d939e5d27ec9ccb4cf2"
       }
     },
     "Mimir": {

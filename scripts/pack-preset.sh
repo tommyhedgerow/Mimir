@@ -31,19 +31,69 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PRESET_SRC="$HERE/preset"
 ID="mimir-tutor"
-NAME="Mimir Tutor"
-DESCRIPTION="A Socratic tutor for an Obsidian learning vault: nine method skills, six specialist sub-agents, a concept graph and a spaced review queue."
-OUT="$HERE/dist/$ID.dshpreset"
+# ── which preset ─────────────────────────────────────────────────────────────
+#
+# The package is built with a re-exec driver rather than a loop inside one shell.
+# A run needs its own staging directory, its own EXIT trap and its own exit code,
+# and the body below is written for exactly one preset; re-entering it is safer
+# than threading two sets of state through it. `--preset` picks one, and with no
+# argument both are built or checked, in this order.
+PRESET_ID="${MIMIR_PACK_ONE:-}"
+case "$PRESET_ID" in
+  mimir-tutor)
+    PRESET_SRC="$HERE/preset"
+    ID="mimir-tutor"
+    NAME="Mimir Tutor"
+    DESCRIPTION="A Socratic tutor for an Obsidian learning vault: nine method skills, six specialist sub-agents, a concept graph and a spaced review queue."
+    ;;
+  mimir-tutor-zh)
+    PRESET_SRC="$HERE/preset-zh"
+    ID="mimir-tutor-zh"
+    NAME="Mimir 导师"
+    DESCRIPTION="面向 Obsidian 学习库的苏格拉底式导师：九项方法技能、六个专家子代理、概念图谱与间隔复习队列。"
+    ;;
+  '')
+    ;;
+  *) echo "pack-preset: unknown preset '$PRESET_ID'" >&2; exit 2 ;;
+esac
 
+if [ -n "$PRESET_ID" ]; then
+  # The Chinese preset ships the same Lesson pane as the English one, and holds no
+  # copy of its own: two committed copies of a generated bundle is precisely the
+  # shape that drifts. It is staged in from `preset/lesson-pane` below.
+  OUT="$HERE/dist/$ID.dshpreset"
+else
+  OUT=""
+fi
+
+CHECK=0
+PRESET_ONLY=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --check) CHECK=1; shift ;;
     --out) OUT="$2"; shift 2 ;;
+    --preset) PRESET_ONLY="$2"; shift 2 ;;
     -h|--help) sed -n '2,32p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "pack-preset: unknown option '$1' (try --help)" >&2; exit 2 ;;
   esac
 done
-CHECK="${CHECK:-0}"
+
+# ── the driver ───────────────────────────────────────────────────────────────
+if [ -z "$PRESET_ID" ]; then
+  if [ -n "$PRESET_ONLY" ]; then
+    MIMIR_PACK_ONE="$PRESET_ONLY" exec "$0" $( [ "$CHECK" -eq 1 ] && printf -- '--check' )
+  fi
+  status=0
+  for one in mimir-tutor mimir-tutor-zh; do
+    printf '\n═══ %s ═══\n' "$one"
+    if [ "$CHECK" -eq 1 ]; then
+      MIMIR_PACK_ONE="$one" "$0" --check || status=1
+    else
+      MIMIR_PACK_ONE="$one" "$0" || status=1
+    fi
+  done
+  exit "$status"
+fi
 
 if [ ! -f "$PRESET_SRC/agent.cordis.yml" ]; then
   echo "pack-preset: no agent.cordis.yml in $PRESET_SRC — is this a full clone?" >&2
@@ -64,12 +114,26 @@ mkdir -p "$STAGE/preset"
 # `/.` copies the contents, including dotfiles, without nesting a directory.
 cp -R "$PRESET_SRC/." "$STAGE/preset/"
 
+# The Lesson pane travels with whichever preset is being packed, and only one
+# copy of it is ever authored. See the note where PRESET_ID is resolved.
+if [ ! -d "$STAGE/preset/lesson-pane" ]; then
+  if [ -d "$HERE/preset/lesson-pane" ]; then
+    mkdir -p "$STAGE/preset/lesson-pane"
+    cp -R "$HERE/preset/lesson-pane/." "$STAGE/preset/lesson-pane/"
+  else
+    echo "pack-preset: no lesson-pane to stage in — the package would not mount the pane." >&2
+    exit 1
+  fi
+fi
+
 # The lesson pane's built halves are generated, not authored. Rebuild them if the
 # build script is present and runnable, so the package can never carry a stale
 # bundle; if it is not, carry on with what is committed and say so.
 if command -v node >/dev/null 2>&1 && [ -f "$HERE/Tools/build-lesson-pane.mjs" ]; then
   if node "$HERE/Tools/build-lesson-pane.mjs" >/dev/null 2>&1; then
-    cp -R "$PRESET_SRC/lesson-pane/." "$STAGE/preset/lesson-pane/"
+    rm -rf "$STAGE/preset/lesson-pane"
+    mkdir -p "$STAGE/preset/lesson-pane"
+    cp -R "$HERE/preset/lesson-pane/." "$STAGE/preset/lesson-pane/"
   else
     echo "pack-preset: could not rebuild the Lesson pane; packaging what is committed." >&2
   fi

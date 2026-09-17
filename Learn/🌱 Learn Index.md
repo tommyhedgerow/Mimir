@@ -7,6 +7,8 @@ tags:
 
 # 🌱 Learn — home
 
+> **English** · [简体中文](🌱%20学习索引.md)
+
 > This is the vault's front door. `How We Learn.md` is the method; `Learner Profile.md` is where you stand; `Backlog.md` is where you are going; [[Dashboard]] is the state of all of it, read live out of the notes.
 >
 > **Standing format:** the session note is created and opened in Obsidian at the start of a session and written live. **A diagram must fit the column and read in one look** — strand maps are generated SVG in `Learn/Viz/`, not mermaid.

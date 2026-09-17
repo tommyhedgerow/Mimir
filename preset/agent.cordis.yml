@@ -592,5 +592,11 @@
 #     shipped and did nothing in the interface.
 #
 # Rebuild and reinstall both with `node Tools/build-lesson-pane.mjs` from the vault root.
+#
+# The pane's own chrome — its tab labels, buttons and placeholders — follows the `lang`
+# field in `Learn/Sessions/.live/<session-id>.json`. This preset leaves that field out,
+# because English is what the pane falls back to; the Chinese preset writes `"zh-CN"`
+# there. What the field does and does not affect is in the `mimir-teaching` skill,
+# section *The Lesson pane — where they actually read and answer*.
 - id: lesson-pane
   name: ./lesson-pane/host.mjs

@@ -1,0 +1,49 @@
+filters:
+  and:
+    - 'file.inFolder("Learn/Glossary")'
+    - 'file.ext == "md"'
+
+properties:
+  field:
+    displayName: "Field"
+  taught:
+    displayName: "Layers taught"
+  term:
+    displayName: "Term"
+
+views:
+  - type: table
+    name: "全部术语"
+    order:
+      - term
+      - field
+      - file.name
+    sort:
+      - property: term
+        direction: ASC
+
+  - type: table
+    name: "按领域"
+    order:
+      - term
+      - file.name
+    sort:
+      - property: term
+        direction: ASC
+    groupBy:
+      property: field
+      direction: ASC
+
+  - type: table
+    name: "尚未讲授"
+    filters:
+      and:
+        - 'taught < 2'
+    order:
+      - term
+      - field
+      - taught
+      - file.name
+    sort:
+      - property: taught
+        direction: ASC

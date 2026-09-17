@@ -6,7 +6,7 @@ There are three routes. Take the first unless you have a reason not to.
 
 | | Route | Use it when |
 | --- | --- | --- |
-| **A** | `./scripts/install.sh` | Normal case. Clones, installs the preset, registers the pane. |
+| **A** | `./scripts/install.sh` | Normal case. Clones, installs the preset, registers the pane. Add `--lang zh-CN` for the Chinese preset. |
 | **B** | Import a `.dshpreset` | You already have a vault and only want the teacher. |
 | **C** | By hand | You want to know exactly what landed where, or you are on Windows. |
 
@@ -31,7 +31,22 @@ cd Mimir
 ./scripts/install.sh
 ```
 
-That is the whole thing. What it does, in order:
+That is the whole thing. Two presets ship — the same teacher in English and in
+Simplified Chinese. They are separate presets rather than one, because the
+language of instruction is a property of the persona and a session cannot be
+half in each:
+
+```sh
+./scripts/install.sh --lang zh-CN    # 中文导师
+```
+
+Both can be installed at once. Their ids differ (`mimir-tutor` and
+`mimir-tutor-zh`), so they sit side by side in the session picker, and either
+works in the same vault: the vault ships both languages of every document the
+learner reads. `docs/zh-CN-glossary.md` records what is translated and what is
+deliberately not.
+
+What the installer does, in order:
 
 1. **Finds your DSH home.** `$DSH_HOME` if it is set, otherwise `~/Library/Application Support/dsh-desktop/harness` for DSH Desktop on macOS, otherwise `~/.dsh`.
 2. **Copies `preset/` into `<dsh home>/.agent-presets/mimir-tutor/`.** If a preset is already there it is **moved aside, never deleted**, to a sibling folder stamped with the date. If you have edited the preset locally, your edits are in that backup.
@@ -40,8 +55,9 @@ That is the whole thing. What it does, in order:
 Useful flags:
 
 ```sh
-./scripts/install.sh --dry-run     # say what would happen, write nothing
-./scripts/install.sh --no-pane     # preset only, skip the Lesson pane
+./scripts/install.sh --dry-run        # say what would happen, write nothing
+./scripts/install.sh --no-pane        # preset only, skip the Lesson pane
+./scripts/install.sh --lang zh-CN     # the Simplified Chinese preset
 ./scripts/install.sh --help
 ```
 
@@ -74,13 +90,16 @@ Build one from this repository:
 
 ```sh
 ./scripts/pack-preset.sh
-# writes dist/mimir-tutor.dshpreset
+# writes dist/mimir-tutor.dshpreset and dist/mimir-tutor-zh.dshpreset
+
+./scripts/pack-preset.sh --preset mimir-tutor-zh   # just one
+./scripts/pack-preset.sh --check                   # verify both, write nothing
 ```
 
 Then, in DSH Desktop:
 
 1. **Settings → Agent presets → Import.**
-2. Choose the file, confirm the id it offers (`mimir-tutor`), and install.
+2. Choose the file, confirm the id it offers (`mimir-tutor` or `mimir-tutor-zh`), and install.
 
 This route installs the preset only. **The Lesson pane is not inside it and will not appear.** If you want the pane, run the `dsh plugin` line from Route A as well.
 
@@ -92,8 +111,14 @@ The preset is a directory of plain files. Copying it is a legitimate installatio
 
 ```sh
 # 1. the preset
+# English
 mkdir -p "$DSH_HOME/.agent-presets/mimir-tutor"
 cp -R preset/. "$DSH_HOME/.agent-presets/mimir-tutor/"
+
+# 简体中文 — preset-zh carries no lesson-pane of its own, so stage the shared one in
+mkdir -p "$DSH_HOME/.agent-presets/mimir-tutor-zh"
+cp -R preset-zh/. "$DSH_HOME/.agent-presets/mimir-tutor-zh/"
+cp -R preset/lesson-pane "$DSH_HOME/.agent-presets/mimir-tutor-zh/lesson-pane"
 
 # 2. the Lesson pane (optional)
 dsh plugin --profile web add "$PWD/preset/lesson-pane"

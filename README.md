@@ -6,15 +6,13 @@
 
 # Mimir
 
+**English** · [简体中文](README.zh-CN.md)
+
 **A learning vault that teaches.** It is an [Obsidian](https://obsidian.md) vault and a [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) agent preset, wired together so that the agent is a teacher rather than a chatbot: it probes what you already understand, plans a dependency map of the subject, waits for your approval, then builds the topic one node at a time and writes everything into the vault as it goes.
 
 Named for Mímir's well, the well of wisdom under Yggdrasil. What you are looking at is the well; the vault is where the water goes.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)"  srcset="assets/mimir-startup.gif">
-  <source media="(prefers-color-scheme: light)" srcset="assets/mimir-startup.gif">
-  <img alt="A six-second pixel-art animation: roots grow down from the top of the frame, scatter into dust, and a stone well rises through the dispersal. Two Futhark runes resolve above it." src="assets/mimir-startup.gif" width="640">
-</picture>
+<img alt="A six-second pixel-art animation on a loop: roots grow down from the top of the frame, scatter into dust, and a stone well rises through the dispersal. Two Futhark runes resolve above it." src="assets/mimir-startup-loop.gif" width="640">
 
 ---
 
@@ -158,31 +156,6 @@ All three are MIT and installable by hand from their own repositories, which car
 
 The theme is **[Mimir](https://github.com/tommyhedgerow/obsidian-mimir-theme)**.
 
-## The artwork
-
-Everything in `assets/` is generated, not drawn. A Python renderer builds the
-pixel art from the same cyan and magenta ramps the theme uses, with an 8×8 Bayer
-dither over a fixed 57-colour table, and the marks and rules are the same
-geometry at other sizes. Nothing is traced, sampled or downloaded.
-
-| | |
-| --- | --- |
-| `banner_1280x320.png` | The hero strip, with a `_light` twin. |
-| `social_1280x640.png` | The card GitHub shows when the repository is linked, with a `_light` twin. Set the dark one under Settings → General → Social preview; it is worth uploading rather than leaving the automatic one. |
-| `mark_{well,rune,axis}_{64,256}.png` | Three marks with transparent backgrounds, each with a `_light` twin. Straight alpha, no baked background. |
-| `divider_1280.png` | The rules between sections here. |
-| `badge_row_1280.png` | The strip above the licence. Decorative only. |
-| `mimir-startup.gif` | The animation, once, holding on the dispersed frame. |
-| `mimir-startup-loop.gif` | The same, looping. |
-| `mimir-startup.{mp4,webm}` | The same again for embedding, where a video is cheaper than a GIF. |
-| `mimir-startup-poster.png` | A still, for a video element's poster or anywhere motion is unwelcome. |
-
-The dividers, badge strips and marks carry `alt=""` on purpose: they are
-decoration, and a screen reader should skip them. The banner and the social card
-carry real alt text, because they carry meaning.
-
-All of it is MIT, like the rest of the repository. Take it.
-
 <picture>
   <source media="(prefers-color-scheme: dark)"  srcset="assets/divider_1280.png">
   <source media="(prefers-color-scheme: light)" srcset="assets/divider_light_1280.png">
@@ -196,18 +169,12 @@ All of it is MIT, like the rest of the repository. Take it.
 - **Web search** for the verifier. The preset grants `web_search` and `web_fetch` and nothing else to that role, and caps it at eight calls.
 - **Node.js**, only for the vault's three generator scripts.
 
-## Honesty about what this is
-
-The method is tuned for the humanities, the historical sciences and natural history first, because that is where its author works. In those fields clean exception-free truths are rarer than in physics, and the skills say so rather than manufacturing a foundation: a fabricated axiom is worse than an honest "the ground here is genuinely a matter of interpretation", because everything above it inherits the error.
-
-The teacher is not right by default. It has been wrong in real sessions, been corrected by a check question or a source, and the correction is recorded in the note rather than quietly dropped. That is the intended behaviour, and the skills are written to make it the easy path.
-
 ## Other things worth knowing
 
 - **Nothing is loaded from the network by the theme.** No webfonts, no remote images: system fonts, local CSS. It works offline.
 - **The Lesson pane is optional.** The preset works without it; you read the lesson in the vault instead of in a docked tab.
 - **Everything is a plain file.** The preset is a directory you can read and edit, the skills are markdown, and the vault is markdown. Editing a skill takes effect on its next load; editing `agent.cordis.yml` needs a DSH restart, for the reason above.
-- **The artwork and the animation are generated, not drawn.** They are procedurally rendered from the theme's own palette by the same renderer that made the startup animation. The one supplied illustration the project ever used is **not** in this repository, because its rights were never established.
+- **It ships in Simplified Chinese too.** A second preset, `mimir-tutor-zh`, teaches in Chinese, and every document the learner reads has a Chinese twin beside it in the vault. `docs/zh-CN-glossary.md` records what is translated and what is deliberately left in English.
 
 <picture>
   <source media="(prefers-color-scheme: dark)"  srcset="assets/badge_row_1280.png">

@@ -32,6 +32,11 @@ Learn/Sessions/.live/*
 # Where the library vault is. Per-machine, so it is not committed.
 Tools/publish-target.txt
 
+# The Chinese preset stages the shared Lesson pane in at install and pack time
+# rather than keeping a second copy of a generated bundle. Nothing should ever
+# create this directory in the working tree; if something does, it is a mistake.
+preset-zh/lesson-pane/
+
 # Build output
 dist/
 node_modules/
