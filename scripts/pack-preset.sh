@@ -103,13 +103,31 @@ iso_from_epoch() {
     || printf '1970-01-01T00:00:00.000Z'
 }
 
+# `touch -t` wants CCYYMMDDhhmm.ss, and wants it in UTC. POSIX, so one form
+# serves both platforms once the epoch-to-fields step is branched.
+epoch_as_touch() {
+  TZ=UTC "${EPOCH_AS_ISO[@]}" "$1" +%Y%m%d%H%M.%S 2>/dev/null \
+    || printf '197001010000.00'
+}
+
 # `exportedAt` would otherwise make every run produce a different file, which
 # makes "has anything changed?" unanswerable and breaks the byte-comparison the
 # Checks workflow runs. SOURCE_DATE_EPOCH is the standard override for exactly
-# this; without it the stamp is the newest modification time in the source tree.
-# A fresh clone has no meaningful mtimes, so the value is not reproducible from
-# git alone — see the note in RELEASING.md.
-EPOCH="${SOURCE_DATE_EPOCH:-$(newest_mtime "$PRESET_SRC")}"
+# this.
+#
+# Failing that, the commit is the stamp: it is stable across runs, it is
+# meaningful in a bug report, and it does not move when this script rebuilds the
+# Lesson pane's generated files. The newest mtime is the last resort, for a tree
+# that is not a git checkout — and it is a poor last resort, because those
+# generated files are rewritten on every run, so two builds of an unchanged
+# preset would disagree.
+if [ -n "${SOURCE_DATE_EPOCH:-}" ]; then
+  EPOCH="$SOURCE_DATE_EPOCH"
+elif EPOCH="$(git -C "$HERE" log -1 --format=%ct 2>/dev/null)" && [ -n "$EPOCH" ]; then
+  :
+else
+  EPOCH="$(newest_mtime "$PRESET_SRC")"
+fi
 EXPORTED_AT="$(iso_from_epoch "$EPOCH")"
 
 cat > "$STAGE/manifest.json" <<JSON
@@ -123,6 +141,22 @@ cat > "$STAGE/manifest.json" <<JSON
   "exportedAt": "$EXPORTED_AT"
 }
 JSON
+
+# Normalise every timestamp in the staging tree.
+#
+# WHY THIS IS NOT COSMETIC. A zip records each entry's modification time, and the
+# staged files are copies, so their mtimes are "whenever this script last ran".
+# Two builds of an unchanged tree therefore produced two different archives, and
+# `--check` — which rebuilds and compares SHA-256 — reported "stale" on a tree
+# nothing had touched. A check that cries wolf is worse than no check: it teaches
+# you to ignore the one time it is right.
+#
+# Every entry is stamped with the same instant the manifest declares, which is
+# also what makes SOURCE_DATE_EPOCH work as the standard reproducibility knob.
+touch -t "$(epoch_as_touch "$EPOCH")" "$STAGE/manifest.json"
+while IFS= read -r file; do
+  touch -t "$(epoch_as_touch "$EPOCH")" "$file"
+done < <(find "$STAGE/preset" -type f)
 
 # ── verify the staged tree against the format's own rules ────────────────────
 
