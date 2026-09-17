@@ -1,0 +1,10 @@
+{
+  "id": "mimir-splash",
+  "name": "Mimir Splash",
+  "version": "1.0.0",
+  "minAppVersion": "1.5.0",
+  "description": "Play a short pixel-art animation over the vault as it opens, then get out of the way.",
+  "author": "tommyhedgerow",
+  "authorUrl": "https://github.com/tommyhedgerow",
+  "isDesktopOnly": false
+}

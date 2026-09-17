@@ -1,0 +1,36 @@
+# Cut a release on a bare `x.y.z` tag, or any `v*` tag for the vault itself.
+#
+# The release carries the two things a stranger needs: the `.dshpreset`, which
+# is the teacher as a single importable file, and its SHA-256, so the download
+# can be verified without trusting the connection it came over.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Build the preset package
+        run: ./scripts/pack-preset.sh
+
+      - name: Create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          gh release create "$tag" --title="$tag" --generate-notes \
+            dist/mimir-tutor.dshpreset \
+            dist/mimir-tutor.dshpreset.sha256

@@ -1,0 +1,129 @@
+filters:
+  and:
+    - file.inFolder("Learn")
+    - 'file.ext == "md"'
+
+formulas:
+  days_to_review: 'if(review_due, (date(review_due) - today()).days, "")'
+  retrieval_count: 'retrievals.length'
+  probe_pct: 'if(probe_checks, ((probe_correct / probe_checks) * 100).round(0), "")'
+
+properties:
+  formula.days_to_review:
+    displayName: "Days"
+  formula.retrieval_count:
+    displayName: "Reviews"
+  formula.probe_pct:
+    displayName: "Probe %"
+  review_due:
+    displayName: "Due"
+  probe_checks:
+    displayName: "Asked"
+  probe_correct:
+    displayName: "Right"
+  books:
+    displayName: "Reading added"
+  terms:
+    displayName: "Terms"
+
+views:
+  - type: table
+    name: "Due"
+    filters:
+      and:
+        - 'type == "concept"'
+    order:
+      - file.name
+      - status
+      - review_due
+      - formula.days_to_review
+      - formula.retrieval_count
+      - subjects
+    sort:
+      - property: review_due
+        direction: ASC
+
+  - type: table
+    name: "Concepts"
+    filters:
+      and:
+        - 'type == "concept"'
+    order:
+      - file.name
+      - status
+      - subjects
+      - taught
+      - formula.retrieval_count
+    groupBy:
+      property: status
+      direction: ASC
+
+  - type: table
+    name: "Strands"
+    filters:
+      and:
+        - 'type == "map"'
+        - 'state != "index"'
+    order:
+      - file.name
+      - state
+      - opened
+      - frontier
+      - next
+
+  - type: table
+    name: "Sessions"
+    filters:
+      and:
+        - 'type == "session"'
+    order:
+      - date
+      - file.name
+      - formula.probe_pct
+      - probe_correct
+      - teach_correct
+      - status
+    sort:
+      - property: date
+        direction: DESC
+
+  - type: table
+    name: "Retrieval log"
+    filters:
+      and:
+        - 'type == "concept"'
+        - 'retrievals.isEmpty() == false'
+    order:
+      - file.name
+      - status
+      - review_due
+      - retrievals
+    sort:
+      - property: review_due
+        direction: ASC
+
+  - type: table
+    name: "Books added"
+    filters:
+      and:
+        - 'books.isEmpty() == false'
+    order:
+      - date
+      - topic
+      - books
+    sort:
+      - property: date
+        direction: DESC
+
+  - type: table
+    name: "Terms added"
+    filters:
+      and:
+        - 'terms.isEmpty() == false'
+    order:
+      - date
+      - topic
+      - terms
+    sort:
+      - property: date
+        direction: DESC

@@ -1,0 +1,66 @@
+/* ------------------------------------------------------------------
+   Mermaid, restyled.
+   
+   Deliberately narrow. Each diagram's own classDef decides what a box
+   *means* — amber for learning, red dashed for fragile, grey dotted for
+   planned. This file only fixes what mermaid gets wrong by default in
+   Obsidian: the type is wrong, the edges are as loud as the boxes, the
+   corners are square, and every diagram looks like a wireframe.
+
+   Note what is NOT here: no `fill` and no `stroke` on nodes. Those carry
+   the state (see Tools/vault-map.mjs) and mermaid already applies them
+   from the diagram's classDef. Styling them here would out-specify the
+   class and quietly erase the one thing the graph is for.
+   ------------------------------------------------------------------ */
+
+/* Type: match the note, not mermaid's own font stack. The Mimir theme labels
+   everything that is furniture in monospace, and a diagram is furniture. */
+.mermaid svg {
+  font-family: var(--mimir-mono, var(--font-monospace));
+  max-width: 100%;
+  height: auto;
+}
+
+.mermaid .nodeLabel,
+.mermaid .label,
+.mermaid .edgeLabel,
+.mermaid text {
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+/* Corners: worth a lot on their own. Ignored where the browser is old,
+   in which case nothing breaks. */
+.mermaid .node rect,
+.mermaid .node polygon,
+.mermaid .node path,
+.mermaid .cluster rect {
+  rx: 7px;
+  ry: 7px;
+}
+
+/* Edges: quiet, so the boxes carry the meaning. */
+.mermaid .edgePath path,
+.mermaid .flowchart-link {
+  stroke: var(--text-faint);
+  stroke-width: 1.2px;
+}
+
+.mermaid .marker,
+.mermaid marker path {
+  fill: var(--text-faint);
+  stroke: var(--text-faint);
+}
+
+/* Edge labels sit on a halo; make the halo the note's own background. */
+.mermaid .edgeLabel,
+.mermaid .edgeLabel rect {
+  background-color: var(--background-primary);
+  fill: var(--background-primary);
+  color: var(--text-muted);
+}
+
+/* A diagram should never be the reason the pane scrolls sideways. */
+.mermaid {
+  overflow-x: auto;
+}

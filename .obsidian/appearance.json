@@ -1,0 +1,12 @@
+{
+  "accentColor": "#4f7a5c",
+  "theme": "obsidian",
+  "cssTheme": "Mimir",
+  "baseFontSize": 18.5,
+  "translucency": false,
+  "showRibbon": true,
+  "showViewHeader": true,
+  "enabledCssSnippets": [
+    "mermaid"
+  ]
+}

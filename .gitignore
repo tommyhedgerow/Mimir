@@ -1,0 +1,37 @@
+# macOS
+.DS_Store
+
+# Obsidian: per-machine pane layout and caches. Changes on every scroll.
+# The rest of .obsidian/ IS tracked on purpose: the theme, the plugins and the
+# hotkeys are the reason a fresh clone is ready to read in.
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache/
+
+# Obsidian per-plugin state, written at runtime and keyed to this machine.
+.obsidian/plugins/*/data.json
+
+# Live lesson state: working files, written on every question, never knowledge.
+# The README explaining the folder is the only part worth keeping.
+Learn/Sessions/.live/*
+!Learn/Sessions/.live/README.md
+
+# The learner's own record. These files ship as empty forms; once you have
+# taught anything they hold your state, and your state is not for committing to
+# a public fork. Uncomment if you fork this and push.
+# Learn/Learner Profile.md
+# Learn/Backlog.md
+# Learn/Reading List.md
+# Learn/Glossary.md
+# Learn/Glossary/
+# Learn/Sessions/
+# Learn/Concepts/
+# Learn/Maps/
+# Learn/Viz/
+
+# Where the library vault is. Per-machine, so it is not committed.
+Tools/publish-target.txt
+
+# Build output
+dist/
+node_modules/

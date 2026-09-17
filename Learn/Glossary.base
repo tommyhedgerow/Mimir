@@ -1,0 +1,49 @@
+filters:
+  and:
+    - 'file.inFolder("Learn/Glossary")'
+    - 'file.ext == "md"'
+
+properties:
+  field:
+    displayName: "Field"
+  taught:
+    displayName: "Layers taught"
+  term:
+    displayName: "Term"
+
+views:
+  - type: table
+    name: "All terms"
+    order:
+      - term
+      - field
+      - file.name
+    sort:
+      - property: term
+        direction: ASC
+
+  - type: table
+    name: "By field"
+    order:
+      - term
+      - file.name
+    sort:
+      - property: term
+        direction: ASC
+    groupBy:
+      property: field
+      direction: ASC
+
+  - type: table
+    name: "Not yet taught"
+    filters:
+      and:
+        - 'taught < 2'
+    order:
+      - term
+      - field
+      - taught
+      - file.name
+    sort:
+      - property: taught
+        direction: ASC

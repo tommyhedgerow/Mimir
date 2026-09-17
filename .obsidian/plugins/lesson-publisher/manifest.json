@@ -1,0 +1,10 @@
+{
+  "id": "lesson-publisher",
+  "name": "Lesson Publisher",
+  "version": "1.0.0",
+  "minAppVersion": "1.4.0",
+  "description": "Publish a finished note and every file it embeds into a second vault, mirroring the folder structure.",
+  "author": "tommyhedgerow",
+  "authorUrl": "https://github.com/tommyhedgerow",
+  "isDesktopOnly": true
+}

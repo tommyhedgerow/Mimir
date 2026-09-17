@@ -1,0 +1,22 @@
+{
+  "name": "dsh-mimir-lesson-pane",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The Lesson pane: a paper-and-ink right-hand column for Mimir Tutor sessions, carrying the quiz, the vault's SVG visualisations, the lesson spine and a scratch pad.",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  }
+}

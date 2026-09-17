@@ -1,0 +1,86 @@
+/* ============================================================================
+   MIMIR CONTROLS — the two buttons in the top bar of a note
+   ============================================================================
+
+   The plugin puts a `.mimir-controls` group in each view header; this is what it
+   looks like. Two buttons, no panel:
+
+     .mimir-size-btn    a type mark with three pips — small / medium / large
+     .mimir-frame-btn   a sun or a moon — the frame you are reading in
+
+   Nothing here moves or hides anything the app owns. The group is appended to the
+   header's own actions and takes its place after them.
+
+   Every colour is read from the theme's tokens with a literal fallback, so the buttons
+   still draw sensibly under another theme. The shape language is the theme's: square,
+   hairline, monospace, one accent for the live state.
+   ========================================================================= */
+
+/* The group: a hairline between the note's own actions and these, then two targets. */
+.mimir-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid var(--mimir-rule, var(--background-modifier-border));
+}
+
+.mimir-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 28px;
+  min-width: 28px;
+  padding: 0 5px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--mimir-ink-2, var(--text-muted));
+  cursor: pointer;
+}
+
+.mimir-btn:hover {
+  background: var(--mimir-paper-3, var(--background-modifier-hover));
+  color: var(--mimir-ink, var(--text-normal));
+}
+
+.mimir-btn:focus-visible {
+  outline: 2px solid var(--mimir-cyan, var(--text-accent));
+  outline-offset: -2px;
+}
+
+.mimir-btn .svg-icon {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.7;
+}
+
+/* The frame button wears the accent, because it changes the whole page. */
+.mimir-frame-btn {
+  color: var(--mimir-mark, var(--interactive-accent));
+}
+
+.mimir-frame-btn:hover {
+  color: var(--mimir-mint, var(--interactive-accent-hover));
+}
+
+/* Three pips, one filled: a control that cycles has to say where in the cycle it is. */
+.mimir-pips {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mimir-pip {
+  width: 3px;
+  height: 3px;
+  background: var(--mimir-line, var(--background-modifier-border));
+}
+
+.mimir-pip[data-on="true"] {
+  background: var(--mimir-mark, var(--interactive-accent));
+}

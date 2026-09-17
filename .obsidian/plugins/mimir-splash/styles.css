@@ -1,0 +1,77 @@
+/* ============================================================================
+   MIMIR SPLASH — the sheet the startup animation is played on
+   ============================================================================
+
+   One rule and one surface. The curtain is the paper the vault is already
+   wearing, so the animation composites onto it rather than arriving in a box,
+   and the only other decision here is how the 320x180 pixel art scales.
+
+   ONE COLOUR, AND IT COMES FROM THE ANIMATION. The piece was rendered on grounds
+   of its own — a purple black in the dark build, a lavender grey in the light one
+   — and neither is this theme's paper, so a curtain in the vault's colours left
+   the artwork reading as a rectangle laid on the page. The sheet is therefore the
+   piece's own ground while it plays. The plugin supplies it as
+   `--mimir-splash-ground`; the theme's paper below is only the fallback for a
+   splash drawn without one.
+
+   No colour is written down here. `Tools/check-tokens.mjs` still has four files to
+   keep in step, and this is not a fifth: the two grounds belong to the animation
+   and are recorded with it in `Tools/splash/README.md`.
+
+   Author: the student · for the Mimisbrunnr vault
+   ========================================================================= */
+
+.mimir-splash {
+  position: fixed;
+  inset: 0;
+  /* Above the workspace, at the same layer a modal uses. The piece is the first
+     thing on screen at startup and there is nothing yet for it to cover. */
+  z-index: var(--layer-modal, 100);
+  display: grid;
+  place-items: center;
+  background: var(--mimir-splash-ground, var(--mimir-paper, var(--background-primary)));
+  cursor: pointer;
+  animation: mimir-splash-in 240ms ease-out;
+}
+
+/* Going, not gone: the element is removed a beat later, so the fade is what is
+   seen and the removal is not a jump. */
+.mimir-splash[data-going='true'] {
+  animation: mimir-splash-out 400ms ease-in forwards;
+  pointer-events: none;
+}
+
+/* THE SCALE IS THE WHOLE DESIGN. The master is 320x180 exported at 4x, so each
+   drawn pixel is four device pixels wide. `pixelated` is what keeps that an
+   edge rather than a smear, and on a 2x display the 640 CSS px cap lands on
+   whole device pixels — an exact 4x of the drawn grid.
+
+   Both dimensions are `auto` with a maximum each, never a fixed width with a
+   max-height: on a replaced element a fixed width plus a clamped height is a
+   distorted video, and `width:auto` is what lets the aspect ratio carry. */
+.mimir-splash > video,
+.mimir-splash > img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(88vw, 640px);
+  max-height: 74vh;
+  image-rendering: pixelated;
+}
+
+@keyframes mimir-splash-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes mimir-splash-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* Where motion is reduced the still frame is what plays, so there is nothing to
+   ease in: the fade out stays, because removing an element abruptly is a jump
+   rather than a movement. */
+@media (prefers-reduced-motion: reduce) {
+  .mimir-splash { animation: none; }
+}

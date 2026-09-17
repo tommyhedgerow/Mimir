@@ -1,0 +1,52 @@
+{
+  "_": [
+    "The Mimir palette, in one place. Four files speak it and they must agree:",
+    "  .obsidian/themes/Mimir/theme.css        \u2014 the vault theme",
+    "  Tools/vault-chart.mjs                   \u2014 every SVG in Learn/Viz",
+    "  Tools/lesson-pane/client.mjs (VIZ_ROLES) \u2014 re-inks those SVGs in the Lesson pane",
+    "  .obsidian/plugins/mimir/main.js         \u2014 the top-bar controls",
+    "Run `node Tools/check-tokens.mjs` after touching any of them. This file is the",
+    "source; the others are copies, and a disagreement is a bug, not a preference."
+  ],
+  "light": {
+    "paper": "#faf6ea",
+    "paper-2": "#f2ead6",
+    "paper-3": "#e9dfc6",
+    "canvas": "#fbfaf6",
+    "ink": "#25231d",
+    "ink-2": "#5d5749",
+    "ink-3": "#756d59",
+    "rule": "#e3d9c1",
+    "rule-soft": "#eadfc8",
+    "line": "#c9bc9e",
+    "mark": "#4f7a5c",
+    "mark-soft": "#dbe8d4",
+    "mint": "#2f7d63",
+    "peach": "#b5642f",
+    "peach-soft": "#f4e7d6",
+    "cyan": "#2c6b7a"
+  },
+  "dark": {
+    "paper": "#131a19",
+    "paper-2": "#18211f",
+    "paper-3": "#1f2a27",
+    "canvas": "#f7faf8",
+    "ink": "#e6f0e6",
+    "ink-2": "#9db3a9",
+    "ink-3": "#82998f",
+    "rule": "#25322e",
+    "rule-soft": "#2b3a35",
+    "line": "#33443e",
+    "mark": "#8fd6a4",
+    "mark-soft": "#1e3830",
+    "mint": "#a6e3bd",
+    "peach": "#f0b183",
+    "peach-soft": "#33261d",
+    "cyan": "#95d7de"
+  },
+  "readingSizes": [
+    15,
+    16.5,
+    18.5
+  ]
+}

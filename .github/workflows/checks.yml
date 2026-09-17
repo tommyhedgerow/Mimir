@@ -1,0 +1,44 @@
+# The checks that can be run without Obsidian or a running harness.
+#
+# These are the vault's own gates, the ones the project relies on to stop a
+# drawing or a colour drifting away from the notes it claims to describe. They
+# are cheap, so they run on every push and pull request.
+
+name: Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: The palette is one palette
+        run: node Tools/check-tokens.mjs
+
+      - name: The drawn maps match the notes
+        run: node Tools/vault-map.mjs
+
+      - name: The Lesson pane bundle is current
+        run: node Tools/build-lesson-pane.mjs --check
+
+      - name: The plugin copies match the lock
+        run: |
+          # The three plugins are vendored into .obsidian/plugins so a fresh
+          # clone is ready to read in. They are authored in their own
+          # repositories, because the community directory installs one plugin per
+          # repository; this checks the copies here are the ones that were synced.
+          node scripts/sync-plugins.mjs --check
+
+      - name: The preset package is current and importable
+        run: |
+          ./scripts/pack-preset.sh
+          ./scripts/pack-preset.sh --check

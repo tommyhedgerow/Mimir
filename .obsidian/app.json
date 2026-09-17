@@ -1,0 +1,8 @@
+{
+  "promptDelete": false,
+  "alwaysUpdateLinks": true,
+  "newFileLocation": "current",
+  "attachmentFolderPath": "Learn/Attachments",
+  "showUnsupportedFiles": true,
+  "readableLineLength": true
+}

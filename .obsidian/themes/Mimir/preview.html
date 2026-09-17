@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mimir — theme preview</title>
+<style>
+/* ============================================================================
+   MIMIR — an Obsidian theme taken from the Lesson window
+   ============================================================================
+
+   The exchange is now the other way round. The Lesson window was first dressed
+   as a terminal in the vault's own colours: warm paper, sage green, a serif for
+   what is read, a blocky monospace for what is furniture. It has since been
+   tuned harder than the theme it came from — the paper is warmer, the sage is
+   quieter, the labels are letterspaced monospace rather than caps in the UI
+   font, and nothing is boxed that a hairline and a single edge can separate.
+   That tuning is the better set of decisions, so it is the source, and this
+   theme is the vault catching up.
+
+   Two rules carried across whole, because they are what the pane gets right:
+
+     1. RULE vs LINE. `--mimir-rule` is a hairline for separation. `--mimir-line`
+        is the one weight that means "this is a surface". Everything else
+        separates with space or with one coloured edge on the left. A box around
+        every element is what makes a page shout.
+     2. A CARD IS PAPER, NOT A FRAME. Surfaces are the next shade of the same
+        stock, with an offset shadow in the corner and a 3px accent edge along
+        the top (a question) or the left (a voice). No outlines, no rounding.
+
+   Palette and metrics are copied from Tools/lesson-pane/client.mjs, tokens
+   `--mm-*`. If the pane's palette moves, this file is the second place to move.
+
+   Author: the student · for the Mimisbrunnr vault · saved 2026-09-17
+   ========================================================================= */
+
+/* ---------------------------------------------------------------------------
+   §1  TOKENS
+   ------------------------------------------------------------------------ */
+
+body {
+  /* ── light: warm paper, ink, sage ─────────────────────────────────────── */
+  --mimir-paper:      #faf6ea;
+  --mimir-paper-2:    #f2ead6;
+  --mimir-paper-3:    #e9dfc6;
+  --mimir-ink:        #25231d;
+  --mimir-ink-2:      #5d5749;
+  --mimir-ink-3:      #756d59;  /* the pane's #8b836f, darkened for 4.5:1 on paper-3 */
+  --mimir-rule:       #e3d9c1;
+  --mimir-rule-soft:  #eadfc8;  /* the hairline a surface is allowed to have */
+  --mimir-line:       #c9bc9e;
+  --mimir-mark:       #4f7a5c;  /* sage — the accent */
+  --mimir-mark-soft:  #dbe8d4;
+  --mimir-canvas:     #fbfaf6;  /* the page drawings are inked on */
+  --mimir-shadow:     rgba(58, 45, 28, 0.14);
+  --mimir-grid:       rgba(120, 100, 70, 0.05);
+  --mimir-scan:       rgba(120, 100, 70, 0.028);
+
+  /* ── the four voices ──────────────────────────────────────────────────── */
+  --mimir-mint:       #2f7d63;  /* the teacher */
+  --mimir-mint-soft:  #e4f0e8;
+  --mimir-peach:      #b5642f;  /* the learner */
+  --mimir-peach-soft: #f4e7d6;
+  --mimir-lilac:      #6b5aa8;  /* the working: quotes, earlier turns */
+  --mimir-lilac-soft: #e5e0f5;
+  --mimir-cyan:       #2c6b7a;  /* the vault's furniture: links, status, spines */
+  --mimir-cyan-soft:  #d5e9ee;
+
+  /* ── the two faces ────────────────────────────────────────────────────── */
+  --mimir-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
+                 Charter, Georgia, "Times New Roman", serif;
+  --mimir-mono:  ui-monospace, SFMono-Regular, "SF Mono", Monaco, Menlo, monospace;
+
+  /* ── furniture ────────────────────────────────────────────────────────── */
+  --mimir-edge:  3px;   /* the single coloured edge */
+  --mimir-offset: 4px;  /* the offset card shadow */
+}
+
+/* Dark is the same object in green-black. The body class is Obsidian's own, so
+   the theme follows the app's setting and neither variant is ever half-defined. */
+body.theme-dark,
+.theme-dark {
+  --mimir-paper:      #131a19;
+  --mimir-paper-2:    #18211f;
+  --mimir-paper-3:    #1f2a27;
+  --mimir-ink:        #e6f0e6;
+  --mimir-ink-2:      #9db3a9;
+  --mimir-ink-3:      #82998f;  /* the pane's #6d8279, lifted for contrast on paper-3 */
+  --mimir-rule:       #25322e;
+  --mimir-rule-soft:  #2b3a35;  /* the hairline a surface is allowed to have */
+  --mimir-line:       #33443e;
+  --mimir-mark:       #8fd6a4;
+  --mimir-mark-soft:  #1e3830;
+  --mimir-canvas:     #f7faf8;  /* drawings stay inked light, as in the pane */
+  --mimir-shadow:     rgba(0, 0, 0, 0.45);
+  --mimir-grid:       rgba(150, 220, 190, 0.045);
+  --mimir-scan:       rgba(150, 220, 190, 0.022);
+
+  --mimir-mint:       #a6e3bd;
+  --mimir-mint-soft:  #16302a;
+  --mimir-peach:      #f0b183;
+  --mimir-peach-soft: #33261d;
+  --mimir-lilac:      #bcb0f2;
+  --mimir-lilac-soft: #2a2542;
+  --mimir-cyan:       #95d7de;
+  --mimir-cyan-soft:  #17323a;
+}
+
+/* ---------------------------------------------------------------------------
+   §2  OBSIDIAN'S OWN VARIABLES, SET FROM THE TOKENS
+   ------------------------------------------------------------------------ */
+
+body {
+  /* surfaces and type */
+  --background-primary:          var(--mimir-paper);
+  --background-primary-alt:      var(--mimir-paper-2);
+  --background-secondary:        var(--mimir-paper-2);
+  --background-secondary-alt:    var(--mimir-paper-3);
+  --background-modifier-border:  var(--mimir-line);
+  --background-modifier-border-hover: var(--mimir-ink-3);
+  --background-modifier-border-focus: var(--mimir-mark);
+  --background-modifier-hover:   var(--mimir-paper-3);
+  --background-modifier-active-hover: var(--mimir-mark-soft);
+  --background-modifier-form-field: var(--mimir-paper);
+  --background-modifier-form-field-highlighted: var(--mimir-paper-3);
+  --background-modifier-box-shadow: var(--mimir-shadow);
+  --background-modifier-success: var(--mimir-mint-soft);
+  --background-modifier-error:   var(--mimir-peach-soft);
+  --background-modifier-error-hover: var(--mimir-peach-soft);
+  --background-modifier-cover:   rgba(37, 35, 29, 0.55);
+
+  --text-normal:        var(--mimir-ink);
+  --text-muted:         var(--mimir-ink-2);
+  --text-faint:         var(--mimir-ink-3);
+  --text-on-accent:     var(--mimir-paper);
+  --text-on-accent-inverted: var(--mimir-paper);
+  --text-success:       var(--mimir-mint);
+  --text-warning:       var(--mimir-peach);
+  --text-error:         var(--mimir-peach);
+  --text-accent:        var(--mimir-cyan);
+  --text-accent-hover:  var(--mimir-mint);
+  --text-selection:     var(--mimir-mark-soft);
+  --text-highlight-bg:  var(--mimir-mark-soft);
+  --text-highlight-bg-active: var(--mimir-peach-soft);
+  --text-code:          var(--mimir-ink);
+
+  --interactive-normal:       var(--mimir-paper);
+  --interactive-hover:        var(--mimir-paper-2);
+  --interactive-accent:       var(--mimir-mark);
+  --interactive-accent-hover: var(--mimir-mint);
+  --interactive-accent-rgb:   79, 122, 92;
+  --interactive-success:      var(--mimir-mint);
+  --interactive-muted:        var(--mimir-paper-3);
+
+  --divider-color:        var(--mimir-rule);
+  --divider-color-hover:  var(--mimir-line);
+  --tab-outline-color:    var(--mimir-rule);
+
+  --scrollbar-bg:            transparent;
+  --scrollbar-thumb-bg:      var(--mimir-line);
+  --scrollbar-active-thumb-bg: var(--mimir-ink-3);
+
+  --prompt-border-color:   var(--mimir-line);
+  --modal-border-color:    var(--mimir-line);
+
+  --hr-color:  var(--mimir-rule);
+  --tag-color: var(--mimir-ink-2);
+  --tag-background: var(--mimir-paper-3);
+
+  --caret-color: var(--mimir-mint);
+
+  --link-color:          var(--mimir-cyan);
+  --link-color-hover:    var(--mimir-mint);
+  --link-decoration:     underline;
+  --link-decoration-hover: underline;
+  --link-external-color: var(--mimir-cyan);
+  --link-unresolved-color: var(--mimir-peach);
+  --link-unresolved-opacity: 1;
+
+  --checkbox-border-color: var(--mimir-line);
+  --checkbox-color: var(--mimir-mark);
+  --checkbox-color-hover: var(--mimir-mint);
+  --checkbox-marker-color: var(--mimir-paper);
+  --checklist-done-color: var(--mimir-ink-3);
+
+  --blockquote-border-color: var(--mimir-lilac);
+  --blockquote-color: var(--mimir-ink-2);
+  --blockquote-background-color: transparent;
+
+  --code-background: var(--mimir-paper-2);
+  --code-normal: var(--mimir-ink);
+  --code-size: 0.84em;
+  --code-comment: var(--mimir-ink-3);
+  --code-function: var(--mimir-mark);
+  --code-important: var(--mimir-peach);
+  --code-keyword: var(--mimir-lilac);
+  --code-property: var(--mimir-cyan);
+  --code-punctuation: var(--mimir-ink-2);
+  --code-string: var(--mimir-mint);
+  --code-tag: var(--mimir-peach);
+  --code-value: var(--mimir-cyan);
+
+  --table-border-color: var(--mimir-rule);
+  --table-header-background: var(--mimir-paper-2);
+  --table-header-color: var(--mimir-ink-2);
+  --table-row-alt-background: var(--mimir-paper-2);
+  --table-row-background-hover: var(--mimir-mark-soft);
+  --table-column-alt-background: transparent;
+
+  --embed-background: var(--mimir-paper-2);
+  --embed-border-left: var(--mimir-edge) solid var(--mimir-lilac);
+  --embed-border-right: none;
+  --embed-padding: 0.6em 1em;
+
+  --nav-item-color:              var(--mimir-ink-2);
+  --nav-item-color-hover:        var(--mimir-ink);
+  --nav-item-color-active:       var(--mimir-ink);
+  --nav-item-color-selected:     var(--mimir-ink);
+  --nav-item-background-hover:   var(--mimir-paper-3);
+  --nav-item-background-active:  var(--mimir-mark-soft);
+  --nav-item-background-selected: var(--mimir-mark-soft);
+  --nav-item-weight-active:      400;
+  --nav-collapse-icon-color:     var(--mimir-ink-3);
+
+  --titlebar-background: var(--mimir-paper-2);
+  --titlebar-background-focused: var(--mimir-paper-2);
+  --titlebar-border-color: var(--mimir-rule);
+  --titlebar-text-color: var(--mimir-ink-2);
+  --titlebar-text-color-focused: var(--mimir-ink);
+
+  --status-bar-background: var(--mimir-paper-2);
+  --status-bar-border-color: var(--mimir-rule);
+  --status-bar-text-color: var(--mimir-ink-3);
+
+  --ribbon-background: var(--mimir-paper-2);
+  --ribbon-background-collapsed: var(--mimir-paper-2);
+
+  --icon-color: var(--mimir-ink-2);
+  --icon-color-hover: var(--mimir-ink);
+  --icon-color-active: var(--mimir-mark);
+  --icon-color-focused: var(--mimir-mark);
+
+  /* flat, unrounded, hairline-separated — the pane's whole shape language */
+  --radius-s: 0;
+  --radius-m: 0;
+  --radius-l: 0;
+  --input-radius: 0;
+  --clickable-icon-radius: 0;
+  --modal-radius: 0;
+  --tab-radius: 0;
+  --tab-radius-active: 0;
+  --button-radius: 0;
+
+  --font-text-theme: var(--mimir-serif);
+  --font-interface-theme: var(--mimir-serif);
+  --font-monospace-theme: var(--mimir-mono);
+  --font-text-size: 18px;
+}
+
+/* Values that cannot live in custom properties, kept beside the block above. */
+body { --input-border-width: 1px; --input-height: 30px; }
+
+/* ---------------------------------------------------------------------------
+   §3  THE WRITING SURFACE
+   ------------------------------------------------------------------------ */
+
+.markdown-source-view.mod-cm6,
+.markdown-preview-view,
+.markdown-rendered {
+  font-family: var(--mimir-serif);
+  line-height: 1.62;
+  letter-spacing: 0.002em;
+}
+
+body {
+  background-color: var(--mimir-paper);
+  background-image:
+    radial-gradient(circle at 15% 6%, var(--mimir-grid), transparent 52%),
+    repeating-linear-gradient(135deg, var(--mimir-scan) 0 2px, transparent 2px 4px);
+  color: var(--mimir-ink);
+  -webkit-font-smoothing: antialiased;
+}
+.workspace-split,
+.workspace-leaf,
+.workspace-leaf-content,
+.view-content,
+.markdown-reading-view,
+.cm-s-obsidian {
+  background-color: transparent;
+}
+
+/* Drawings are inked for light paper, so they get paper even in the dark — the
+   same decision the pane makes for `--mm-canvas`. */
+.markdown-rendered img,
+.markdown-rendered svg,
+.internal-embed img,
+.internal-embed svg,
+.markdown-embed img,
+.markdown-embed svg {
+  background: var(--mimir-canvas);
+  padding: 12px;
+  box-shadow: var(--mimir-offset) var(--mimir-offset) 0 var(--mimir-shadow);
+  max-width: 100%;
+}
+.markdown-rendered img.emoji,
+.markdown-rendered .callout img,
+.markdown-rendered .callout svg {
+  background: none;
+  padding: 0;
+  box-shadow: none;
+}
+
+/* ---------------------------------------------------------------------------
+   §4  HEADINGS — the pane's letterspaced monospace labels, scaled up
+   ------------------------------------------------------------------------ */
+
+.markdown-rendered h1, .cm-s-obsidian .HyperMD-header-1,
+.markdown-rendered h2, .cm-s-obsidian .HyperMD-header-2,
+.markdown-rendered h3, .cm-s-obsidian .HyperMD-header-3 {
+  font-family: var(--mimir-mono);
+  font-weight: 400;
+  color: var(--mimir-ink);
+}
+.markdown-rendered h1, .cm-s-obsidian .HyperMD-header-1 {
+  font-size: 1.16em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--mimir-rule);
+  padding-bottom: 0.45em;
+  margin: 1.8em 0 0.8em;
+}
+.markdown-rendered h2, .cm-s-obsidian .HyperMD-header-2 {
+  font-size: 1.02em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mimir-ink-2);
+  margin: 1.6em 0 0.6em;
+}
+.markdown-rendered h3, .cm-s-obsidian .HyperMD-header-3 {
+  font-size: 0.98em;
+  letter-spacing: 0.05em;
+  color: var(--mimir-ink-2);
+  margin: 1.4em 0 0.5em;
+}
+.markdown-rendered h4, .markdown-rendered h5, .markdown-rendered h6 {
+  font-family: var(--mimir-mono);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--mimir-ink-2);
+}
+
+/* The first heading in a note is the title in many of these notes; Obsidian's
+   inline title already carries it, so give it the serif weight of a statement. */
+.inline-title {
+  font-family: var(--mimir-serif);
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--mimir-ink);
+}
+
+/* ---------------------------------------------------------------------------
+   §5  LINKS, LISTS, RULES
+   ------------------------------------------------------------------------ */
+
+.markdown-rendered a.internal-link,
+.markdown-rendered a.external-link {
+  color: var(--mimir-cyan);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.markdown-rendered a:hover { color: var(--mimir-mint); }
+
+.markdown-rendered a.internal-link.is-unresolved {
+  color: var(--mimir-peach);
+  text-decoration-style: dotted;
+}
+
+.markdown-rendered ul > li::marker,
+.markdown-rendered ol > li::marker,
+.markdown-rendered .list-bullet {
+  color: var(--mimir-ink-3);
+}
+.markdown-rendered ul > li::marker { content: "—  "; }
+.markdown-rendered li { padding-left: 0.1em; }
+
+.markdown-rendered hr,
+.cm-s-obsidian .hr {
+  border: 0;
+  border-top: 1px solid var(--mimir-rule);
+  margin: 2em 0;
+}
+
+/* ---------------------------------------------------------------------------
+   §6  CODE, QUOTES, TABLES
+   ------------------------------------------------------------------------ */
+
+.markdown-rendered code,
+.cm-s-obsidian .cm-inline-code {
+  font-family: var(--mimir-mono);
+  font-size: 0.84em;
+  background: var(--mimir-mark-soft);
+  color: var(--mimir-ink);
+  padding: 1px 5px;
+  border: 0;
+  border-radius: 0;
+}
+
+.markdown-rendered pre,
+.markdown-rendered pre code,
+.HyperMD-codeblock {
+  font-family: var(--mimir-mono);
+  font-size: 0.82em;
+  background: var(--mimir-paper-2);
+  color: var(--mimir-ink);
+  border: 0;
+  border-left: var(--mimir-edge) solid var(--mimir-line);
+  border-radius: 0;
+  padding: 12px 14px;
+  line-height: 1.6;
+}
+.markdown-rendered pre code { padding: 0; background: none; }
+
+.markdown-rendered blockquote {
+  border-left: var(--mimir-edge) solid var(--mimir-lilac);
+  background: transparent;
+  color: var(--mimir-ink-2);
+  font-style: italic;
+  padding-left: 16px;
+  margin: 14px 0;
+}
+
+.markdown-rendered table {
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+.markdown-rendered th {
+  font-family: var(--mimir-mono);
+  font-size: 0.78em;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mimir-ink-2);
+  background: var(--mimir-paper-2);
+  border: 1px solid var(--mimir-rule);
+  padding: 8px 10px;
+}
+.markdown-rendered td {
+  border: 1px solid var(--mimir-rule);
+  padding: 8px 10px;
+}
+
+/* A tag is a chip, not a pill: square, hairline, monospace. */
+.markdown-rendered a.tag,
+.cm-s-obsidian .cm-hashtag {
+  font-family: var(--mimir-mono);
+  font-size: 0.74em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mimir-ink-2);
+  background: none;
+  border: 1px solid var(--mimir-rule);
+  border-radius: 0;
+  padding: 1px 6px;
+  text-decoration: none;
+}
+.markdown-rendered a.tag:hover {
+  color: var(--mimir-mark);
+  border-color: var(--mimir-mark);
+}
+
+/* Frontmatter: the properties block is machine furniture, so it is monospaced
+   and quiet, with the hairline under it that the pane uses for its bars. */
+.metadata-container {
+  font-family: var(--mimir-mono);
+  font-size: 0.78em;
+  border-bottom: 1px solid var(--mimir-rule);
+  padding-bottom: 10px;
+}
+.metadata-property-key { letter-spacing: 0.08em; text-transform: uppercase; }
+.metadata-property { background: none; }
+.metadata-property-icon { color: var(--mimir-ink-3); }
+
+/* Checkboxes: a square, filled with sage when done. */
+.markdown-rendered input[type="checkbox"],
+.markdown-rendered .task-list-item-checkbox {
+  border: 1px solid var(--mimir-line);
+  border-radius: 0;
+  background: transparent;
+}
+.markdown-rendered input[type="checkbox"]:checked,
+.markdown-rendered .task-list-item-checkbox:checked {
+  background: var(--mimir-mark);
+  border-color: var(--mimir-mark);
+}
+.markdown-rendered .task-list-item.is-checked,
+.markdown-rendered .task-list-item.is-checked a {
+  color: var(--mimir-ink-3);
+}
+
+/* ---------------------------------------------------------------------------
+   §7  CALLOUTS — the card: next shade of paper, 3px edge, offset shadow
+   ------------------------------------------------------------------------ */
+
+.callout {
+  border: 0;
+  border-radius: 0;
+  border-left: var(--mimir-edge) solid var(--mimir-line);
+  background: var(--mimir-paper-2);
+  box-shadow: var(--mimir-offset) var(--mimir-offset) 0 var(--mimir-shadow);
+  padding: 14px 16px;
+  mix-blend-mode: normal;
+}
+.callout-title {
+  font-family: var(--mimir-mono);
+  font-size: 0.8em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mimir-ink-2);
+  gap: 8px;
+}
+.callout-icon { color: var(--mimir-ink-3); }
+
+.callout[data-callout="note"],
+.callout[data-callout="info"]     { border-left-color: var(--mimir-cyan); }
+.callout[data-callout="note"]    > .callout-title,
+.callout[data-callout="info"]    > .callout-title { color: var(--mimir-cyan); }
+
+.callout[data-callout="tip"],
+.callout[data-callout="hint"],
+.callout[data-callout="success"],
+.callout[data-callout="check"]    { border-left-color: var(--mimir-mint); }
+.callout[data-callout="tip"]     > .callout-title,
+.callout[data-callout="hint"]    > .callout-title,
+.callout[data-callout="success"] > .callout-title,
+.callout[data-callout="check"]   > .callout-title { color: var(--mimir-mint); }
+
+.callout[data-callout="question"],
+.callout[data-callout="warning"],
+.callout[data-callout="caution"],
+.callout[data-callout="attention"] { border-left-color: var(--mimir-peach); }
+.callout[data-callout="question"]  > .callout-title,
+.callout[data-callout="warning"]   > .callout-title,
+.callout[data-callout="caution"]   > .callout-title,
+.callout[data-callout="attention"] > .callout-title { color: var(--mimir-peach); }
+
+.callout[data-callout="quote"],
+.callout[data-callout="cite"],
+.callout[data-callout="example"],
+.callout[data-callout="abstract"],
+.callout[data-callout="summary"]  { border-left-color: var(--mimir-lilac); }
+.callout[data-callout="quote"]    > .callout-title,
+.callout[data-callout="cite"]     > .callout-title,
+.callout[data-callout="example"]  > .callout-title,
+.callout[data-callout="abstract"] > .callout-title,
+.callout[data-callout="summary"]  > .callout-title { color: var(--mimir-lilac); }
+
+.callout[data-callout="danger"],
+.callout[data-callout="error"],
+.callout[data-callout="failure"],
+.callout[data-callout="fail"],
+.callout[data-callout="missing"],
+.callout[data-callout="bug"]      { border-left-color: var(--mimir-peach); }
+.callout[data-callout="danger"]   > .callout-title,
+.callout[data-callout="error"]    > .callout-title,
+.callout[data-callout="failure"]  > .callout-title,
+.callout[data-callout="fail"]     > .callout-title,
+.callout[data-callout="missing"]  > .callout-title,
+.callout[data-callout="bug"]      > .callout-title { color: var(--mimir-peach); }
+
+/* ---------------------------------------------------------------------------
+   §8  THE APP AROUND THE NOTE
+   ------------------------------------------------------------------------ */
+
+/* Tabs are an underline, never a box. */
+.workspace-tab-header-container { border-bottom: 1px solid var(--mimir-rule); }
+.workspace-tab-header-inner-title {
+  font-family: var(--mimir-mono);
+  font-size: 0.76em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mimir-ink-3);
+}
+.workspace-tab-header.is-active .workspace-tab-header-inner-title { color: var(--mimir-ink); }
+.workspace-tab-header.is-active { box-shadow: inset 0 -2px 0 var(--mimir-mark); }
+.workspace-tab-header-inner { border-radius: 0; }
+
+/* Sidebars: a rail of small monospace labels, with hairlines for structure. */
+.nav-files-container { padding-top: 6px; }
+.nav-file-title,
+.nav-folder-title {
+  border-radius: 0;
+  font-size: 0.86em;
+}
+.nav-folder-title {
+  font-family: var(--mimir-mono);
+  font-size: 0.74em;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--mimir-ink-3);
+}
+.nav-file-title.is-active {
+  box-shadow: inset 2px 0 0 var(--mimir-mark);
+  background: var(--mimir-mark-soft);
+}
+.side-dock-settings, .workspace-ribbon { border: 0; }
+.workspace-ribbon { border-right: 1px solid var(--mimir-rule); }
+.workspace-leaf-resize-handle { background: var(--mimir-rule); }
+
+/* The title bar of the window and of a pane: one hairline, nothing else. */
+.workspace-tab-header-container,
+.view-header {
+  background: var(--mimir-paper-2);
+  border-bottom: 1px solid var(--mimir-rule);
+}
+.view-header-title {
+  font-family: var(--mimir-serif);
+  color: var(--mimir-ink);
+}
+
+/* Buttons and chips: square, monospace, uppercase. */
+button:not(.clickable-icon),
+.mod-cta {
+  font-family: var(--mimir-mono);
+  font-size: 0.76em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 0;
+  background: var(--mimir-mark);
+  color: var(--mimir-paper);
+  border: 0;
+  box-shadow: none;
+  padding: 8px 12px;
+}
+button:not(.clickable-icon):hover,
+.mod-cta:hover {
+  background: var(--mimir-mint);
+  color: var(--mimir-paper);
+}
+button.mod-warning { background: var(--mimir-peach); }
+.clickable-icon { border-radius: 0; color: var(--mimir-ink-2); }
+.clickable-icon:hover { background: var(--mimir-paper-3); color: var(--mimir-ink); }
+
+input[type="text"], input[type="search"], input[type="number"], textarea, select {
+  border: 1px solid var(--mimir-rule);
+  border-radius: 0;
+  background: var(--mimir-paper);
+  color: var(--mimir-ink);
+  font-family: var(--mimir-serif);
+}
+input[type="text"]:focus, input[type="search"]:focus, textarea:focus, select:focus {
+  border-color: var(--mimir-mark);
+  box-shadow: none;
+  outline: none;
+}
+
+/* Menus, prompts and modals: paper with one hairline and a hard shadow. */
+.menu,
+.suggestion-container,
+.prompt,
+.modal,
+.modal-sidebar,
+.menu-item {
+  border-radius: 0;
+}
+.menu, .suggestion-container, .prompt, .modal {
+  border: 1px solid var(--mimir-line);
+  box-shadow: var(--mimir-offset) var(--mimir-offset) 0 var(--mimir-shadow);
+}
+.menu-item:hover, .suggestion-item.is-selected {
+  background: var(--mimir-mark-soft);
+}
+.suggestion-item { border-radius: 0; }
+.modal-title {
+  font-family: var(--mimir-mono);
+  font-size: 0.8em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mimir-ink-2);
+}
+
+/* The status bar is the pane's rail: lowercase-quiet, monospace, hairline above. */
+.status-bar {
+  font-family: var(--mimir-mono);
+  font-size: 0.72em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.status-bar-item { color: var(--mimir-ink-3); }
+
+/* Scrollbars: a thin line, never a slab. */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: var(--mimir-line);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background-color: var(--mimir-ink-3); }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------------------------------------------------------------------------
+   §9  PLUGINS THIS VAULT ACTUALLY RUNS
+   ------------------------------------------------------------------------ */
+
+/* Bases — the dashboard tables are the same paper as everything else. */
+.bases-view, .bases-table-container, .bases-toolbar {
+  font-family: var(--mimir-serif);
+  background: transparent;
+}
+.bases-toolbar {
+  border-bottom: 1px solid var(--mimir-rule);
+  font-family: var(--mimir-mono);
+  font-size: 0.76em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mimir-ink-3);
+}
+.bases-table th, .bases-table-header {
+  font-family: var(--mimir-mono);
+  font-size: 0.76em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mimir-ink-2);
+  background: var(--mimir-paper-2);
+  border-color: var(--mimir-rule);
+}
+.bases-table td { border-color: var(--mimir-rule); }
+.bases-table tr:hover td { background: var(--mimir-mark-soft); }
+
+/* Charts drawn by the Bases chart view sit on the page, not in a box. */
+.bases-chart-view, .bases-chart { background: transparent; }
+.bases-chart text { font-family: var(--mimir-mono); fill: var(--mimir-ink-2); }
+
+/* Dataview, if it is ever turned on. */
+.dataview.table-view-table th {
+  font-family: var(--mimir-mono);
+  font-size: 0.76em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--mimir-paper-2);
+  color: var(--mimir-ink-2);
+}
+.dataview.table-view-table td { border-color: var(--mimir-rule); }
+
+/* Mermaid, kept in step with .obsidian/snippets/mermaid.css — and, like that
+   snippet, deliberately narrow. NO `fill` OR `stroke` ON NODES: each diagram's
+   own classDef decides what a box means (amber for learning, dashed for
+   fragile, grey for planned — see Tools/vault-map.mjs), and setting them here
+   would out-specify the class and quietly erase the one thing the graphs are
+   for. Only type and the canvas are the theme's business. */
+.mermaid, .mermaid svg { background: transparent; }
+.mermaid svg { font-family: var(--mimir-mono); max-width: 100%; height: auto; }
+.mermaid .nodeLabel,
+.mermaid .label,
+.mermaid .edgeLabel,
+.mermaid text {
+  font-family: var(--mimir-mono) !important;
+  font-size: 13px;
+  line-height: 1.3;
+}
+.mermaid .edgeLabel,
+.mermaid .edgeLabel rect {
+  fill: var(--background-primary);
+  color: var(--text-muted);
+}
+.mermaid { overflow-x: auto; }
+
+/* ---------------------------------------------------------------------------
+   §10  THE LESSON PANE MOUNTS INSIDE THIS APP
+   ------------------------------------------------------------------------ */
+
+/* The pane brings its own palette and its own frame; it is a window over the
+   app, not a part of it. It needs no help from this theme, and this theme must
+   not reach into it — the selectors below are the only ones that touch it, and
+   they fix the handover at the edges rather than restyling the lesson. */
+.mm-window { font-family: var(--mimir-serif); }
+
+/* preview furniture only — not part of the theme */
+html,body{margin:0;background:#0b0f0e;color:#e6f0e6;
+  font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+.wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:18px}
+.pane{background:var(--mimir-paper);border:1px solid var(--mimir-line);padding:26px 30px}
+.pane h2.tag{font:400 11px/1 var(--mimir-mono);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--mimir-ink-3);margin:0 0 18px}
+.markdown-rendered, .markdown-preview-view, .markdown-source-view.mod-cm6{max-width:640px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="pane theme-light"><h2 class="tag">Light — moonstone</h2>
+    <div class="markdown-preview-view markdown-rendered">
+<h1>A diagram has to fit the column</h1>
+<div class="metadata-container">
+  <div class="metadata-property"><span class="metadata-property-key">subjects</span> <span>method</span></div>
+  <div class="metadata-property"><span class="metadata-property-key">status</span> <span>established</span></div>
+  <div class="metadata-property"><span class="metadata-property-key">review_due</span> <span>2026-01-01</span></div>
+</div>
+<p>A note is read in a column, not on a page. Anything drawn wider than that column has
+to be scrolled sideways, and a checkpoint you have to scroll to is one you stop looking
+at. So a <a class="internal-link" href="#">[[dependency map]]</a> is drawn at the width of
+the pane, and the colour on a node is that concept's own
+<a class="external-link" href="#">[state]</a>, never decoration.</p>
+<blockquote><p>A picture that cannot go stale is one that a script draws.</p></blockquote>
+<div class="callout" data-callout="question">
+  <div class="callout-title"><span class="callout-icon">?</span><span>Question</span></div>
+  <p>If every drawing is generated from the notes, what has to be true of the notes
+  before any drawing can be trusted?</p>
+</div>
+<div class="callout" data-callout="warning">
+  <div class="callout-title"><span class="callout-icon">!</span><span>Mind the edge</span></div>
+  <p>The spine is frontmatter, not prose. A note whose graph block disagrees with its own
+  text draws the wrong map, and nothing complains.</p>
+</div>
+<h2>The table</h2>
+<table><thead><tr><th>What</th><th>Written by</th><th>Regenerated?</th></tr></thead>
+<tbody><tr><td>The spine</td><td>hand, in the note</td><td>no</td></tr>
+<tr><td>The drawing</td><td>vault-chart.mjs</td><td>every run</td></tr>
+<tr><td>The palette</td><td>mimir-tokens.json</td><td>checked</td></tr></tbody></table>
+<h3>Tasks and code</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" checked> <span>Redraw after editing a spine</span></li>
+<li class="task-list-item"><input type="checkbox"> <span>Add the new concept to its map</span></li>
+</ul>
+<pre><code>node Tools/vault-chart.mjs  # redraws every SVG in Learn/Viz
+node Tools/check-tokens.mjs # fails if the copies disagree</code></pre>
+<p>Inline <code>review_due: 2026-01-01</code> sits in the field, next to a
+<a class="tag" href="#">#learn</a> <a class="tag" href="#">#method</a>.</p>
+</div></div>
+  <div class="pane theme-dark"><h2 class="tag">Dark — the same theme, dark</h2>
+    <div class="markdown-preview-view markdown-rendered">
+<h1>A diagram has to fit the column</h1>
+<div class="metadata-container">
+  <div class="metadata-property"><span class="metadata-property-key">subjects</span> <span>method</span></div>
+  <div class="metadata-property"><span class="metadata-property-key">status</span> <span>established</span></div>
+  <div class="metadata-property"><span class="metadata-property-key">review_due</span> <span>2026-01-01</span></div>
+</div>
+<p>A note is read in a column, not on a page. Anything drawn wider than that column has
+to be scrolled sideways, and a checkpoint you have to scroll to is one you stop looking
+at. So a <a class="internal-link" href="#">[[dependency map]]</a> is drawn at the width of
+the pane, and the colour on a node is that concept's own
+<a class="external-link" href="#">[state]</a>, never decoration.</p>
+<blockquote><p>A picture that cannot go stale is one that a script draws.</p></blockquote>
+<div class="callout" data-callout="question">
+  <div class="callout-title"><span class="callout-icon">?</span><span>Question</span></div>
+  <p>If every drawing is generated from the notes, what has to be true of the notes
+  before any drawing can be trusted?</p>
+</div>
+<div class="callout" data-callout="warning">
+  <div class="callout-title"><span class="callout-icon">!</span><span>Mind the edge</span></div>
+  <p>The spine is frontmatter, not prose. A note whose graph block disagrees with its own
+  text draws the wrong map, and nothing complains.</p>
+</div>
+<h2>The table</h2>
+<table><thead><tr><th>What</th><th>Written by</th><th>Regenerated?</th></tr></thead>
+<tbody><tr><td>The spine</td><td>hand, in the note</td><td>no</td></tr>
+<tr><td>The drawing</td><td>vault-chart.mjs</td><td>every run</td></tr>
+<tr><td>The palette</td><td>mimir-tokens.json</td><td>checked</td></tr></tbody></table>
+<h3>Tasks and code</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" checked> <span>Redraw after editing a spine</span></li>
+<li class="task-list-item"><input type="checkbox"> <span>Add the new concept to its map</span></li>
+</ul>
+<pre><code>node Tools/vault-chart.mjs  # redraws every SVG in Learn/Viz
+node Tools/check-tokens.mjs # fails if the copies disagree</code></pre>
+<p>Inline <code>review_due: 2026-01-01</code> sits in the field, next to a
+<a class="tag" href="#">#learn</a> <a class="tag" href="#">#method</a>.</p>
+</div></div>
+</div>
+</body>
+</html>
