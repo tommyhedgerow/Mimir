@@ -1,13 +1,13 @@
 # Tools/splash — the copies the vault plays from
 
 The startup animation, as the two surfaces here consume it. **This is a copy, not the
-source.** The piece is authored and rendered in a separate `video-production` project,
-whose `notes/06-export-matrix.md` is the export of record; when it changes there, re-copy
-it here with the commands at the bottom of this note.
+source.** The piece is authored and rendered in `code/video-production`, whose
+`notes/06-export-matrix.md` is the export of record; when it changes there, re-copy it
+here with the commands at the bottom of this note.
 
 ## What is here, and where it came from
 
-| File | Copied from (`video-production/`) | SHA-256 |
+| File | Copied from (`code/video-production/`) | SHA-256 |
 |---|---|---|
 | `mimir_startup_dark.mp4` | `exports/mimir_startup_1280x720.mp4` (the dark master) | `e4cc50479879…5000f1f` |
 | `mimir_startup_light.webm` | `exports/variants/light_transparent/mimir_startup_1280x720_light_transparent.webm` | `a73127f1bcf3…d03795` |
@@ -72,28 +72,27 @@ from the matching master's hold frame — the outer 8-pixel band, which is the e
 compares against the sheet:
 
 ```sh
-E="${VIDEO_PRODUCTION:?set VIDEO_PRODUCTION to the video-production checkout}/exports"
+E=~/code/video-production/exports
 ffmpeg -v error -ss 8.5 -i "$E/mimir_startup_1280x720.mp4" -frames:v 1 -f rawvideo -pix_fmt rgb24 /tmp/dark.raw -y
 ffmpeg -v error -ss 8.5 -i "$E/variants/light/mimir_startup_1280x720_light.mp4" -frames:v 1 -f rawvideo -pix_fmt rgb24 /tmp/light.raw -y
 ```
 
-…then average the border ring of each raw RGB frame. Both places the piece is played pin
-those two values, so a re-render that changes them fails a check rather than going unnoticed:
-`Tools/test-lesson-pane.mjs` here, for the Lesson window, and `test/main.mjs` in the splash
-plugin's own repository (https://github.com/tommyhedgerow/obsidian-mimir-splash), for the
-plugin that plays it in a vault.
+…then average the border ring of each raw RGB frame. `Tools/test-mimir-splash.mjs` asserts
+that the values in the plugin, in `Tools/lesson-pane/client.mjs` and in the table above are
+the same two, so a re-render that changes them fails a check rather than going unnoticed.
 
 ## Where they are played
 
 | Surface | What reads it |
 |---|---|
 | Obsidian, when the vault opens | `.obsidian/plugins/mimir-splash/` — bytes via the vault adapter, once, dismissible with any key |
-| The mimir-tutor Lesson window, when it opens | `Tools/lesson-pane/client.mjs` — bytes over the Harness' own `/api/file` route, once, dismissible with any key |
+| Obsidian on a phone | the same plugin, which holds the still poster frame instead — the clip is desktop- and tablet-sized on purpose |
 
-Both pick the dark or light build from the frame in front of them, both hold the still frame
-instead where `prefers-reduced-motion: reduce` is set, and both leave on their own when the
-clip ends. Both are marked decorative and carry no accessible name — see the note on the alt
-text below.
+Only the plugin plays it now. The Lesson window used to be a second surface and is gone with
+the pane; the piece plays once, over the vault, as the vault opens. It picks the dark or light
+build from the frame in front of it, holds the still frame instead where
+`prefers-reduced-motion: reduce` is set, and leaves on its own when the clip ends. It is marked
+decorative and carries no accessible name — see the note on the alt text below.
 
 ## The alt text
 
@@ -113,7 +112,7 @@ alternative, this is the text:
 ## Refreshing these copies
 
 ```sh
-E="${VIDEO_PRODUCTION:?set VIDEO_PRODUCTION to the video-production checkout}/exports"
+E=~/code/video-production/exports
 cp "$E/mimir_startup_1280x720.mp4"                                               Tools/splash/mimir_startup_dark.mp4
 cp "$E/mimir_startup_poster.png"                                                 Tools/splash/mimir_startup_dark_poster.png
 cp "$E/variants/light_transparent/mimir_startup_1280x720_light_transparent.webm" Tools/splash/mimir_startup_light.webm

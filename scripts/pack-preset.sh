@@ -183,11 +183,10 @@ epoch_as_touch() {
 # this.
 #
 # Failing that, the commit is the stamp: it is stable across runs, it is
-# meaningful in a bug report, and it does not move when this script rebuilds the
-# Lesson pane's generated files. The newest mtime is the last resort, for a tree
-# that is not a git checkout — and it is a poor last resort, because those
-# generated files are rewritten on every run, so two builds of an unchanged
-# preset would disagree.
+# meaningful in a bug report, and it does not move when a build script rewrites a
+# generated file. The newest mtime is the last resort, for a tree that is not a
+# git checkout — and it is a poor last resort, because a rewritten generated file
+# moves it, so two builds of an unchanged preset would disagree.
 if [ -n "${SOURCE_DATE_EPOCH:-}" ]; then
   EPOCH="$SOURCE_DATE_EPOCH"
 elif EPOCH="$(git -C "$HERE" log -1 --format=%ct 2>/dev/null)" && [ -n "$EPOCH" ]; then
