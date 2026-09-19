@@ -128,17 +128,45 @@ if [ "$CHECK" -eq 1 ]; then
     say "pack-plugin: $OUT does not exist — run ./scripts/pack-plugin.sh"
     exit 1
   fi
-  EXISTING="$(digest_of "$OUT")"
-  if [ "$EXISTING" != "$DIGEST" ]; then
+
+  # CONTENT, NOT BYTES. `npm pack` writes a gzip container whose deflate output
+  # depends on the zlib the running Node was built against, so the same tree packs
+  # to 35,271 bytes on this machine and 35,266 on the CI runner with byte-identical
+  # contents. Comparing digests would report a stale artifact on every run and teach
+  # everyone to ignore the check; comparing what is INSIDE the container answers the
+  # question the check is actually for, which is whether the shipped build still
+  # matches its sources.
+  A="$(mktemp -d)"; B="$(mktemp -d)"
+  trap 'rm -rf "$STAGE" "$A" "$B"' EXIT
+  tar -xzf "$TARGET" -C "$A" 2>/dev/null
+  tar -xzf "$OUT" -C "$B" 2>/dev/null
+  if ! diff -r "$A" "$B" >/dev/null 2>&1; then
     say ""
-    say "pack-plugin: the committed tarball is stale."
-    say "   on disk  $EXISTING"
-    say "   built    $DIGEST"
+    say "pack-plugin: the built tarball and $OUT hold different files:"
+    diff -r "$A" "$B" | sed 's/^/   /'
     say "   rebuild with ./scripts/pack-plugin.sh"
     exit 1
   fi
+
+  # And the thing on disk is the thing that installs — not the one just built.
+  if command -v dsh >/dev/null 2>&1 && [ "${MIMIR_SKIP_INSTALL_CHECK:-0}" != "1" ]; then
+    P="$(mktemp -d)"
+    trap 'rm -rf "$STAGE" "$A" "$B" "$P"' EXIT
+    if DSH_HOME="$P" dsh plugin --profile web add "$OUT" >"$P/log" 2>&1 \
+       && [ -f "$P/profiles/web/node_modules/$NAME/lib/index.js" ] \
+       && [ -f "$P/profiles/web/node_modules/$NAME/lib/client.js" ]; then
+      say "   the copy on disk installs, and both halves are present"
+    else
+      echo "pack-plugin: $OUT does not install:" >&2
+      tail -5 "$P/log" 2>/dev/null | sed 's/^/   /' >&2
+      exit 1
+    fi
+  fi
+
   say ""
-  say "pack-plugin: $OUT is current — $SIZE bytes, sha256 $DIGEST"
+  say "pack-plugin: $OUT is current — $SIZE bytes, and the same files as the build"
+  say "             (its sha256 is $(digest_of "$OUT"); the digest is reported, not enforced,"
+  say "              because npm's gzip container differs between zlib builds)"
   exit 0
 fi
 
