@@ -42,9 +42,9 @@ body {
   --mimir-mark:       #4f7a5c;  /* sage — the accent */
   --mimir-mark-soft:  #dbe8d4;
   --mimir-canvas:     #fbfaf6;  /* the page drawings are inked on, in either frame */
-  --mimir-shadow:     rgba(58, 45, 28, 0.14);
-  --mimir-grid:       rgba(120, 100, 70, 0.05);
-  --mimir-scan:       rgba(120, 100, 70, 0.028);
+  --mimir-shadow:     rgb(58 45 28 / 14%);
+  --mimir-grid:       rgb(120 100 70 / 5%);
+  --mimir-scan:       rgb(120 100 70 / 2.8%);
 
   /* ── the four voices ──────────────────────────────────────────────────── */
   --mimir-mint:       #2f7d63;  /* the teacher */
@@ -84,10 +84,9 @@ body.theme-dark,
   --mimir-mark:       #8fd6a4;  /* pastel green: the accent */
   --mimir-mark-soft:  #1e3830;
   --mimir-canvas:     #eaf6fb;  /* drawings stay inked light, on either stock */
-  --mimir-shadow:     rgba(0, 0, 0, 0.45);
-  --mimir-grid:       rgba(150, 220, 190, 0.045);
-  --mimir-scan:       rgba(150, 220, 190, 0.022);
-
+  --mimir-shadow:     rgb(0 0 0 / 45%);
+  --mimir-grid:       rgb(150 220 190 / 4.5%);
+  --mimir-scan:       rgb(150 220 190 / 2.2%);
   --mimir-mint:       #a6e3bd;
   --mimir-mint-soft:  #16302a;
   --mimir-peach:      #f0b183;
@@ -119,8 +118,7 @@ body {
   --background-modifier-success: var(--mimir-mint-soft);
   --background-modifier-error:   var(--mimir-peach-soft);
   --background-modifier-error-hover: var(--mimir-peach-soft);
-  --background-modifier-cover:   rgba(37, 35, 29, 0.55);
-
+  --background-modifier-cover:   rgb(37 35 29 / 55%);
   --text-normal:        var(--mimir-ink);
   --text-muted:         var(--mimir-ink-2);
   --text-faint:         var(--mimir-ink-3);
@@ -135,7 +133,6 @@ body {
   --text-highlight-bg:  var(--mimir-mark-soft);
   --text-highlight-bg-active: var(--mimir-peach-soft);
   --text-code:          var(--mimir-ink);
-
   --interactive-normal:       var(--mimir-paper);
   --interactive-hover:        var(--mimir-paper-2);
   --interactive-accent:       var(--mimir-mark);
@@ -143,24 +140,18 @@ body {
   --interactive-accent-rgb:   79, 122, 92;
   --interactive-success:      var(--mimir-mint);
   --interactive-muted:        var(--mimir-paper-3);
-
   --divider-color:        var(--mimir-rule);
   --divider-color-hover:  var(--mimir-line);
   --tab-outline-color:    var(--mimir-rule);
-
   --scrollbar-bg:            transparent;
   --scrollbar-thumb-bg:      var(--mimir-line);
   --scrollbar-active-thumb-bg: var(--mimir-ink-3);
-
   --prompt-border-color:   var(--mimir-line);
   --modal-border-color:    var(--mimir-line);
-
   --hr-color:  var(--mimir-rule);
   --tag-color: var(--mimir-ink-2);
   --tag-background: var(--mimir-paper-3);
-
   --caret-color: var(--mimir-mint);
-
   --link-color:          var(--mimir-cyan);
   --link-color-hover:    var(--mimir-mint);
   --link-decoration:     underline;
@@ -168,17 +159,14 @@ body {
   --link-external-color: var(--mimir-cyan);
   --link-unresolved-color: var(--mimir-peach);
   --link-unresolved-opacity: 1;
-
   --checkbox-border-color: var(--mimir-line);
   --checkbox-color: var(--mimir-mark);
   --checkbox-color-hover: var(--mimir-mint);
   --checkbox-marker-color: var(--mimir-paper);
   --checklist-done-color: var(--mimir-ink-3);
-
   --blockquote-border-color: var(--mimir-lilac);
   --blockquote-color: var(--mimir-ink-2);
   --blockquote-background-color: transparent;
-
   --code-background: var(--mimir-paper-2);
   --code-normal: var(--mimir-ink);
   --code-size: 0.84em;
@@ -191,19 +179,16 @@ body {
   --code-string: var(--mimir-mint);
   --code-tag: var(--mimir-peach);
   --code-value: var(--mimir-cyan);
-
   --table-border-color: var(--mimir-rule);
   --table-header-background: var(--mimir-paper-2);
   --table-header-color: var(--mimir-ink-2);
   --table-row-alt-background: var(--mimir-paper-2);
   --table-row-background-hover: var(--mimir-mark-soft);
   --table-column-alt-background: transparent;
-
   --embed-background: var(--mimir-paper-2);
   --embed-border-left: var(--mimir-edge) solid var(--mimir-lilac);
   --embed-border-right: none;
   --embed-padding: 0.6em 1em;
-
   --nav-item-color:              var(--mimir-ink-2);
   --nav-item-color-hover:        var(--mimir-ink);
   --nav-item-color-active:       var(--mimir-ink);
@@ -213,20 +198,16 @@ body {
   --nav-item-background-selected: var(--mimir-mark-soft);
   --nav-item-weight-active:      400;
   --nav-collapse-icon-color:     var(--mimir-ink-3);
-
   --titlebar-background: var(--mimir-paper-2);
   --titlebar-background-focused: var(--mimir-paper-2);
   --titlebar-border-color: var(--mimir-rule);
   --titlebar-text-color: var(--mimir-ink-2);
   --titlebar-text-color-focused: var(--mimir-ink);
-
   --status-bar-background: var(--mimir-paper-2);
   --status-bar-border-color: var(--mimir-rule);
   --status-bar-text-color: var(--mimir-ink-3);
-
   --ribbon-background: var(--mimir-paper-2);
   --ribbon-background-collapsed: var(--mimir-paper-2);
-
   --icon-color: var(--mimir-ink-2);
   --icon-color-hover: var(--mimir-ink);
   --icon-color-active: var(--mimir-mark);
@@ -242,7 +223,6 @@ body {
   --tab-radius: 0;
   --tab-radius-active: 0;
   --button-radius: 0;
-
   --font-text-theme: var(--mimir-serif);
   --font-interface-theme: var(--mimir-serif);
   --font-monospace-theme: var(--mimir-mono);
@@ -272,6 +252,7 @@ body {
   color: var(--mimir-ink);
   -webkit-font-smoothing: antialiased;
 }
+
 .workspace-split,
 .workspace-leaf,
 .workspace-leaf-content,
@@ -299,12 +280,14 @@ body {
   box-shadow: var(--mimir-offset) var(--mimir-offset) 0 var(--mimir-shadow);
   max-width: 100%;
 }
+
 .markdown-rendered img.emoji,
 .markdown-rendered .callout img {
   background: none;
   padding: 0;
   box-shadow: none;
 }
+
 /* An embedded drawing is bare: no frame of the theme's, because it brings its own. */
 .markdown-rendered svg,
 .internal-embed svg,
@@ -326,6 +309,7 @@ body {
   font-weight: 400;
   color: var(--mimir-ink);
 }
+
 .markdown-rendered h1, .cm-s-obsidian .HyperMD-header-1 {
   font-size: 1.16em;
   letter-spacing: 0.14em;
@@ -334,6 +318,7 @@ body {
   padding-bottom: 0.45em;
   margin: 1.8em 0 0.8em;
 }
+
 .markdown-rendered h2, .cm-s-obsidian .HyperMD-header-2 {
   font-size: 1.02em;
   letter-spacing: 0.12em;
@@ -341,12 +326,14 @@ body {
   color: var(--mimir-ink-2);
   margin: 1.6em 0 0.6em;
 }
+
 .markdown-rendered h3, .cm-s-obsidian .HyperMD-header-3 {
   font-size: 0.98em;
   letter-spacing: 0.05em;
   color: var(--mimir-ink-2);
   margin: 1.4em 0 0.5em;
 }
+
 .markdown-rendered h4, .markdown-rendered h5, .markdown-rendered h6 {
   font-family: var(--mimir-mono);
   font-weight: 400;
@@ -439,6 +426,7 @@ body {
   border-collapse: collapse;
   font-size: 0.95em;
 }
+
 .markdown-rendered th {
   font-family: var(--mimir-mono);
   font-size: 0.78em;
@@ -450,6 +438,7 @@ body {
   border: 1px solid var(--mimir-rule);
   padding: 8px 10px;
 }
+
 .markdown-rendered td {
   border: 1px solid var(--mimir-rule);
   padding: 8px 10px;
@@ -469,6 +458,7 @@ body {
   padding: 1px 6px;
   text-decoration: none;
 }
+
 .markdown-rendered a.tag:hover {
   color: var(--mimir-mark);
   border-color: var(--mimir-mark);
@@ -493,11 +483,13 @@ body {
   border-radius: 0;
   background: transparent;
 }
+
 .markdown-rendered input[type="checkbox"]:checked,
 .markdown-rendered .task-list-item-checkbox:checked {
   background: var(--mimir-mark);
   border-color: var(--mimir-mark);
 }
+
 .markdown-rendered .task-list-item.is-checked,
 .markdown-rendered .task-list-item.is-checked a {
   color: var(--mimir-ink-3);
@@ -516,6 +508,7 @@ body {
   padding: 14px 16px;
   mix-blend-mode: normal;
 }
+
 .callout-title {
   font-family: var(--mimir-mono);
   font-size: 0.8em;
@@ -528,6 +521,7 @@ body {
 
 .callout[data-callout="note"],
 .callout[data-callout="info"]     { border-left-color: var(--mimir-cyan); }
+
 .callout[data-callout="note"]    > .callout-title,
 .callout[data-callout="info"]    > .callout-title { color: var(--mimir-cyan); }
 
@@ -535,6 +529,7 @@ body {
 .callout[data-callout="hint"],
 .callout[data-callout="success"],
 .callout[data-callout="check"]    { border-left-color: var(--mimir-mint); }
+
 .callout[data-callout="tip"]     > .callout-title,
 .callout[data-callout="hint"]    > .callout-title,
 .callout[data-callout="success"] > .callout-title,
@@ -544,6 +539,7 @@ body {
 .callout[data-callout="warning"],
 .callout[data-callout="caution"],
 .callout[data-callout="attention"] { border-left-color: var(--mimir-peach); }
+
 .callout[data-callout="question"]  > .callout-title,
 .callout[data-callout="warning"]   > .callout-title,
 .callout[data-callout="caution"]   > .callout-title,
@@ -554,6 +550,7 @@ body {
 .callout[data-callout="example"],
 .callout[data-callout="abstract"],
 .callout[data-callout="summary"]  { border-left-color: var(--mimir-lilac); }
+
 .callout[data-callout="quote"]    > .callout-title,
 .callout[data-callout="cite"]     > .callout-title,
 .callout[data-callout="example"]  > .callout-title,
@@ -566,6 +563,7 @@ body {
 .callout[data-callout="fail"],
 .callout[data-callout="missing"],
 .callout[data-callout="bug"]      { border-left-color: var(--mimir-peach); }
+
 .callout[data-callout="danger"]   > .callout-title,
 .callout[data-callout="error"]    > .callout-title,
 .callout[data-callout="failure"]  > .callout-title,
@@ -579,6 +577,7 @@ body {
 
 /* Tabs are an underline, never a box. */
 .workspace-tab-header-container { border-bottom: 1px solid var(--mimir-rule); }
+
 .workspace-tab-header-inner-title {
   font-family: var(--mimir-mono);
   font-size: 0.76em;
@@ -592,11 +591,13 @@ body {
 
 /* Sidebars: a rail of small monospace labels, with hairlines for structure. */
 .nav-files-container { padding-top: 6px; }
+
 .nav-file-title,
 .nav-folder-title {
   border-radius: 0;
   font-size: 0.86em;
 }
+
 .nav-folder-title {
   font-family: var(--mimir-mono);
   font-size: 0.74em;
@@ -604,6 +605,7 @@ body {
   text-transform: uppercase;
   color: var(--mimir-ink-3);
 }
+
 .nav-file-title.is-active {
   box-shadow: inset 2px 0 0 var(--mimir-mark);
   background: var(--mimir-mark-soft);
@@ -618,6 +620,7 @@ body {
   background: var(--mimir-paper-2);
   border-bottom: 1px solid var(--mimir-rule);
 }
+
 .view-header-title {
   font-family: var(--mimir-serif);
   color: var(--mimir-ink);
@@ -637,6 +640,7 @@ button:not(.clickable-icon),
   box-shadow: none;
   padding: 8px 12px;
 }
+
 button:not(.clickable-icon):hover,
 .mod-cta:hover {
   background: var(--mimir-mint);
@@ -653,6 +657,7 @@ input[type="text"], input[type="search"], input[type="number"], textarea, select
   color: var(--mimir-ink);
   font-family: var(--mimir-serif);
 }
+
 input[type="text"]:focus, input[type="search"]:focus, textarea:focus, select:focus {
   border-color: var(--mimir-mark);
   box-shadow: none;
@@ -668,14 +673,17 @@ input[type="text"]:focus, input[type="search"]:focus, textarea:focus, select:foc
 .menu-item {
   border-radius: 0;
 }
+
 .menu, .suggestion-container, .prompt, .modal {
   border: 1px solid var(--mimir-line);
   box-shadow: var(--mimir-offset) var(--mimir-offset) 0 var(--mimir-shadow);
 }
+
 .menu-item:hover, .suggestion-item.is-selected {
   background: var(--mimir-mark-soft);
 }
 .suggestion-item { border-radius: 0; }
+
 .modal-title {
   font-family: var(--mimir-mono);
   font-size: 0.8em;
@@ -695,6 +703,7 @@ input[type="text"]:focus, input[type="search"]:focus, textarea:focus, select:foc
 
 /* Scrollbars: a thin line, never a slab. */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
+
 ::-webkit-scrollbar-thumb {
   background: var(--mimir-line);
   border: 3px solid transparent;
@@ -712,6 +721,7 @@ input[type="text"]:focus, input[type="search"]:focus, textarea:focus, select:foc
   font-family: var(--mimir-serif);
   background: transparent;
 }
+
 .bases-toolbar {
   border-bottom: 1px solid var(--mimir-rule);
   font-family: var(--mimir-mono);
@@ -720,6 +730,7 @@ input[type="text"]:focus, input[type="search"]:focus, textarea:focus, select:foc
   text-transform: uppercase;
   color: var(--mimir-ink-3);
 }
+
 .bases-table th, .bases-table-header {
   font-family: var(--mimir-mono);
   font-size: 0.76em;
@@ -755,6 +766,7 @@ input[type="text"]:focus, input[type="search"]:focus, textarea:focus, select:foc
    for. Only type and the canvas are the theme's business. */
 .mermaid, .mermaid svg { background: transparent; }
 .mermaid svg { font-family: var(--mimir-mono); max-width: 100%; height: auto; }
+
 .mermaid .nodeLabel,
 .mermaid .label,
 .mermaid .edgeLabel,
@@ -763,6 +775,7 @@ input[type="text"]:focus, input[type="search"]:focus, textarea:focus, select:foc
   font-size: 13px;
   line-height: 1.3;
 }
+
 .mermaid .edgeLabel,
 .mermaid .edgeLabel rect {
   fill: var(--background-primary);

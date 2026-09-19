@@ -33,10 +33,10 @@
     "Mimir": {
       "kind": "theme",
       "source": "https://github.com/tommyhedgerow/obsidian-mimir-theme",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "files": {
-        "manifest.json": "a6e5ede673834cc54ac2ebd334c515879c45f4685c31593fa071ceb66ddb3a7f",
-        "theme.css": "b2346102e8ecbfb43f72f22570ec1b8ba4603b4a325aa96a77f2cd25fc849ed4"
+        "manifest.json": "19e8682f0b80b18abf6d44c7efdc3e4ee70da3d5e90d45081a7398eccca534e1",
+        "theme.css": "51f52998fca15766e7785df0e9d2f2328a570084d1d2b7e792de0f5e8b4ac032"
       }
     }
   }
