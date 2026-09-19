@@ -96,6 +96,8 @@ node Tools/test-mimir-board.mjs              # the board's host half mounts and 
 node Tools/test-mimir-skin.mjs               # the board's browser half, loaded the way the page loads it
 ./scripts/pack-preset.sh                     # rebuild both .dshpreset files
 ./scripts/pack-preset.sh --check             # and prove they are current
+./scripts/pack-plugin.sh                     # rebuild the board's tarball, and install it for real
+./scripts/pack-plugin.sh --check             # and prove it is current
 ```
 
 `check-bilingual.mjs` is the one that matters most after any edit to either
@@ -173,23 +175,36 @@ each localization (`Mimir Tutor (English)` / `Mimir Tutor（英文）`) before
 publishing, and check every locale side by side rather than only the English.
 
 **The plugin catalog** — [`awesome-dsh-plugin`](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) —
-is for *plugins*, and Mimir is a preset, so the preset does not go there. The board
-does, because it is a real DSH plugin: it declares `dsh.bundle` at
-`preset/mimir-skin/package.json`, which is the thing that makes a package installable.
-One YAML file per entry, at `data/plugins/tommyhedgerow__Mimir.yml`:
+is for *plugins*, and Mimir is a preset, so the PRESET does not go there. The board
+does: it declares `dsh.bundle` at `preset/mimir-skin/package.json`, beside its own
+`cordis.patch.yml`, which is the thing that makes a package installable at all.
+The rule the catalog states most plainly is that `dsh.client` alone is not
+installable, and that is exactly the mistake this would be if the bundle block were
+missing.
 
-```yaml
-url: https://github.com/tommyhedgerow/Mimir
-name: tommyhedgerow/Mimir
-category: ui
-description:
-  en: Publishes a lesson into the DSH conversation — the dependency spine, the question and the vault's drawings, in the vault's own colours.
-```
+**Mimir is a monorepo, so the root is not the entry.** The root declares no
+`dsh.bundle` — deliberately, because a preset is not a plugin — so submitting
+`tommyhedgerow/Mimir` would be bounced. The subpackage rule applies: point `url`
+at the directory, and make the filename `<owner>__<repo>--<path>` with every `/`
+turned into `-`. The entry is written out and ready to copy at
+**[`docs/dsh-plugin-catalog-entry.yml`](docs/dsh-plugin-catalog-entry.yml)**; it goes
+to `data/plugins/tommyhedgerow__Mimir--preset-mimir-skin.yml`.
 
-The checks that gate it, in the order they run: at most three entries per pull
-request, the repository must declare `dsh.bundle` somewhere in its tree, and the
-repository must be at least one day old. The repository also needs the
-`dsh-plugin` GitHub topic, which it has.
+**The tarball is attached, not linked loose.** The catalog prefers a prebuilt
+artifact over a build-from-source command, and offers a `tarball:` field for it.
+`./scripts/pack-plugin.sh` builds it and installs it into a throwaway harness home
+to prove it composes; `.github/workflows/release.yml` attaches it to every release.
+**The release asset name must carry no version** — the field resolves `latest` at
+request time but takes the filename literally, so `dsh-mimir-skin-1.0.0.tgz` would
+work on the day it is published and 404 after the next release. The workflow
+uploads it as `dsh-mimir-skin.tgz` for that reason.
+
+The other gates: at most three entries per pull request; the repository must be at
+least one day old; it needs the [`dsh-plugin`](https://github.com/topics/dsh-plugin)
+topic, which it has; and the description must be accurate, because a maintainer
+checks it against the code. What the entry claims is one tool (`mimir_board`), one
+browser half, and a `dsh.bundle` manifest — no dependency counts, nothing that a
+later edit could quietly make untrue.
 
 ### 6. Publish the Obsidian entries
 

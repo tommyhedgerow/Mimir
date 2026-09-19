@@ -26,6 +26,9 @@ jobs:
       - name: Build the preset package
         run: ./scripts/pack-preset.sh
 
+      - name: Build the plugin tarball
+        run: ./scripts/pack-plugin.sh
+
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -36,8 +39,16 @@ jobs:
           # means this list has to be kept in step with the PRESETS the packer
           # knows about. It was not, on the first bilingual release: the Chinese
           # package was built, validated, and then left out of the release.
+          # The board's tarball is uploaded under a VERSION-FREE name on purpose.
+          # The plugin catalog points its `tarball:` field at
+          # `releases/latest/download/<name>`, which resolves `latest` at request
+          # time but takes the filename literally — so a name carrying the version
+          # works the day it is published and 404s the moment the next release is
+          # cut. `#` sets the asset name; the local file keeps its version because
+          # that is what npm's own conventions want.
           gh release create "$tag" --title="$tag" --generate-notes \
             dist/mimir-tutor.dshpreset \
             dist/mimir-tutor.dshpreset.sha256 \
             dist/mimir-tutor-zh.dshpreset \
-            dist/mimir-tutor-zh.dshpreset.sha256
+            dist/mimir-tutor-zh.dshpreset.sha256 \
+            "dist/dsh-mimir-skin.tgz#dsh-mimir-skin.tgz"

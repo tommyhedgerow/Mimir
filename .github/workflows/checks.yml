@@ -57,3 +57,13 @@ jobs:
         run: |
           ./scripts/pack-preset.sh
           ./scripts/pack-preset.sh --check
+
+      - name: The plugin tarball is current, and installs
+        run: |
+          # This unpacks the tarball into a throwaway harness home and checks both
+          # halves land. A package that unpacks and then fails to compose is the
+          # failure it exists to catch — the host half once imported a harness
+          # package, which resolves from a real directory but not from a symlink,
+          # so the same package installed two ways behaved differently.
+          ./scripts/pack-plugin.sh
+          ./scripts/pack-plugin.sh --check
