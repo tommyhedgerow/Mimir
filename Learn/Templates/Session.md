@@ -30,6 +30,8 @@ published:
 
 > [[🌱 Learn Index]] · goal made concrete in the probe · plan approved before teaching started
 
+_The lesson itself is read in the conversation, on the board. This note is the record of it._
+
 ## 🎯 Goal
 
 _(What I wanted, made concrete during the probe — in my words, not the teacher's.)_
@@ -49,6 +51,8 @@ _(Approved before any teaching: roots at the top, the goal at the bottom. This m
 ![[<filename-slug>-graph.svg]]
 
 ## 📖 Nodes
+
+_Each node is published to the board as it is taught — `mimir_board`, once per node, carrying the spine, the question, the hint and whichever drawings this node turns on. The board is where the lesson is read; this section is where it is written down._
 
 ### Node 1 — _name_
 

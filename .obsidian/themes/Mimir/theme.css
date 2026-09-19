@@ -1,17 +1,13 @@
 /* ============================================================================
-   MIMIR — an Obsidian theme taken from the Lesson window
+   MIMIR — the vault's own theme, and the board's
    ============================================================================
 
-   The exchange is now the other way round. The Lesson window was first dressed
-   as a terminal in the vault's own colours: warm paper, sage green, a serif for
-   what is read, a blocky monospace for what is furniture. It has since been
-   tuned harder than the theme it came from — the paper is warmer, the sage is
-   quieter, the labels are letterspaced monospace rather than caps in the UI
-   font, and nothing is boxed that a hairline and a single edge can separate.
-   That tuning is the better set of decisions, so it is the source, and this
-   theme is the vault catching up.
+   One palette, spoken in three places: this file, the drawings the scripts
+   generate into Learn/Viz, and the board that publishes a lesson into the
+   conversation. Tools/mimir-tokens.json is the source those three are held to,
+   and `node Tools/check-tokens.mjs` is what holds them.
 
-   Two rules carried across whole, because they are what the pane gets right:
+   Two rules do most of the work:
 
      1. RULE vs LINE. `--mimir-rule` is a hairline for separation. `--mimir-line`
         is the one weight that means "this is a surface". Everything else
@@ -21,8 +17,9 @@
         stock, with an offset shadow in the corner and a 3px accent edge along
         the top (a question) or the left (a voice). No outlines, no rounding.
 
-   Palette and metrics are copied from Tools/lesson-pane/client.mjs, tokens
-   `--mm-*`. If the pane's palette moves, this file is the second place to move.
+   Palette and metrics live in Tools/mimir-tokens.json; `preset/mimir-skin/client.mjs`
+   reads that file's roles by name rather than copying its values, so a colour
+   changed here and there cannot drift apart.
 
    Author: the student · for the Mimisbrunnr vault · saved 2026-09-17
    ========================================================================= */
@@ -38,13 +35,13 @@ body {
   --mimir-paper-3:    #e9dfc6;
   --mimir-ink:        #25231d;
   --mimir-ink-2:      #5d5749;
-  --mimir-ink-3:      #756d59;  /* the pane's #8b836f, darkened for 4.5:1 on paper-3 */
+  --mimir-ink-3:      #665e4c;  /* MEASURED 4.84:1 on paper-3. #756d59 claimed this and made 3.87:1 */
   --mimir-rule:       #e3d9c1;
   --mimir-rule-soft:  #eadfc8;  /* the hairline a surface is allowed to have */
   --mimir-line:       #c9bc9e;
   --mimir-mark:       #4f7a5c;  /* sage — the accent */
   --mimir-mark-soft:  #dbe8d4;
-  --mimir-canvas:     #fbfaf6;  /* the page drawings are inked on */
+  --mimir-canvas:     #fbfaf6;  /* the page drawings are inked on, in either frame */
   --mimir-shadow:     rgba(58, 45, 28, 0.14);
   --mimir-grid:       rgba(120, 100, 70, 0.05);
   --mimir-scan:       rgba(120, 100, 70, 0.028);
@@ -69,22 +66,24 @@ body {
   --mimir-offset: 4px;  /* the offset card shadow */
 }
 
-/* Dark is the same object in green-black. The body class is Obsidian's own, so
-   the theme follows the app's setting and neither variant is ever half-defined. */
+/* Dark is the same object in a colder room: a blue-black stock under a cyan-and-magenta
+   light, with the warm orange and the green kept for the two things that are not the
+   accent — a warning and a success. The body class is Obsidian's own, so the theme follows
+   the app's setting and neither variant is ever half-defined. */
 body.theme-dark,
 .theme-dark {
-  --mimir-paper:      #131a19;
-  --mimir-paper-2:    #18211f;
-  --mimir-paper-3:    #1f2a27;
-  --mimir-ink:        #e6f0e6;
-  --mimir-ink-2:      #9db3a9;
-  --mimir-ink-3:      #82998f;  /* the pane's #6d8279, lifted for contrast on paper-3 */
-  --mimir-rule:       #25322e;
-  --mimir-rule-soft:  #2b3a35;  /* the hairline a surface is allowed to have */
-  --mimir-line:       #33443e;
-  --mimir-mark:       #8fd6a4;
+  --mimir-paper:      #06070d;
+  --mimir-paper-2:    #0b0e18;
+  --mimir-paper-3:    #121724;
+  --mimir-ink:        #dbeaf2;
+  --mimir-ink-2:      #9db8c6;
+  --mimir-ink-3:      #7f9dad;  /* MEASURED 6.24:1 on paper-3 */
+  --mimir-rule:       #182031;
+  --mimir-rule-soft:  #1e2739;  /* the hairline a surface is allowed to have */
+  --mimir-line:       #2a3550;
+  --mimir-mark:       #8fd6a4;  /* pastel green: the accent */
   --mimir-mark-soft:  #1e3830;
-  --mimir-canvas:     #f7faf8;  /* drawings stay inked light, as in the pane */
+  --mimir-canvas:     #eaf6fb;  /* drawings stay inked light, on either stock */
   --mimir-shadow:     rgba(0, 0, 0, 0.45);
   --mimir-grid:       rgba(150, 220, 190, 0.045);
   --mimir-scan:       rgba(150, 220, 190, 0.022);
@@ -233,7 +232,7 @@ body {
   --icon-color-active: var(--mimir-mark);
   --icon-color-focused: var(--mimir-mark);
 
-  /* flat, unrounded, hairline-separated — the pane's whole shape language */
+  /* flat, unrounded, hairline-separated — the shape language, throughout */
   --radius-s: 0;
   --radius-m: 0;
   --radius-l: 0;
@@ -317,7 +316,7 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
-   §4  HEADINGS — the pane's letterspaced monospace labels, scaled up
+   §4  HEADINGS — the letterspaced monospace labels, scaled up
    ------------------------------------------------------------------------ */
 
 .markdown-rendered h1, .cm-s-obsidian .HyperMD-header-1,
@@ -476,7 +475,7 @@ body {
 }
 
 /* Frontmatter: the properties block is machine furniture, so it is monospaced
-   and quiet, with the hairline under it that the pane uses for its bars. */
+   and quiet, with the hairline under it that the bars use. */
 .metadata-container {
   font-family: var(--mimir-mono);
   font-size: 0.78em;
@@ -685,7 +684,7 @@ input[type="text"]:focus, input[type="search"]:focus, textarea:focus, select:foc
   color: var(--mimir-ink-2);
 }
 
-/* The status bar is the pane's rail: lowercase-quiet, monospace, hairline above. */
+/* The status bar is the rail: lowercase-quiet, monospace, hairline above. */
 .status-bar {
   font-family: var(--mimir-mono);
   font-size: 0.72em;
@@ -772,11 +771,15 @@ input[type="text"]:focus, input[type="search"]:focus, textarea:focus, select:foc
 .mermaid { overflow-x: auto; }
 
 /* ---------------------------------------------------------------------------
-   §10  THE LESSON PANE MOUNTS INSIDE THIS APP
+   §10  THE BOARD, AND WHAT IS LEFT OF THE OLD SURFACE
    ------------------------------------------------------------------------ */
 
-/* The pane brings its own palette and its own frame; it is a window over the
-   app, not a part of it. It needs no help from this theme, and this theme must
-   not reach into it — the selectors below are the only ones that touch it, and
-   they fix the handover at the edges rather than restyling the lesson. */
+/* The lesson is read in the conversation now, and the board brings its own
+   palette and its own frame — it is a surface over the app, not a part of it.
+   It needs no help from this theme and this theme must not reach into it.
+
+   `.mm-window` is what remains of the retired Lesson pane: the class it wore
+   for the two properties that had to come from the app rather than from itself.
+   Nothing composes it any more; it is kept so that a vault opened on an old
+   session file still reads in the serif it was written for. */
 .mm-window { font-family: var(--mimir-serif); }

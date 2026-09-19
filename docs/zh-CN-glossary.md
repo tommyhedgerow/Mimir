@@ -48,8 +48,8 @@ Structural paths are identical; only the document's own name differs.
 
 Unchanged in both: `Learn/Sessions/`, `Learn/Concepts/`, `Learn/Maps/`,
 `Learn/Reviews/`, `Learn/Sources/`, `Learn/Viz/`, `Learn/Glossary/`,
-`Learn/Inbox/`, `Learn/Attachments/`, `Learn/Sessions/.live/`, `Tools/`,
-`preset/`, `preset-zh/`, `scripts/`, `assets/`.
+`Learn/Inbox/`, `Learn/Attachments/`, `Tools/`, `preset/`, `preset-zh/`,
+`scripts/`, `assets/`.
 
 ## Vocabulary
 
@@ -64,7 +64,9 @@ PKM communities, that form wins over a literal translation.
 | library vault | 文库 | the second vault a finished note is published into |
 | note | 笔记 | |
 | session | 会话 | a dated teaching sitting; `Learn/Sessions/` stays English |
-| lesson | 本课 | the thing on screen in the Lesson pane — the question, the drawings and the spine for the *current* sitting. Distinct from 会话, which is the whole dated sitting; 本课 is what the pane is showing right now. |
+| lesson | 本课 | the thing being taught in the *current* sitting — the spine, the question and the drawings for it. Distinct from 会话, which is the whole dated sitting. |
+| board | 课程板 | the lesson published into the conversation: spine, question, hint and drawings. Never 面板, which was the retired window. |
+| drawing / visual | 图 | one SVG in `Learn/Viz/`, carried onto the board |
 | session note | 会话笔记 | |
 | concept note | 概念笔记 | |
 | map | 图谱 | a strand's map note |

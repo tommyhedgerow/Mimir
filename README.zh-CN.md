@@ -41,13 +41,26 @@
 | --- | --- |
 | **预设** | `Mimir Tutor` —— 九项方法技能、六个专家子代理，以及「先核实再断言」的常设规则。这就是那位导师。 |
 | **笔记库** | 一个可用的 Obsidian 库：会话、概念与图谱模板，间隔复习队列，脚本生成的 SVG 依赖图，一个只从课上真正用到的词里长出来的术语表，以及每节课最多两本书的阅读清单。 |
-| **课程面板** | DSH 界面里一个停靠标签页，承载题目、库里的图、课程主干和一个草稿页，让阅读栏保持完整高度。 |
-| **主题** | `Mimir` —— 暖纸色、鼠尾草绿，正文用衬线，界面用等宽。 |
+| **课程板** | 本课本身，发布进对话里：依赖节点的主干与你在每个节点上的位置、题目、一行提示，以及库里的图。往回翻、刷新、分叉——它是对话的一部分，所以一直都在。 |
+| **主题** | `Mimir` —— 白天是暖纸色与鼠尾草绿，夜里换成青与品红光照下的冷蓝黑；正文用衬线，界面用等宽。 |
 | **三个插件** | 阅读字号与明暗切换、启动动画，以及把完成的笔记连同它嵌入的文件复制进第二个文库的发布器。 |
+
+### 课程板
+
+每一节课都是随讲随发布的。导师讲一个节点时调用 `mimir_board`，把下面这些放进对话：
+
+- **主干** —— 依赖图的节点，按讲授顺序排列，每个标着已掌握、正在学、不稳固或计划中，所以你不离开这节课就能看见自己站在哪；
+- **题目**与选项，和你作答的那张卡片一字不差；
+- 一行**提示**，只在真的有用时才给；
+- 这节课用到的**图**，满宽渲染。
+
+关于图有两件事值得知道，因为这正是课程板要是一个工具、而不是一条笔记的原因。它们进入你的界面，**从不进入模型的上下文**——导师只知道它们的文件名，别的什么都不知道，所以一节课可以带四张图，而不让四千个 token 的路径数据涌进对话。而一张缺失、读不出或过大的图，会**在屏幕上被点名说成「未显示」**，而不是悄悄不见：一节引用了你看不见的图的课，比一节承认图不在的课更糟。
+
+不需要第二扇窗去保持同步。对话就是这节课；课程板是你一眼扫过的那部分。
 
 ## 安装
 
-你需要 [Obsidian](https://obsidian.md) 和 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)。用 DSH 的桌面版最省事。
+你需要 [Obsidian](https://obsidian.md) 和 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)。
 
 ```sh
 git clone https://github.com/tommyhedgerow/Mimir.git
@@ -55,25 +68,34 @@ cd Mimir
 ./scripts/install.sh --lang zh-CN
 ```
 
+它做两件事：把预设放进你的 DSH 目录，并把课程板装进你的 DSH profile。两件都要——预设载不动课程板的浏览器端，所以少了第二步，你得到的是一个往空处发布的导师。
+
 也可以只装导师，不克隆任何东西。两个预设都在 Preset Square 上，各自是单个 `.dshpreset` 文件，在 DSH Desktop 的「设置 → Agent presets → 导入」里安装：
 
 - **[Mimir Tutor](https://dshdesktop.com/preset/p/mimir-tutor-20d96e)** —— 用英文讲授。
 - **[Mimir 导师](https://dshdesktop.com/preset/p/mimir-tutor-chinese-582526)** —— 用简体中文讲授。
 
-那条路只给你导师；笔记库、主题和三个插件来自克隆。
+那条路只给你导师：没有笔记库、没有主题、没有插件，也没有课程板。如果你已经有自己的库、只想要这套方法，那条路是对的。
 
-安装脚本把预设复制进你的 DSH 目录，并把课程面板注册为一个 profile bundle。它替换任何东西之前都会先备份，而不是直接覆盖。`--lang zh-CN` 装的是中文预设，不传则装英文的。
+安装脚本替换任何东西之前都会先备份，而不是直接覆盖。`--lang zh-CN` 装的是中文预设，不传则装英文的。
 
 然后：
 
-1. **重启 DSH Desktop。** 预设在一个进程里只组装一次，所以不重启就看不到新的那个。
+1. **重启 DSH。** 预设在一个进程里只组装一次，所以不重启就看不到新的那个。课程板的行也是在同一个时刻组装的。
 2. **在 DSH 里把 `Mimir` 文件夹作为工作区打开**，在会话选择器里选 **Mimir Tutor**。
 3. **在 Obsidian 里把同一个文件夹作为笔记库打开。**
 4. **说出你想学什么。** 「教我板块构造。」「我想弄明白康德到底做了什么。」「讲讲菌根。」
 
-`./scripts/install.sh --dry-run` 只说明会做什么，不碰任何东西。`--no-pane` 跳过课程面板，只装预设。`./scripts/uninstall.sh` 撤销安装。
+`./scripts/install.sh --dry-run` 只说明会做什么，不碰任何东西。`--no-board` 跳过课程板，只装预设。`./scripts/uninstall.sh` 撤销安装。
 
-更详细的说明，包括手动安装和怎么打包一个 `.dshpreset` 给别人，都在 **[INSTALL.md](INSTALL.md)**（英文）。
+### 在浏览器里跑，而不是桌面应用
+
+这里的一切在 `dsh web` 下和在 DSH Desktop 里完全一样——同一个预设根目录、同一个 profile、同一块课程板。有两点要知道：
+
+- **用 `./scripts/serve.sh` 起服务，不要直接 `dsh web`。** harness 按包名解析 profile 插件，走的是 Node 的内部模块加载器，而那个加载器只有在进程带 `--expose-internals` 启动时才可达。DSH Desktop 在自己的启动器里写死了这个参数，命令行的 `dsh` 没有。少了它，课程板那一行的导入就会失败，整棵插件树加载不起来，服务根本起不来——而报错指的是 harness 自己的加载器，不是那个缺失的参数。
+- **导入 `.dshpreset` 是 DSH Desktop 才有的功能。** 导入导出的路由随桌面外壳一起发布，不在 harness 核心里，所以在 `dsh web` 下没有东西接住那个文件。走 `./scripts/install.sh`，或者手工把预设复制到 `<dsh 目录>/.agent-presets/mimir-tutor-zh/`——目录结构完全一样。
+
+更详细的说明，包括手动安装、Windows 的注意事项，以及怎么打包一个 `.dshpreset` 给别人，都在 **[INSTALL.md](INSTALL.md)**（英文）。
 
 <picture>
   <source media="(prefers-color-scheme: dark)"  srcset="assets/mark_well_256.png">
@@ -114,17 +136,18 @@ Learn/              笔记库
   放在同一个库中，读哪一份都可以。文件夹名和属性字段保持英文——它们是脚本、
   模板和技能之间的契约，见 docs/zh-CN-glossary.md。
 
-preset/             DSH 英文预设
+preset/             DSH 英文预设，以及课程板
 preset-zh/          DSH 中文预设，结构与英文版一一对应
   preset.yml          会话选择器里显示的名称与描述
   agent.cordis.yml    人格设定、工具行、六个专家
   skills/             九项方法技能，一项一个目录
-  lesson-pane/        课程面板：宿主端与浏览器端
+
+preset/mimir-skin/  课程板：宿主端、浏览器端，和它自己的 profile 层
 
 .obsidian/          主题与三个插件，开箱可用
-Tools/              生成器：vault-map、vault-chart、check-tokens、publish、sync-skills
+Tools/              生成器、课程板的构建与测试、各项检查
 assets/             本 README 里的图，以及启动动画
-scripts/            安装、卸载、预设打包
+scripts/            安装、卸载、插件同步、预设打包、本地起服务
 ```
 
 <picture>
@@ -177,16 +200,16 @@ scripts/            安装、卸载、预设打包
 ## 依赖，以及它会去动什么
 
 - **Obsidian** 1.5 或更高。笔记库、主题和两个阅读类插件在桌面端和移动端都能用；Lesson Publisher 只支持桌面端，因为它要往库外写文件。
-- **DeepSeek Harness**，并配好模型路由。预设只组合 harness 已经提供的 `@deepseek-ai/*` 包，自己不安装、不下载任何东西。
+- **DeepSeek Harness**，并配好模型路由。预设只组合 harness 已经提供的 `@deepseek-ai/*` 包；课程板是随仓库附带的那个包，自己不安装、不下载任何东西。
 - **联网搜索**，给核查员用。预设只给这个角色 `web_search` 和 `web_fetch`，不给别的，并把调用次数限制在八次。
 - **Node.js**，只用于笔记库的三个生成脚本。
 
 ## 其他值得知道的
 
 - **主题不从网络加载任何东西。** 没有网络字体，没有远程图片：系统字体，本地 CSS。离线可用。
-- **课程面板是可选的。** 没有它预设照样工作，你改成在笔记库里读这节课，而不是在停靠面板里读。
+- **课程板是可选的。** 没有它预设照样工作：课照上，题照答，只是都发生在平实的对话里，而不是在课程板上。
 - **一切都是纯文件。** 预设是你可以读、可以改的目录；技能是 markdown；笔记库是 markdown。改技能在下次加载时生效；改 `agent.cordis.yml` 需要重启 DSH，原因上面说过。
-- **中文界面。** 预设、库内文档和三个插件的界面都跟随 Obsidian 的界面语言；把 Obsidian 设为简体中文即可。课程面板的界面文字由中文预设指定的 `lang` 字段切换。agent 面向的技能文件保持英文——读它们的是模型，不是学习者。
+- **中文界面。** 预设、库内文档和三个插件的界面都跟随 Obsidian 的界面语言；把 Obsidian 设为简体中文即可。课程板上的字用的是库自己的语言。agent 面向的技能文件保持英文——读它们的是模型，不是学习者。
 
 <picture>
   <source media="(prefers-color-scheme: dark)"  srcset="assets/badge_row_1280.png">

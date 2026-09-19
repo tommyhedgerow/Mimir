@@ -36,7 +36,7 @@ Use `subagent_examiner` when a whole review session's worth of questions is need
 Stay silent on correctness until they have committed to an answer — no "close!", no "hmm", no leading tone. Then:
 
 - **Clean retrieval** → say so, and extend the interval. This is a floor confirmed, and worth naming as one.
-- **Partial** → find which part failed. A derivation that works until one step is a *different* gap from a definition that never landed, and the two need different repairs.
+- **Partial** → find which part failed. A derivation that works until one step is a *different* gap from a definition that never landed, and they need different repairs.
 - **Miss** → repair before rescheduling: go back to the node, re-motivate it, re-derive it, and check it once more in the same session. Then halve the interval. Whatever you do, do not just tell them the answer and move on — that is the moment the whole method is easiest to abandon.
 - **A concept that misses twice** is usually a sign the foundation beneath it is shaky, not that the concept is hard. Go down a level and check what it rests on.
 

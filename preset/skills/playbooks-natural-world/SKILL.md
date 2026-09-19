@@ -40,7 +40,7 @@ Energy flow and nutrient cycling are the roots; then trophic levels and why they
 
 ## The earth sciences
 
-**The foundation is deep time plus uniformitarianism-as-a-method**: the same physical processes we can watch, acting over spans they cannot feel. Those two together make almost everything else derivable, and they are exactly what intuition refuses — which is why the first job is to break the intuition with a scale the learner can feel (a year on a metre of tape; a human lifetime as a hair's width of the column).
+**The foundation is deep time plus uniformitarianism-as-a-method**: the same physical processes we can watch, acting over spans they cannot feel. Those two together make almost everything else derivable, and they are exactly what intuition refuses — which is why the first job is to break the intuition with a scale they can feel (a year on a metre of tape; a human lifetime as a hair's width of the column).
 
 Then the reusable structural truths, in dependency order:
 
@@ -55,5 +55,5 @@ Then the reusable structural truths, in dependency order:
 
 - **Verify names, dates and current classifications** with `subagent_researcher`. Taxonomy moves, ranges change, and the field's vocabulary is precisely the kind of detail a language model fabricates. Give the authority you are following.
 - **Diagrams earn their place constantly**: the rock cycle, a cladogram, a cross-section, a food web, a geological column, a timeline of deep time, a drainage basin, a climate diagram. This is the subject family where `subagent_diagram_maker` will be used most.
-- **Field knowledge beats list knowledge.** Wherever possible, tie the material to what is around the learner — the plants in their own walks, the rocks under their own county, the weather they can see. Ask what they noticed; that is both the probe and the motivation.
+- **Field knowledge beats list knowledge.** Wherever possible, tie the material to what is around them — the plants in their own walks, the rocks under their own county, the weather they can see. Ask what they noticed; that is both the probe and the motivation.
 - **Scale checks are the highest-value check questions in these fields**: "if this timeline is one metre, where is the first human?", "how long would that rate take to move that much?", "which is bigger — the number of species or the number of stars?". Get one wrong and the intuition is missing; get it right and the numbers start to mean something.

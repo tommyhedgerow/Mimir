@@ -2,9 +2,10 @@
 #
 # Undo ./scripts/install.sh.
 #
-#   ./scripts/uninstall.sh              remove the preset and the Lesson pane
+#   ./scripts/uninstall.sh              remove the preset and the lesson board
 #   ./scripts/uninstall.sh --dry-run    say what would happen, change nothing
-#   ./scripts/uninstall.sh --keep-pane  remove the preset, leave the pane alone
+#   ./scripts/uninstall.sh --keep-board remove the preset, leave the board alone
+#   ./scripts/uninstall.sh --lang zh-CN remove the Simplified Chinese preset
 #
 # Nothing is deleted outright. The preset is moved to a `.removed-<date>` sibling
 # so that any edits you made to it are still there afterwards. Your vault is not
@@ -17,15 +18,24 @@ PRESET_ID="mimir-tutor"
 PROFILE="${MIMIR_PROFILE:-web}"
 
 DRY_RUN=0
-KEEP_PANE=0
-for arg in "$@"; do
-  case "$arg" in
-    --dry-run) DRY_RUN=1 ;;
-    --keep-pane) KEEP_PANE=1 ;;
-    -h|--help) sed -n '2,14p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
-    *) echo "uninstall: unknown option '$arg' (try --help)" >&2; exit 2 ;;
+KEEP_BOARD=0
+LANG_CHOICE="en"
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --dry-run) DRY_RUN=1; shift ;;
+    --keep-board|--keep-pane) KEEP_BOARD=1; shift ;;
+    --lang) LANG_CHOICE="${2:-}"; shift 2 ;;
+    --lang=*) LANG_CHOICE="${1#--lang=}"; shift ;;
+    -h|--help) sed -n '2,16p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) echo "uninstall: unknown option '$1' (try --help)" >&2; exit 2 ;;
   esac
 done
+
+case "$LANG_CHOICE" in
+  en|english) PRESET_ID="mimir-tutor" ;;
+  zh|zh-CN|zh-Hans|chinese) PRESET_ID="mimir-tutor-zh" ;;
+  *) echo "uninstall: unknown language '$LANG_CHOICE' (use --lang en or --lang zh-CN)" >&2; exit 2 ;;
+esac
 
 say() { printf '%s\n' "$*"; }
 run() { if [ "$DRY_RUN" -eq 1 ]; then say "  would run: $*"; else "$@"; fi }
@@ -44,7 +54,7 @@ fi
 PRESET_DEST="$DSH_HOME_RESOLVED/.agent-presets/$PRESET_ID"
 STAMP="$(date -u +%Y-%m-%dT%H-%M-%SZ)"
 
-say "Removing Mimir Tutor from $DSH_HOME_RESOLVED"
+say "Removing Mimir Tutor ($PRESET_ID) from $DSH_HOME_RESOLVED"
 [ "$DRY_RUN" -eq 1 ] && say "(dry run, nothing will be written)"
 say ""
 
@@ -55,17 +65,17 @@ else
   say "preset: not installed, nothing to do"
 fi
 
-if [ "$KEEP_PANE" -eq 1 ]; then
-  say "Lesson pane: kept (--keep-pane)"
+if [ "$KEEP_BOARD" -eq 1 ]; then
+  say "lesson board: kept (--keep-board)"
 elif command -v dsh >/dev/null 2>&1; then
-  say "Lesson pane: dsh plugin --profile $PROFILE remove dsh-mimir-lesson-pane"
+  say "lesson board: dsh plugin --profile $PROFILE remove dsh-mimir-skin"
   if [ "$DRY_RUN" -eq 0 ]; then
-    DSH_HOME="$DSH_HOME_RESOLVED" dsh plugin --profile "$PROFILE" remove dsh-mimir-lesson-pane || \
+    DSH_HOME="$DSH_HOME_RESOLVED" dsh plugin --profile "$PROFILE" remove dsh-mimir-skin || \
       say "  could not remove it; it may not have been installed. Continuing."
   fi
 else
-  say "Lesson pane: dsh is not on your PATH, so it was left in place."
-  say "  Remove it later with: dsh plugin --profile $PROFILE remove dsh-mimir-lesson-pane"
+  say "lesson board: dsh is not on your PATH, so it was left in place."
+  say "  Remove it later with: dsh plugin --profile $PROFILE remove dsh-mimir-skin"
 fi
 
 say ""

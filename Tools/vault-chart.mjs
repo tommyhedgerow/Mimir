@@ -117,18 +117,18 @@ const M = {
  * the pane and in the dark is inked in one frame rather than three.
  *
  * TWO PALETTES, BOTH COMPLETE. The light values are baked into the stylesheet and
- * the dark ones behind `prefers-color-scheme`, exactly as before. They are kept as
- * role pairs because the Lesson window reads this file's colours as a *mapping*:
- * `VIZ_ROLES` in Tools/lesson-pane/client.mjs translates each one to the pane's own
- * token, and it can only do that if a colour's role is single. Change a value here
- * and its partner in that table must change with it — there is a note there too.
+ * the dark ones behind `prefers-color-scheme`. They are kept as role pairs, not as two
+ * loose lists, because a drawing has to mean the same thing in either frame: `mint` is
+ * what is held, `peach` what is still moving, `cyan` the vault's own furniture, and each
+ * has exactly one value per frame. Change one here and `Tools/check-tokens.mjs` holds
+ * every other file that speaks the palette to the same change.
  */
 const PALETTE = {
   light: {
     // surfaces
     paper: '#faf6ea', 'paper-2': '#f2ead6', 'paper-3': '#e9dfc6',
     // ink
-    ink: '#25231d', 'ink-2': '#5d5749', 'ink-3': '#756d59',
+    ink: '#25231d', 'ink-2': '#5d5749', 'ink-3': '#665e4c',
     // rules: a hairline, the hairline a surface may have, and the one weight
     // that means "surface"
     rule: '#e3d9c1', 'rule-soft': '#eadfc8', line: '#c9bc9e',
@@ -139,9 +139,9 @@ const PALETTE = {
     mint: '#2f7d63', peach: '#b5642f', 'peach-soft': '#f4e7d6', cyan: '#2c6b7a'
   },
   dark: {
-    paper: '#131a19', 'paper-2': '#18211f', 'paper-3': '#1f2a27',
-    ink: '#e6f0e6', 'ink-2': '#9db3a9', 'ink-3': '#82998f',
-    rule: '#25322e', 'rule-soft': '#2b3a35', line: '#33443e',
+    paper: '#06070d', 'paper-2': '#0b0e18', 'paper-3': '#121724',
+    ink: '#dbeaf2', 'ink-2': '#9db8c6', 'ink-3': '#7f9dad',
+    rule: '#182031', 'rule-soft': '#1e2739', line: '#2a3550',
     mark: '#8fd6a4', 'mark-soft': '#1e3830',
     mint: '#a6e3bd', peach: '#f0b183', 'peach-soft': '#33261d', cyan: '#95d7de'
   }

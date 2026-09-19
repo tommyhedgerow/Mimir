@@ -6,7 +6,7 @@ whenToUse: When verifying a claim before teaching it, judging whether a source i
 
 # Sources and accuracy
 
-An error delivered confidently does more damage than a gap admitted. The learner is building a structure on what you tell them; a wrong foundation is not a small mistake, it is a load-bearing one. This skill is the standard for what counts as knowing something.
+An error delivered confidently does more damage than a gap admitted. They are building a structure on what you tell them; a wrong foundation is not a small mistake, it is a load-bearing one. This skill is the standard for what counts as knowing something.
 
 ## The rule that comes before all others
 
@@ -32,7 +32,7 @@ Rank is relative to the claim, not absolute. A field guide is authoritative on g
 | General reference | Wikipedia, Britannica | orientation and expansion links — excellent for what they want from them, never the final word on a contested point |
 | Weak | blogs, content farms, undated pages, AI-generated summaries, unsourced videos | leads to chase, nothing else |
 
-Wikipedia deserves its own note, because the learner values it. Use it freely as the **expansion link** in a lesson — that is exactly what it is good at — but read the article's own sources before you teach a contested claim from it, and never cite it as the authority behind a disputed claim.
+Wikipedia deserves its own note, because they value it. Use it freely as the **expansion link** in a lesson — that is exactly what it is good at — but read the article's own sources before you teach a contested claim from it, and never cite it as the authority behind a disputed claim.
 
 ## Consensus, dispute, and interpretation
 
@@ -43,7 +43,7 @@ The single most useful thing you can report is *which kind of claim* you are mak
 - **Genuinely contested** — present the camps and what turns on the disagreement, and do not resolve it by fiat. ("Whether the Cambrian explosion was a real diversification or an artefact of preservation is live, and the answer depends on how you read the Ediacaran record.")
 - **Interpretation** — not a matter of fact at all, but of reading. ("On this passage, the Neoplatonist and the analytic reading disagree about what the soul's 'turning' is.")
 
-In philosophy, history, literature and taxonomy, most interesting claims are in the last three categories — that is what makes them interesting. Teaching a contested claim as if it were settled is the most common and most damaging failure in these subjects, because it manufactures a certainty that the first real book the learner reads will demolish.
+In philosophy, history, literature and taxonomy, most interesting claims are in the last three categories — that is what makes them interesting. Teaching a contested claim as if it were settled is the most common and most damaging failure in these subjects, because it manufactures a certainty that the first real book they read will demolish.
 
 **Textbook myths are a genre of their own**, and they propagate precisely because they are teachable. Watch for: the lone-genius story, the neat linear progress narrative, the tidy etymology that is folk etymology, the "medieval people thought the earth was flat", the *scala naturae*, Lamarck as a fool, the pristine wilderness, the single-origin narrative of a food or a word. When a claim has that satisfying shape, check it before you enjoy it.
 

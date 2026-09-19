@@ -4,25 +4,28 @@
 #
 #   ./scripts/install.sh              install, or update an existing install
 #   ./scripts/install.sh --dry-run    say what would happen, change nothing
-#   ./scripts/install.sh --no-pane    install the preset only, skip the Lesson pane
 #   ./scripts/install.sh --lang zh-CN install the Simplified Chinese preset
+#   ./scripts/install.sh --no-board   install the preset only, skip the lesson board
 #
 # What this does, and why each part is needed:
 #
-#   1. Copies `preset/` to <dsh home>/.agent-presets/mimir-tutor, which is the
-#      user preset root DSH reads. Anything already there is moved aside, never
-#      deleted — if you have locally edited the preset, the backup is where your
-#      edit still is.
+#   1. Copies `preset/` to <dsh home>/.agent-presets/mimir-tutor, which is the user preset
+#      root DSH reads. Anything already there is moved aside, never deleted — if you have
+#      locally edited the preset, the backup is where your edit still is.
 #
-#   2. Installs the Lesson pane's browser half. It cannot travel inside the
-#      preset: a preset row loads a *host* half perfectly and produces no browser
-#      bundle at all, so the pane would silently do nothing in the interface.
-#      The browser half has to be a profile bundle, and `dsh plugin add` is the
-#      supported way to make one — it installs the package and appends it to
-#      `dsh.profile.bundles` in one step.
+#   2. Installs the board. There is no way around this step: a preset row can mount the
+#      board's host half and produces NO browser bundle at all, so the spine, the question
+#      and the drawings would never reach the page. Both halves ship in one package,
+#      `preset/mimir-skin`, and `dsh plugin add` is the supported way to install it — it
+#      copies the package into the profile, appends it to `dsh.profile.bundles`, and the
+#      package's own `cordis.patch.yml` is the row that mounts it.
 #
-# The preset is a directory of plain files. You can read all of it, and edit any
-# of it, after installing.
+#      If `dsh` is missing, the preset still installs and the teacher still teaches; what
+#      is lost is the board — the lesson spine, the question card in the transcript, and
+#      the vault's drawings. The script says so rather than failing.
+#
+# The preset is a directory of plain files. You can read all of it, and edit any of it,
+# after installing.
 
 set -euo pipefail
 
@@ -30,26 +33,26 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROFILE="${MIMIR_PROFILE:-web}"
 
 DRY_RUN=0
-WITH_PANE=1
+WITH_BOARD=1
 LANG_CHOICE="en"
 
-# A `while` over `$#`, not a `for` over `"$@"`: `--lang` takes a value, and a
-# `for` loop iterates a list fixed when it starts, so `shift` inside it would
-# leave the value to be visited again as a stray positional argument.
+# A `while` over `$#`, not a `for` over `"$@"`: `--lang` takes a value, and a `for` loop
+# iterates a list fixed when it starts, so `shift` inside it would leave the value to be
+# visited again as a stray positional argument.
 while [ $# -gt 0 ]; do
   case "$1" in
     --dry-run) DRY_RUN=1; shift ;;
-    --no-pane) WITH_PANE=0; shift ;;
+    --no-board|--no-pane) WITH_BOARD=0; shift ;;
     --lang) LANG_CHOICE="${2:-}"; shift 2 ;;
     --lang=*) LANG_CHOICE="${1#--lang=}"; shift ;;
-    -h|--help) sed -n '2,25p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,30p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "install: unknown option '$1' (try --help)" >&2; exit 2 ;;
   esac
 done
 
-# Two presets ship: the same teacher, in English and in Simplified Chinese. They
-# are separate presets rather than one, because the language of instruction is a
-# property of the persona, and a session cannot be half in each.
+# Two presets ship: the same teacher, in English and in Simplified Chinese. They are
+# separate presets rather than one, because the language of instruction is a property of
+# the persona, and a session cannot be half in each.
 case "$LANG_CHOICE" in
   en|english)     PRESET_SRC="$HERE/preset";    PRESET_ID="mimir-tutor";    PRESET_LABEL="English" ;;
   zh|zh-CN|zh-Hans|chinese)
@@ -115,56 +118,60 @@ run mkdir -p "$PRESET_DEST"
 # pre-existing empty directory is filled rather than nested inside.
 run cp -R "$PRESET_SRC/." "$PRESET_DEST/"
 
-# The Lesson pane travels with whichever preset is installed, and only one copy of
-# it is ever authored. `preset/lesson-pane` is the copy; the Chinese preset stages
-# it in rather than keeping a second one, because two committed copies of a
-# generated bundle is exactly the shape that drifts.
-if [ ! -d "$PRESET_DEST/lesson-pane" ]; then
-  if [ -d "$HERE/preset/lesson-pane" ]; then
-    say "   staging the Lesson pane in from preset/lesson-pane"
-    run cp -R "$HERE/preset/lesson-pane" "$PRESET_DEST/lesson-pane"
-  else
-    echo "install: no preset/lesson-pane to stage in — the pane will not mount." >&2
-  fi
-fi
-
 if [ "$DRY_RUN" -eq 0 ]; then
   COUNT="$(find "$PRESET_DEST/skills" -name SKILL.md 2>/dev/null | wc -l | tr -d ' ')"
-  say "   installed: $COUNT skills, $(basename "$PRESET_DEST/agent.cordis.yml"), the Lesson pane host half"
+  say "   installed: $COUNT skills and $(basename "$PRESET_DEST/agent.cordis.yml")"
 fi
 
-# ── 2. the Lesson pane's browser half ────────────────────────────────────────
+# ── 2. the board ─────────────────────────────────────────────────────────────
 
 say ""
-say "2. Lesson pane"
-if [ "$WITH_PANE" -eq 0 ]; then
-  say "   skipped (--no-pane)"
-else
-  if ! command -v dsh >/dev/null 2>&1; then
-    cat >&2 <<'EOF'
-   skipped: the `dsh` command is not on your PATH.
+say "2. lesson board"
+BOARD_SRC="$HERE/preset/mimir-skin"
+BOARD_PACKAGE="dsh-mimir-skin"
 
-   The preset is installed and will work without this. You lose only the docked
-   Lesson pane — the quiz, the drawings and the scratch pad in the right-hand
-   column. The lesson itself reads normally in the vault.
+if [ "$WITH_BOARD" -eq 0 ]; then
+  say "   skipped (--no-board)"
+elif [ ! -d "$BOARD_SRC" ]; then
+  echo "install: no preset/mimir-skin in this clone — the board will not mount." >&2
+elif ! command -v dsh >/dev/null 2>&1; then
+  cat >&2 <<EOF
+   skipped: the \`dsh\` command is not on your PATH.
 
-   To add it later, install the dsh CLI and run:
+   The preset is installed and the teacher will work without this. What you lose is the
+   board: the lesson spine, the question card in the conversation, and the vault's own
+   drawings. The lesson still reads and the questions are still answered — just in the
+   plain conversation rather than on the board.
 
-     dsh plugin --profile web add "<repo>/preset/lesson-pane"
+   To add it later, install the harness CLI and run:
+
+     dsh plugin --profile $PROFILE add "$BOARD_SRC"
 EOF
-  else
-    say "   dsh plugin --profile $PROFILE add $PRESET_SRC/lesson-pane"
-    if [ "$DRY_RUN" -eq 0 ]; then
-      if DSH_HOME="$DSH_HOME_RESOLVED" dsh plugin --profile "$PROFILE" add "$PRESET_SRC/lesson-pane"; then
-        say "   installed and registered as a profile bundle"
-      else
-        cat >&2 <<EOF
-   failed. The preset still works; only the docked pane is missing.
+else
+  say "   dsh plugin --profile $PROFILE add $BOARD_SRC"
+  if [ "$DRY_RUN" -eq 0 ]; then
+    if DSH_HOME="$DSH_HOME_RESOLVED" dsh plugin --profile "$PROFILE" add "$BOARD_SRC"; then
+      # `dsh plugin add` records a `link:` dependency, so the profile ends up with a
+      # SYMLINK to this checkout. The package is then found, but DSH composes it by
+      # importing it, and Node resolves a symlinked module's own imports from its real
+      # path — where there is no `node_modules`. Replacing the symlink with a real copy
+      # puts the package where both the resolver and the loader expect it.
+      INSTALLED="$DSH_HOME_RESOLVED/profiles/$PROFILE/node_modules/$BOARD_PACKAGE"
+      if [ -L "$INSTALLED" ]; then
+        say "   materialising the package (replacing the symlink with a copy)"
+        run rm -f "$INSTALLED"
+        run mkdir -p "$INSTALLED"
+        run cp -R "$BOARD_SRC/." "$INSTALLED/"
+      fi
+      say "   installed: the board's tool and its browser half, as one package"
+    else
+      cat >&2 <<EOF
+   failed. The preset is installed and the teacher will work; the board is what is missing.
    Retry by hand with:
 
-     dsh plugin --profile $PROFILE add "$PRESET_SRC/lesson-pane"
+     dsh plugin --profile $PROFILE add "$BOARD_SRC"
+     cp -R "$BOARD_SRC/." "$DSH_HOME/profiles/$PROFILE/node_modules/$BOARD_PACKAGE/"
 EOF
-      fi
     fi
   fi
 fi
@@ -181,16 +188,24 @@ cat <<EOF
 Installed.
 
 Next:
-  1. Restart DSH Desktop. A preset is composed once per process, so the new one
-     is not visible until the app comes back up.
-  2. Open this folder as the workspace, and pick "Mimir Tutor" in the session
-     picker.
+  1. Restart DSH. A preset is composed once per process, so the new one is not visible
+     until the app comes back up. (The board's own row is composed at the same time.)
+  2. Open this folder as the workspace, and pick "Mimir Tutor" in the session picker.
   3. Open the same folder as a vault in Obsidian, and say what you want to learn.
 
+Serving it in a browser rather than the desktop app:
+
+  ./scripts/serve.sh
+
+  Use that rather than a bare `dsh web`. The harness resolves a profile plugin by package
+  name through Node's internal loader, which needs `--expose-internals`; DSH Desktop passes
+  it, the command-line `dsh` does not, and without it the plugin tree fails to load and the
+  server never starts. serve.sh is `dsh web` with that flag in front.
+
 Editing it afterwards:
-  skills/         re-read on every load — edit and it takes effect at the next step
+  skills/           re-read on every load — edit and it takes effect at the next step
   agent.cordis.yml  needs a DSH restart, for the reason above
-  preset.yml      the name and description the session picker shows
+  preset.yml        the name and description the session picker shows
 
 To undo: ./scripts/uninstall.sh
 EOF

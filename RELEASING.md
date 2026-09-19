@@ -88,12 +88,14 @@ vendored file by hand, that check fails, and it is right to.
 ### 4. Release the vault
 
 ```sh
-node Tools/check-tokens.mjs             # one palette, five files
-node Tools/vault-map.mjs                # the spines validate
-node Tools/check-bilingual.mjs          # the two languages still agree
-node Tools/build-lesson-pane.mjs --check # all three host copies agree
-./scripts/pack-preset.sh                # rebuild both .dshpreset files
-./scripts/pack-preset.sh --check        # and prove they are current
+node Tools/check-tokens.mjs                  # one palette, five files and the board
+node Tools/vault-map.mjs                     # the spines validate
+node Tools/check-bilingual.mjs               # the two languages still agree
+node Tools/build-mimir-skin.mjs --check      # the board ships built, and the build is current
+node Tools/test-mimir-board.mjs              # the board's host half mounts and registers
+node Tools/test-mimir-skin.mjs               # the board's browser half, loaded the way the page loads it
+./scripts/pack-preset.sh                     # rebuild both .dshpreset files
+./scripts/pack-preset.sh --check             # and prove they are current
 ```
 
 `check-bilingual.mjs` is the one that matters most after any edit to either
@@ -105,10 +107,19 @@ names a view that base actually defines, and compares the two presets' skills an
 composition rows. That last pair is what catches a translation that quietly
 dropped a specialist or a tool permission.
 
-The Chinese preset needs no separate pane build: `preset-zh/` holds no
-`lesson-pane/`, and both the installer and the packer stage the shared one in
-from `preset/lesson-pane`. Two committed copies of a generated bundle is the
-shape that drifts, so there is only ever one.
+**Install the thing before you tag it, into a throwaway harness home.** The board is
+the one part of this repository that lives outside the preset, and its two halves reach
+their runtimes by different roads, so nothing above proves it actually mounts:
+
+```sh
+DSH_HOME=/tmp/mimir-release-check ./scripts/install.sh
+DSH_HOME=/tmp/mimir-release-check ./scripts/serve.sh --port 8099
+# the page comes up, and a session that calls mimir_board draws a board
+```
+
+A green CI run does not cover this. `build-mimir-skin.mjs --check` proves the artifact
+matches its source, and the two test scripts prove each half behaves on its own; only an
+install proves DSH composes the row.
 
 Then tag. The vault's release carries the `.dshpreset` and its SHA-256, which is
 the teacher as a single importable file.
@@ -162,17 +173,17 @@ each localization (`Mimir Tutor (English)` / `Mimir Tutor（英文）`) before
 publishing, and check every locale side by side rather than only the English.
 
 **The plugin catalog** — [`awesome-dsh-plugin`](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) —
-is for *plugins*, and Mimir is a preset, so the preset does not go there. The
-Lesson pane does, because it is a real DSH plugin: it declares `dsh.bundle` at
-`preset/lesson-pane/package.json`, which is the thing that makes a package
-installable. One YAML file per entry, at `data/plugins/tommyhedgerow__Mimir.yml`:
+is for *plugins*, and Mimir is a preset, so the preset does not go there. The board
+does, because it is a real DSH plugin: it declares `dsh.bundle` at
+`preset/mimir-skin/package.json`, which is the thing that makes a package installable.
+One YAML file per entry, at `data/plugins/tommyhedgerow__Mimir.yml`:
 
 ```yaml
 url: https://github.com/tommyhedgerow/Mimir
 name: tommyhedgerow/Mimir
 category: ui
 description:
-  en: A docked lesson pane for tutoring sessions, carrying the question, the vault's drawings and a scratch page.
+  en: Publishes a lesson into the DSH conversation — the dependency spine, the question and the vault's drawings, in the vault's own colours.
 ```
 
 The checks that gate it, in the order they run: at most three entries per pull

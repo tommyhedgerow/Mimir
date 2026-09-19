@@ -1,22 +1,29 @@
 #!/usr/bin/env node
 /**
- * Tools/check-tokens.mjs — one palette, four files, and this is what keeps them honest.
+ * Tools/check-tokens.mjs — one palette, five files, and this is what keeps them honest.
  *
  * WHY THIS EXISTS
- *   The Mimir palette is spoken in four places, because four things have to agree about
+ *   The Mimir palette is spoken in six places, because six things have to agree about
  *   it and none of them can import the others:
  *
  *     Tools/mimir-tokens.json                    the source
  *     .obsidian/themes/Mimir/theme.css           the vault theme
  *     Tools/vault-chart.mjs                      every SVG in Learn/Viz
- *     Tools/lesson-pane/client.mjs (VIZ_ROLES)   re-inks those SVGs in the pane
  *     .obsidian/plugins/mimir/main.js            the reading sizes in the top bar
+ *     Tools/vault-map.mjs                        the mermaid class colours
  *
  *   A colour that disagrees across these is not a matter of taste, it is a drawing that
- *   changes meaning when it moves from the note to the pane, or a theme whose dark mode
+ *   changes meaning when it moves from the note to the board, or a theme whose dark mode
  *   is a different dark from the dark in its own diagrams. So the copies are checked
  *   rather than trusted, exactly as Tools/vault-map.mjs checks a spine instead of
  *   re-parsing prose.
+ *
+ *   THE BOARD IS CHECKED DIFFERENTLY, FOR A DIFFERENT REASON. `preset/mimir-skin` holds no
+ *   copy: `Tools/build-mimir-skin.mjs` reads this palette and emits it into the bundle, so
+ *   it cannot drift in value. What it can get wrong is a role NAME — and a misspelt role
+ *   reaches the page as the literal string `undefined` inside a custom property, which the
+ *   browser ignores in silence. So the skin is read for the roles it names, and every one
+ *   of them is required to exist in both palettes.
  *
  * USAGE
  *   node Tools/check-tokens.mjs          # report and exit non-zero on drift
@@ -52,7 +59,6 @@ const cssVar = key => '--mimir-' + key
 const files = {
   theme: read('.obsidian/themes/Mimir/theme.css'),
   chart: read('Tools/vault-chart.mjs'),
-  roles: read('Tools/lesson-pane/client.mjs'),
   plugin: read('.obsidian/plugins/mimir/main.js'),
   map: read('Tools/vault-map.mjs')
 }
@@ -148,49 +154,22 @@ for (const key of lightKeys) {
   if (!darkKeys.has(key)) fail(`vault-chart.mjs: '${key}' is in the light palette but not the dark one`, 'chart')
 }
 
-/* ── the pane's role table: both palettes, so both kinds of drawing re-ink ── */
-
-const rolesBlock = files.roles.slice(
-  files.roles.indexOf('const VIZ_ROLES = new Map(['),
-  files.roles.indexOf('])', files.roles.indexOf('const VIZ_ROLES = new Map(['))
-)
-if (rolesBlock === '') fail('client.mjs: no VIZ_ROLES table found', 'roles')
-
-// Every token in the palette, both variants, must be a key in the table. The table is
-// what stands between a drawing and a lesson read in the other frame, and a colour it has
-// never seen passes through unchanged — dark ink on dark paper, or a white slab.
-for (const [mode, palette] of [['light', L], ['dark', D]]) {
-  for (const key of Object.keys(palette)) {
-    if (!rolesBlock.includes(`'${palette[key]}'`)) {
-      fail(`client.mjs (VIZ_ROLES): ${key} ${palette[key]} (${mode}) is not mapped`, 'roles')
-    }
-  }
-}
-
-// And every colour the drawings ACTUALLY write must be one the table knows — asked of the
-// drawings themselves rather than of the generator's palette constant, so a colour that is
-// declared but never drawn is not held against anything, and one that is drawn is.
+// And every colour the generated drawings actually write must be a real colour.
+// `vault-chart.mjs --print` renders every drawing the spines call for and prints it, which
+// is the only way to ask the drawings themselves rather than the generator's palette
+// constant: a colour that is declared but never drawn is held against nothing, and one
+// that is drawn is held against everything.
 let drawn = ''
 try {
   drawn = execFileSync(process.execPath, [join(ROOT, 'Tools', 'vault-chart.mjs'), '--print'], {
     encoding: 'utf8', cwd: ROOT, maxBuffer: 64 * 1024 * 1024
   })
 } catch (error) {
-  fail(`vault-chart.mjs could not be run to collect its colours: ${String(error.message).split('\n')[0]}`, 'roles')
-}
-// Only the light half is readable this way: the dark values sit inside a media block. The
-// dark palette is covered by the loop above, which asks the token file directly.
-const declared = new Set(Object.values(L))
-const written = new Set((drawn.match(/#[0-9a-f]{6}/g) || []).filter(c => declared.has(c)))
-for (const colour of written) {
-  if (!rolesBlock.includes(`'${colour}'`)) {
-    fail(`client.mjs (VIZ_ROLES): the drawings write ${colour} but the table does not map it`, 'roles')
-  }
+  fail(`vault-chart.mjs could not be run to collect its colours: ${String(error.message).split('\n')[0]}`, 'chart')
 }
 
-// And every colour the drawings actually write must be a real colour. `undefined` is the
-// failure this is for; `NaN` is the same mistake one arithmetic slip away.
-// Stop the value at a quote, an angle bracket or a newline: a greedy `[^;}]+` runs
+// `undefined` is the failure this is for; `NaN` is the same mistake one arithmetic slip
+// away. Stop the value at a quote, an angle bracket or a newline: a greedy `[^;}]+` runs
 // straight through `"/>` and swallows the next element, which made this report every
 // drawing as broken the first time it ran.
 const badColour = (drawn.match(/(?:fill|stroke)\s*:\s*([^;}"'<>\n]+)/g) || [])
@@ -224,6 +203,37 @@ if (sizes.join(',') !== expected.join(',')) {
   fail(`plugins/mimir/main.js: reading sizes are [${sizes.join(', ')}], tokens say [${expected.join(', ')}]`, 'plugin')
 }
 
+/* ── the skin: every palette role it names must exist ────────────────────── */
+
+// The skin holds no copy of the palette — the build emits it — so there is no literal to
+// match. What it does is NAME roles, and a misspelt role is `undefined`: that reaches the
+// page as the string `undefined` inside a custom property, which the browser ignores in
+// silence. Same class of fault as the chart's dangling token, one layer up.
+//
+// Only `both()` and `across()` take roles. `fixed()` takes a literal — the two faces and
+// the restated type scale — so a font stack must not be read as a role name.
+const skin = read('preset/mimir-skin/client.mjs')
+const rolesNamed = new Set()
+for (const match of skin.matchAll(/\bboth\('([^']+)'\)/g)) rolesNamed.add(match[1])
+for (const match of skin.matchAll(/\bacross\('([^']+)',\s*'([^']+)'\)/g)) {
+  rolesNamed.add(match[1])
+  rolesNamed.add(match[2])
+}
+if (rolesNamed.size === 0) fail('preset/mimir-skin/client.mjs: no palette roles could be read from it', 'skin')
+for (const role of rolesNamed) {
+  if (!(role in L)) fail(`preset/mimir-skin/client.mjs: names '${role}', which the light palette does not hold`, 'skin')
+  if (!(role in D)) fail(`preset/mimir-skin/client.mjs: names '${role}', which the dark palette does not hold`, 'skin')
+}
+
+/* ── and the two palettes have to hold the same roles ─────────────────────── */
+
+for (const key of Object.keys(L)) {
+  if (!(key in D)) fail(`mimir-tokens.json: '${key}' is in the light palette but not the dark one`, 'source')
+}
+for (const key of Object.keys(D)) {
+  if (!(key in L)) fail(`mimir-tokens.json: '${key}' is in the dark palette but not the light one`, 'source')
+}
+
 /* ── report ────────────────────────────────────────────────────────────────── */
 
 if (problems.length) {
@@ -233,4 +243,4 @@ if (problems.length) {
   process.exit(1)
 }
 
-console.log(`✓ Mimir: ${Object.keys(L).length} colours in two palettes and ${expected.length} reading sizes agree across theme.css, vault-chart.mjs, client.mjs, vault-map.mjs and the plugin.`)
+console.log(`✓ Mimir: ${Object.keys(L).length} colours in two palettes and ${expected.length} reading sizes agree across theme.css, vault-chart.mjs, vault-map.mjs, the plugin, and the ${rolesNamed.size} roles the board names.`)

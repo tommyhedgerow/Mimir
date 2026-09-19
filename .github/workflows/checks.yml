@@ -27,8 +27,16 @@ jobs:
       - name: The drawn maps match the notes
         run: node Tools/vault-map.mjs
 
-      - name: The Lesson pane bundle is current
-        run: node Tools/build-lesson-pane.mjs --check
+      # The board ships built, because the package is what `dsh plugin add` reads.
+      # A stale bundle is the failure this catches: the source runs ahead of the
+      # artifact and the page keeps serving last week's ink.
+      - name: The board's bundle is current
+        run: node Tools/build-mimir-skin.mjs --check
+
+      - name: The board's two halves behave
+        run: |
+          node Tools/test-mimir-board.mjs
+          node Tools/test-mimir-skin.mjs
 
       - name: The two languages still agree
         run: |

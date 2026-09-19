@@ -27,8 +27,8 @@
         stock, with an offset shadow in the corner and a 3px accent edge along
         the top (a question) or the left (a voice). No outlines, no rounding.
 
-   Palette and metrics are copied from Tools/lesson-pane/client.mjs, tokens
-   `--mm-*`. If the pane's palette moves, this file is the second place to move.
+   Palette and metrics live in Tools/mimir-tokens.json, and this page is one of
+   the copies held to it by `node Tools/check-tokens.mjs`.
 
    Author: the student · for the Mimisbrunnr vault · saved 2026-09-17
    ========================================================================= */
@@ -788,81 +788,81 @@ html,body{margin:0;background:#0b0f0e;color:#e6f0e6;
 <div class="wrap">
   <div class="pane theme-light"><h2 class="tag">Light — moonstone</h2>
     <div class="markdown-preview-view markdown-rendered">
-<h1>A diagram has to fit the column</h1>
+<h1>Growth needs every requirement met at once</h1>
 <div class="metadata-container">
-  <div class="metadata-property"><span class="metadata-property-key">subjects</span> <span>method</span></div>
+  <div class="metadata-property"><span class="metadata-property-key">subjects</span> <span>botany</span></div>
   <div class="metadata-property"><span class="metadata-property-key">status</span> <span>established</span></div>
-  <div class="metadata-property"><span class="metadata-property-key">review_due</span> <span>2026-01-01</span></div>
+  <div class="metadata-property"><span class="metadata-property-key">review_due</span> <span>2026-10-01</span></div>
 </div>
-<p>A note is read in a column, not on a page. Anything drawn wider than that column has
-to be scrolled sideways, and a checkpoint you have to scroll to is one you stop looking
-at. So a <a class="internal-link" href="#">[[dependency map]]</a> is drawn at the width of
-the pane, and the colour on a node is that concept's own
-<a class="external-link" href="#">[state]</a>, never decoration.</p>
-<blockquote><p>A picture that cannot go stale is one that a script draws.</p></blockquote>
+<p>Liebig's law is not a claim about scarcity. It says that growth is set by the
+one resource in shortest supply, so adding anything else changes nothing.
+A <a class="internal-link" href="#">[[hard evergreen leaf]]</a> is an expensive answer to more
+than drought, and the cost is paid in <a class="external-link" href="#">[sclerophylly]</a>,
+not in water.</p>
+<blockquote><p>A chain is as strong as its weakest link, and a plant is as fast as its scarcest input.</p></blockquote>
 <div class="callout" data-callout="question">
   <div class="callout-title"><span class="callout-icon">?</span><span>Question</span></div>
-  <p>If every drawing is generated from the notes, what has to be true of the notes
-  before any drawing can be trusted?</p>
+  <p>If nitrogen is doubled but phosphorus is unchanged, what does the yield do — and what
+  would you have to measure to be sure?</p>
 </div>
 <div class="callout" data-callout="warning">
   <div class="callout-title"><span class="callout-icon">!</span><span>Mind the edge</span></div>
-  <p>The spine is frontmatter, not prose. A note whose graph block disagrees with its own
-  text draws the wrong map, and nothing complains.</p>
+  <p>"Shortest supply" is per-plant and per-moment. A field average can hide the single
+  individual the claim is actually about.</p>
 </div>
 <h2>The table</h2>
-<table><thead><tr><th>What</th><th>Written by</th><th>Regenerated?</th></tr></thead>
-<tbody><tr><td>The spine</td><td>hand, in the note</td><td>no</td></tr>
-<tr><td>The drawing</td><td>vault-chart.mjs</td><td>every run</td></tr>
-<tr><td>The palette</td><td>mimir-tokens.json</td><td>checked</td></tr></tbody></table>
+<table><thead><tr><th>Resource</th><th>Supply</th><th>Limiting?</th></tr></thead>
+<tbody><tr><td>Nitrogen</td><td>high</td><td>no</td></tr>
+<tr><td>Phosphorus</td><td>low</td><td>yes</td></tr>
+<tr><td>Light</td><td>high</td><td>no</td></tr></tbody></table>
 <h3>Tasks and code</h3>
 <ul class="contains-task-list">
-<li class="task-list-item"><input type="checkbox" checked> <span>Redraw after editing a spine</span></li>
-<li class="task-list-item"><input type="checkbox"> <span>Add the new concept to its map</span></li>
+<li class="task-list-item"><input type="checkbox" checked> <span>Retrieve cold before the next session</span></li>
+<li class="task-list-item"><input type="checkbox"> <span>Find the Mitscherlich curve again</span></li>
 </ul>
-<pre><code>node Tools/vault-chart.mjs  # redraws every SVG in Learn/Viz
-node Tools/check-tokens.mjs # fails if the copies disagree</code></pre>
-<p>Inline <code>review_due: 2026-01-01</code> sits in the field, next to a
-<a class="tag" href="#">#learn</a> <a class="tag" href="#">#method</a>.</p>
+<pre><code>node Tools/vault-map.mjs   # validates the spine
+node Tools/vault-chart.mjs # draws it</code></pre>
+<p>Inline <code>review_due: 2026-10-01</code> sits in the field, next to a
+<a class="tag" href="#">#learn</a> <a class="tag" href="#">#concept</a>.</p>
 </div></div>
   <div class="pane theme-dark"><h2 class="tag">Dark — the same theme, dark</h2>
     <div class="markdown-preview-view markdown-rendered">
-<h1>A diagram has to fit the column</h1>
+<h1>Growth needs every requirement met at once</h1>
 <div class="metadata-container">
-  <div class="metadata-property"><span class="metadata-property-key">subjects</span> <span>method</span></div>
+  <div class="metadata-property"><span class="metadata-property-key">subjects</span> <span>botany</span></div>
   <div class="metadata-property"><span class="metadata-property-key">status</span> <span>established</span></div>
-  <div class="metadata-property"><span class="metadata-property-key">review_due</span> <span>2026-01-01</span></div>
+  <div class="metadata-property"><span class="metadata-property-key">review_due</span> <span>2026-10-01</span></div>
 </div>
-<p>A note is read in a column, not on a page. Anything drawn wider than that column has
-to be scrolled sideways, and a checkpoint you have to scroll to is one you stop looking
-at. So a <a class="internal-link" href="#">[[dependency map]]</a> is drawn at the width of
-the pane, and the colour on a node is that concept's own
-<a class="external-link" href="#">[state]</a>, never decoration.</p>
-<blockquote><p>A picture that cannot go stale is one that a script draws.</p></blockquote>
+<p>Liebig's law is not a claim about scarcity. It says that growth is set by the
+one resource in shortest supply, so adding anything else changes nothing.
+A <a class="internal-link" href="#">[[hard evergreen leaf]]</a> is an expensive answer to more
+than drought, and the cost is paid in <a class="external-link" href="#">[sclerophylly]</a>,
+not in water.</p>
+<blockquote><p>A chain is as strong as its weakest link, and a plant is as fast as its scarcest input.</p></blockquote>
 <div class="callout" data-callout="question">
   <div class="callout-title"><span class="callout-icon">?</span><span>Question</span></div>
-  <p>If every drawing is generated from the notes, what has to be true of the notes
-  before any drawing can be trusted?</p>
+  <p>If nitrogen is doubled but phosphorus is unchanged, what does the yield do — and what
+  would you have to measure to be sure?</p>
 </div>
 <div class="callout" data-callout="warning">
   <div class="callout-title"><span class="callout-icon">!</span><span>Mind the edge</span></div>
-  <p>The spine is frontmatter, not prose. A note whose graph block disagrees with its own
-  text draws the wrong map, and nothing complains.</p>
+  <p>"Shortest supply" is per-plant and per-moment. A field average can hide the single
+  individual the claim is actually about.</p>
 </div>
 <h2>The table</h2>
-<table><thead><tr><th>What</th><th>Written by</th><th>Regenerated?</th></tr></thead>
-<tbody><tr><td>The spine</td><td>hand, in the note</td><td>no</td></tr>
-<tr><td>The drawing</td><td>vault-chart.mjs</td><td>every run</td></tr>
-<tr><td>The palette</td><td>mimir-tokens.json</td><td>checked</td></tr></tbody></table>
+<table><thead><tr><th>Resource</th><th>Supply</th><th>Limiting?</th></tr></thead>
+<tbody><tr><td>Nitrogen</td><td>high</td><td>no</td></tr>
+<tr><td>Phosphorus</td><td>low</td><td>yes</td></tr>
+<tr><td>Light</td><td>high</td><td>no</td></tr></tbody></table>
 <h3>Tasks and code</h3>
 <ul class="contains-task-list">
-<li class="task-list-item"><input type="checkbox" checked> <span>Redraw after editing a spine</span></li>
-<li class="task-list-item"><input type="checkbox"> <span>Add the new concept to its map</span></li>
+<li class="task-list-item"><input type="checkbox" checked> <span>Retrieve cold before the next session</span></li>
+<li class="task-list-item"><input type="checkbox"> <span>Find the Mitscherlich curve again</span></li>
 </ul>
-<pre><code>node Tools/vault-chart.mjs  # redraws every SVG in Learn/Viz
-node Tools/check-tokens.mjs # fails if the copies disagree</code></pre>
-<p>Inline <code>review_due: 2026-01-01</code> sits in the field, next to a
-<a class="tag" href="#">#learn</a> <a class="tag" href="#">#method</a>.</p>
+<pre><code>node Tools/vault-map.mjs   # validates the spine
+node Tools/vault-chart.mjs # draws it</code></pre>
+<p>Inline <code>review_due: 2026-10-01</code> sits in the field, next to a
+<a class="tag" href="#">#learn</a> <a class="tag" href="#">#concept</a>.</p>
 </div></div>
 </div>
 </body>

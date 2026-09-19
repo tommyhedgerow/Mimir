@@ -1,13 +1,13 @@
 {
-  "name": "dsh-mimir-lesson-pane",
+  "name": "dsh-mimir-skin",
   "version": "1.0.0",
   "type": "module",
-  "description": "The Lesson pane: a paper-and-ink right-hand column for Mimir Tutor sessions, carrying the quiz, the vault's SVG visualisations, the lesson spine and a scratch pad.",
+  "description": "The Mimir board: the lesson's spine, question and drawings published into the DSH conversation, in the vault's own palette and faces.",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tommyhedgerow/Mimir.git",
-    "directory": "preset/lesson-pane"
+    "directory": "preset/mimir-skin"
   },
   "homepage": "https://github.com/tommyhedgerow/Mimir#readme",
   "keywords": [
@@ -31,8 +31,7 @@
   },
   "files": [
     "lib",
-    "cordis.patch.yml",
-    "README.md"
+    "cordis.patch.yml"
   ],
   "dsh": {
     "bundle": {

@@ -26,7 +26,7 @@
       "source": "https://github.com/tommyhedgerow/obsidian-lesson-publisher",
       "version": "1.1.0",
       "files": {
-        "main.js": "aee64d241c59c6f022a90f31bf3b2465db1074415a62c92598bbc373e25a0e4f",
+        "main.js": "d47987ad3cc42fc081c288d3648fe1d6c82c3fdb602a0661f2204d19a3ba0320",
         "manifest.json": "b44a4bb3c0b344fabcb9c0bd834bc377ea9c4f13d2147d939e5d27ec9ccb4cf2"
       }
     },
@@ -36,7 +36,7 @@
       "version": "1.0.0",
       "files": {
         "manifest.json": "a6e5ede673834cc54ac2ebd334c515879c45f4685c31593fa071ceb66ddb3a7f",
-        "theme.css": "d8e010924d15a45014317cf5b75aadfc82373cb1aea3c20df36130ae4d9242bc"
+        "theme.css": "b2346102e8ecbfb43f72f22570ec1b8ba4603b4a325aa96a77f2cd25fc849ed4"
       }
     }
   }

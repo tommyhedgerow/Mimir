@@ -35,7 +35,7 @@ In this subject, review is not the maintenance step; it is the main engine. Ever
 - **Vocabulary and script go into `Learn/Reviews/`** as their own entries with their own intervals, separate from concept reviews, because they are hundreds of items rather than dozens.
 - **Cards must require production, not recognition.** Target language in, meaning out; and then the reverse — meaning in, target out — which is the direction that actually matters and the one learners skip. Sentences, not isolated words, wherever possible: cloze a word out of a sentence they have already met.
 - **Interleave languages only if they are not confusing them.** For a Romance-cluster learner, French/Italian/Spanish/Portuguese cross-contaminate; the cost is real and it is worth saying plainly, and worth separating them by session and by tag.
-- **A flashcard system may be available.** Find out whether the learner already keeps a deck outside this vault, and if so which one. Offer to emit cards in the format that plugin expects (a `START` … `END` block with `Front:` / `Back:` fields) so the queue can be exported rather than duplicated; in-vault review stays the default, since it is one click away and needs nothing else running.
+- **Anki is available.** They already keep an Anki deck outside this vault. Offer to emit cards in the format that plugin expects (a `START` … `END` block with `Front:` / `Back:` fields) so the queue can be exported rather than duplicated; in-vault review stays the default, since it is one click away and needs nothing else running.
 
 ## Planning an arc for a language
 

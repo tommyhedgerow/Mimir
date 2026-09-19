@@ -24,7 +24,7 @@ Reach for one when the idea is:
 
 Do **not** visualise when prose or a single sentence already carries it. A decorative diagram that restates the sentence beside it adds noise and adds a chance of being wrong. When in doubt, do not: a missing diagram is cheaper than a false one.
 
-**The same test applies to the learner's own data, and it is easier to fail.** Now that the vault records floors, edges, retrievals and probe scores, there is a standing temptation to chart them. Do not. A bar chart of concepts per subject is decoration; a retention curve drawn through one data point is worse than no curve. Ask what decision the picture changes — if the answer is "none", the table already said it.
+**The same test applies to their own data, and it is easier to fail.** Now that the vault records floors, edges, retrievals and probe scores, there is a standing temptation to chart them. Do not. A bar chart of concepts per subject is decoration; a retention curve drawn through one data point is worse than no curve. Ask what decision the picture changes — if the answer is "none", the table already said it.
 
 **Dependency maps are the exception that proves the rule.** In this method the lesson *is* a dependency graph, so a small mermaid DAG of the approved plan is wanted almost every session — that is a picture carrying the pedagogy itself, not decoration.
 
@@ -44,7 +44,7 @@ If it is a map of a real place, think hard before using mermaid; a schematic coa
 
 ### A picture has to fit the column
 
-The learner reads in Obsidian and **scrolls rather than pans**, so a left-to-right graph runs off the side of the pane. Turning everything vertical solved that and created a worse problem: `graph TD` at mermaid's default padding makes a five-rank graph a full screen tall, which they then scroll *around* every time they go to check the plan. **Settled: the mermaid visualisations are ugly, and too big for the margins, and that just adds friction.** So the rule is not "vertical". It is **"fits"**.
+They read in Obsidian and **scrolls rather than pans**, so a left-to-right graph runs off the side of the pane. Turning everything vertical solved that and created a worse problem: `graph TD` at mermaid's default padding makes a five-rank graph a full screen tall, which they then scroll *around* every time they go to check the plan. **Amended after a lesson read in the vault: the mermaid visualisations were ugly, and too big for the margins, and that just adds friction.** So the rule is not "vertical". It is **"fits"**.
 
 - **One look, no scrolling.** Aim under ~400px tall and inside the reading column (~720px with `readableLineLength` on, which they have). If it needs scrolling it is too big, and the fix is **fewer nodes or a different form, never a smaller font**.
 - **Labels are one short line, or two — never a full gloss.** The explanation belongs in the prose list beside the graph, where it is already being written; a label that repeats the adjacent sentence doubles every box for nothing.
@@ -89,7 +89,7 @@ Include: the medium, the elements, what the layout must express, and what may be
 
 The maker writes into `Learn/Viz/`. Then:
 
-- **Mermaid**: paste the block into the note where the idea is being taught (session note or concept note), in the position where the learner needs it. Keep the diagram's source in the note — a diagram you can edit later is worth more than an image.
+- **Mermaid**: paste the block into the note where the idea is being taught (session note or concept note), in the position where they need it. Keep the diagram's source in the note — a diagram you can edit later is worth more than an image.
 - **SVG or other file**: embed with `![[filename.svg]]` — a wikilink embed resolves by filename anywhere in the vault, so the name must be unique and descriptive. Add a display width when it is dense: `![[cladogram-arthropods.svg|600]]`.
 
 Introduce the visual in a sentence that says what to look at, then let it carry the idea. Do not narrate every element back in prose — that defeats the purpose of drawing it.

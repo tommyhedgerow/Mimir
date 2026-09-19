@@ -10,7 +10,7 @@ This vault is the memory of the teaching. The conversation is not. If a session 
 
 ## The session ritual — do this before anything else
 
-Two standing conventions. They are not polish: **the learner reads the vault, not the chat**, and the vault is where diagrams render. A session that follows the method but leaves the note until the end has taught the learner blind.
+Two standing conventions. They are not polish: **they read the vault, not the chat**, and the vault is where diagrams render. A session that follows the method but leaves the note until the end has taught them blind.
 
 1. **Create the session note at the very start, and open it in Obsidian.** At the start — before the probe, not after the teaching. A skeleton with frontmatter is enough to open; the content fills in as the session runs.
    - Create `Learn/Sessions/YYYY-MM-DD Short Topic.md` from `Learn/Templates/Session.md`.
@@ -113,13 +113,13 @@ Body: the idea in two or three sentences of their own register; then **Why it ha
 
 ## Linking — inline first, list second
 
-**This is a standing rule, not a style preference:** inline Wikipedia links belong in the notes going forward.
+**A standing rule, not a style preference.** The first time a proper noun, movement, species, event, place, dynasty, author or concept appears in a note, it carries an inline link to its article — the learner reads the notes, and a link they can follow where the name appears is worth more than a bibliography at the end.
 
 - **Every proper noun, text, dynasty, person, movement, species, event, place or concept gets a real markdown link at its first mention in the body of the note** — `[Confucius](https://en.wikipedia.org/wiki/Confucius)`, not bare text.
 - The **Sources** section stays, as the collected list with a line on what each source is good for. **It is in addition to the inline links, never instead of them.** A note with only a Sources list fails this rule.
 - The rule applies to session notes, concept notes and map notes — including reference tables, node write-ups and check tables. If a name appears in a table cell, link it once there.
 - Do not pad: link what genuinely expands the lesson, and never link a name to the wrong article. Inline linking is not an excuse to link every common noun.
-- The reason it matters: **the note is where the learner reads, and a link they can follow at the moment of meeting a name is worth more than a bibliography at the end.** The vault is the teaching surface, not a record of the teaching.
+- The reason it matters: **the note is where they read, and a link they can follow at the moment of meeting a name is worth more than a bibliography at the end.** The vault is the teaching surface, not a record of the teaching.
 
 **Map note** — `Learn/Maps/Subject — map.md`. A map of content: the strand's concepts in dependency order, each a wikilink with a one-line gloss, plus the current frontier.
 
@@ -188,11 +188,11 @@ Contributed to at write-back step 2b below, and the field names are load-bearing
 
 ## The reading list
 
-`Learn/Reading List.md` is the one place books accumulate, grouped by strand. The rule: **at most one or two books per session**, chosen at the end of a session for what it extends that the session could not — better one that fits than two that pad. Never during teaching, never a bibliography dump.
+`Learn/Reading List.md` is the one place books accumulate, grouped by strand. The rule they set: **at most one or two books per session**, chosen at the end of a session for what it extends that the session could not — better one that fits than two that pad. Never during teaching, never a bibliography dump.
 
-Each entry gives **title, author, year, one link, and one line on why**. The link rule: **a hardcover retail link where one exists; Goodreads if there is none.** Books are verified as real — author, title and year — before they go on the list, and neither the session note nor the list carries a title whose attribution has not been checked.
+Each entry gives **title, author, year, one link, and one line on why**. The link rule, in their words: **a hardcover retail link where one exists; Goodreads if there is none.** Books are verified as real — author, title and year — before they go on the list, and neither the session note nor the list carries a title whose attribution has not been checked.
 
-The session note mirrors what it contributed: the `books:` list in its frontmatter (one `"Title — Author (year)"` string each) and an `## 📚 Reading` section holding the same recommendation with its reason. `Dashboard.base` has a **Books** view reading `books`. The genre rule is explicit: **published fiction and non-fiction books only — no academic papers, no journal articles.**
+The session note mirrors what it contributed: the `books:` list in its frontmatter (one `"Title — Author (year)"` string each) and an `## 📚 Reading` section holding the same recommendation with its reason. `Dashboard.base` has a **Books** view reading `books`. The genre rule is their and is explicit: **published fiction and non-fiction books only — no academic papers, no journal articles.**
 
 ## The write-back at the end of a session
 
@@ -224,7 +224,7 @@ Spacing: first review within a week, then double the interval each time it is re
 
 ## Publishing to the library
 
-When a session is `status: done` and its concept notes are `established`, it can be published into the library vault:
+When a session is `status: done` and its concept notes are `established`, it can be published into their library:
 
 - **From Obsidian: one click.** The active note's publish button/command copies it, and everything it embeds, into the mirror path inside the library: `Learn/Sessions/x.md` → `Library/Learn/Sessions/x.md`, and likewise for `Concepts/`, `Maps/`, `Viz/`, `Sources/`. It stamps `published:` in the source note so published state is visible here.
 - **From here:** run `Tools/publish-to-library.sh <path-relative-to-vault>` (add `--with-links` to take its linked concept notes along).

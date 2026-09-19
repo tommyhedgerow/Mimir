@@ -244,15 +244,15 @@ const RANK = { planned: 0, seed: 1, learning: 2, fragile: 3, established: 4 }
 
 // Stroke only — fill is left to the theme, so these read correctly in light
 // and dark. Solid mint for what is held, solid peach for what is still moving,
-// dashed for fragile, faint dotted for planned. The values are the Mimir theme's
-// own state colours and the partners of `VIZ_ROLES` in Tools/lesson-pane/client.mjs:
-// mint `--mimir-mint`, peach `--mimir-peach`, faint `--mimir-ink-3`.
+// dashed for fragile, faint dotted for planned. The values are the Mimir theme's own
+// state colours, and `Tools/check-tokens.mjs` holds them to it: mint `--mimir-mint`,
+// peach `--mimir-peach`, faint `--mimir-ink-3`.
 const CLASS_DEFS = [
   ['vm-established', 'stroke:#2f7d63,stroke-width:2.5px'],
   ['vm-learning', 'stroke:#b5642f,stroke-width:2.5px'],
   ['vm-fragile', 'stroke:#b5642f,stroke-width:2.5px,stroke-dasharray:5 3'],
-  ['vm-seed', 'stroke:#756d59,stroke-width:1.5px,stroke-dasharray:2 3'],
-  ['vm-planned', 'stroke:#756d59,stroke-width:1.5px,stroke-dasharray:3 4']
+  ['vm-seed', 'stroke:#665e4c,stroke-width:1.5px,stroke-dasharray:2 3'],
+  ['vm-planned', 'stroke:#665e4c,stroke-width:1.5px,stroke-dasharray:3 4']
 ]
 
 /**

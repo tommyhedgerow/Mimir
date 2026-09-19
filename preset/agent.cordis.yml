@@ -572,31 +572,39 @@
     fetch: true
     searchTimeoutMs: 60000
 
-# ── the Lesson pane ─────────────────────────────────────────────────────────
+# ── the board, and what a plugin can and cannot be ──────────────────────────
 
-# The interface a lesson is read and answered in: the reading column keeps its full
-# height, and a docked tab in the right column carries the question, the vault's
-# drawings, the lesson spine and a scratch page.
+# There is no row here for `mimir_board`, and that is deliberate rather than an
+# omission. The board is TWO halves: a host half that reads the lesson's drawings and
+# registers the tool, and a browser half that draws the spine, the question and those
+# drawings into the conversation. A preset row can mount the host half perfectly and
+# produces NO browser bundle at all — the board would register and draw nothing, which
+# is worse than not shipping it, because it looks like it worked.
 #
-# The two halves reach their runtimes by different roads, and each road was found the
-# hard way — so both are written down here.
+# So both halves live in one package, `preset/mimir-skin/`, and `scripts/install.sh`
+# installs it into the profile:
 #
-#   * THE HOST HALF is named as a preset-relative FILE, pointing into the vault where
-#     its source lives (`Tools/build-lesson-pane.mjs` also installs a copy beside the
-#     browser half). A bare package name cannot be used: preset validation resolves
-#     those by walking up from the HARNESS INSTALL, so it would have to live inside the
-#     application bundle.
-#   * THE BROWSER HALF is a profile BUNDLE (`dsh.profile.bundles` in
-#     `profiles/web/package.json`). A preset row, relative or not, loads a Host half
-#     perfectly and produces no browser bundle at all — which is exactly how this first
-#     shipped and did nothing in the interface.
+#     dsh plugin --profile web add "<repo>/preset/mimir-skin"
 #
-# Rebuild and reinstall both with `node Tools/build-lesson-pane.mjs` from the vault root.
+# That one command puts the package in the profile's `node_modules`, appends it to
+# `dsh.profile.bundles` (the manifest declares `dsh.bundle`), and composes its
+# `cordis.patch.yml`, which is the row that actually mounts it. Both halves are then in
+# place together and cannot be installed out of step.
 #
-# The pane's own chrome — its tab labels, buttons and placeholders — follows the `lang`
-# field in `Learn/Sessions/.live/<session-id>.json`. This preset leaves that field out,
-# because English is what the pane falls back to; the Chinese preset writes `"zh-CN"`
-# there. What the field does and does not affect is in the `mimir-teaching` skill,
-# section *The Lesson pane — where they actually read and answer*.
-- id: lesson-pane
-  name: ./lesson-pane/host.mjs
+# WHY THE HOST HALF IMPORTS NOTHING — this was learned the hard way and is worth not
+# re-learning. A plugin the profile resolves by PACKAGE NAME is found, but Node resolves
+# its own imports from the file's REAL path; installed by symlink, that path is the
+# checkout, where no `node_modules` above it holds the harness' packages. The mount then
+# dies with `ERR_MODULE_NOT_FOUND: '@deepseek-ai/dsh-tools'` and the tool never
+# registers — a failure indistinguishable from a teacher who forgot to call it. So the
+# host half registers against the tool registry's raw contract (`parameters` and
+# `output.schema` are plain JSON Schema, which is what `defineTool` compiles its terse
+# spec into), depends on nothing, and mounts from any install layout.
+#
+# The other road found the hard way: a preset-relative host file cannot import a harness
+# package either, because preset rows resolve those bare names by walking up from the
+# HARNESS INSTALL rather than from the preset. That is the same failure one layer over.
+#
+# `Tools/test-mimir-board.mjs` mounts the built host half into a stub registry and drives
+# it, and `Tools/test-mimir-skin.mjs` loads the shipped browser bundle the way the page
+# loads it. Between them, neither half can be silently wrong.

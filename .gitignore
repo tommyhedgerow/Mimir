@@ -11,11 +11,6 @@
 # Obsidian per-plugin state, written at runtime and keyed to this machine.
 .obsidian/plugins/*/data.json
 
-# Live lesson state: working files, written on every question, never knowledge.
-# The README explaining the folder is the only part worth keeping.
-Learn/Sessions/.live/*
-!Learn/Sessions/.live/README.md
-
 # The learner's own record. These files ship as empty forms; once you have
 # taught anything they hold your state, and your state is not for committing to
 # a public fork. Uncomment if you fork this and push.
@@ -31,11 +26,6 @@ Learn/Sessions/.live/*
 
 # Where the library vault is. Per-machine, so it is not committed.
 Tools/publish-target.txt
-
-# The Chinese preset stages the shared Lesson pane in at install and pack time
-# rather than keeping a second copy of a generated bundle. Nothing should ever
-# create this directory in the working tree; if something does, it is a mistake.
-preset-zh/lesson-pane/
 
 # Build output
 dist/

@@ -572,25 +572,34 @@
     fetch: true
     searchTimeoutMs: 60000
 
-# ── Lesson pane ─────────────────────────────────────────────────────────────
+# ── 课程板：一个插件能是什么、不能是什么 ─────────────────────────────────────
 
-# 上课、答题所用的界面：阅读栏保持完整高度，右栏一个停靠的标签页承载问题、库里
-# 的图、本课主干，以及一页草稿。
+# 这里没有 `mimir_board` 的行，这是刻意为之，不是漏写。
+# 课程板是两半：宿主那一半读取本课的图并注册工具，浏览器那一半把主干、问题和那
+# 些图绘进对话。预设里的一行可以完美地挂载宿主那一半，却完全不产生浏览器
+# bundle——课程板会注册成功却什么也不画，这比不发布更糟，因为它看起来像是成功了。
 #
-# 两半各自走不同的路到达自己的运行时，而每条路都是撞出来的——所以两条都写在这里。
+# 所以两半住在同一个包里，`preset/mimir-skin/`，由 `scripts/install.sh` 装进配置：
 #
-#   * 宿主那一半写成预设相对的文件路径，指向它的源码所在的库内位置
-#     （`Tools/build-lesson-pane.mjs` 也会往浏览器那一半旁边装一份副本）。裸包名
-#     不能用：预设校验解析裸包名时从 HARNESS 安装目录往上找，所以它得住在应用包
-#     里才行。
-#   * 浏览器那一半是一个配置 BUNDLE（`profiles/web/package.json` 里的
-#     `dsh.profile.bundles`）。预设里的一行，无论相对与否，都能把宿主那一半加载
-#     得好好的，却完全不产生浏览器 bundle——最初发布时正是这样，在界面里什么也
-#     没做。
+#     dsh plugin --profile web add "<repo>/preset/mimir-skin"
 #
-# 在库根用 `node Tools/build-lesson-pane.mjs` 重建并重装两半。本预设的课程记录
-# 写在 `Learn/Sessions/.live/<session-id>.json`：中文会话必须在这个文件里写
-# `"lang": "zh-CN"`，否则课程面板（Lesson pane）的标签页、按钮和占位文字都是英文。
-# 该文件的完整字段见 `mimir-teaching` 技能的 *The Lesson pane — where they actually read and answer* 一节。
-- id: lesson-pane
-  name: ./lesson-pane/host.mjs
+# 这一条命令把包放进配置的 `node_modules`，把它追加到 `dsh.profile.bundles`
+# （清单里声明了 `dsh.bundle`），并组合它的 `cordis.patch.yml`——真正挂载它的就是
+# 那里的那一行。两半于是同时到位，不可能装得步调不一。
+#
+# 宿主那一半为什么不 import 任何东西——这是撞出来的教训，不该再学第二遍。配置按
+# 包名解析的插件是找得到的，但 Node 解析它自己的 import 时用的是文件的真实路径；
+# 以符号链接装进来时，那个路径就是这份检出，而它上面没有任何 `node_modules` 装着
+# harness 的包。挂载于是死在 `ERR_MODULE_NOT_FOUND: '@deepseek-ai/dsh-tools'` 上，工具从
+# 头到尾没注册——这种失败和一位忘了调用它的导师分不出来。所以宿主那一半直接对着
+# 工具注册表的原始契约注册（`parameters` 和 `output.schema` 就是普通 JSON
+# Schema，也就是 `defineTool` 把它那份简短规格编译成的东西），不依赖任何东西，
+# 任何安装布局下都挂得上。
+#
+# 另一条路也是撞出来的：预设相对路径的宿主文件同样不能 import harness 包，因为预
+# 设里的行解析那些裸名字时，是从 HARNESS 安装目录往上找，而不是从预设往上找。这
+# 是同一场失败，只是高了一层。
+#
+# `Tools/test-mimir-board.mjs` 把构建好的宿主那一半挂进一个桩注册表并驱动它，
+# `Tools/test-mimir-skin.mjs` 按页面的加载方式加载发布出去的浏览器 bundle。有这
+# 两者在，哪一半都不可能悄悄出错。

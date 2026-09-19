@@ -40,14 +40,27 @@ The method is a port of [amosblomqvist/learn](https://github.com/amosblomqvist/l
 | | |
 | --- | --- |
 | **The preset** | `Mimir Tutor` — nine method skills, six specialist sub-agents, and the standing rules about verifying facts before asserting them. This is the teacher. |
+| **The board** | The lesson itself, published into the conversation: the spine of dependency nodes and where you are in each, the question, a one-line hint, and the vault's drawings. Scroll back to it, reload, fork — it is part of the transcript, so it is still there. |
 | **The vault** | A working Obsidian vault: session, concept and map templates, a spaced-review queue, generated SVG dependency maps, a glossary that grows only from words a lesson actually needed, and a reading list capped at two books a session. |
-| **The Lesson pane** | A docked tab in the DSH interface carrying the question, the vault's drawings, the lesson spine and a scratch page, so the reading column keeps its full height. |
-| **The theme** | `Mimir` — warm paper, sage, a serif for what is read and a monospace for what is furniture. |
+| **The theme** | `Mimir` — warm paper and sage in daylight, a cold blue-black under cyan-and-magenta at night, a serif for what is read and a monospace for what is furniture. |
 | **Three plugins** | Reading-size and light/dark controls, a startup animation, and a publisher that copies a finished note and its diagrams into a second library vault. |
+
+### The board
+
+Every lesson is published as it happens. When the teacher teaches a node it calls `mimir_board`, which puts onto the transcript:
+
+- the **spine** — the dependency map's nodes in teaching order, each marked held, learning, fragile or planned, so you can see where you are without leaving the lesson;
+- the **question** and its options, word for word the same as the card you answer;
+- one line of **hint**, only when it genuinely helps;
+- the **drawings** this lesson turns on, rendered at full width.
+
+Two things about the drawings are worth knowing, because they are the reason the board exists as a tool rather than as a note. They travel to your interface and **never into the model's context** — the teacher is told their names and nothing else, so a lesson can carry four diagrams without four thousand tokens of path data entering the conversation. And a drawing that is missing, unreadable or too large comes back **named as missing**, on screen, rather than being silently absent: a lesson that refers to a picture you cannot see is worse than one that admits the picture is not there.
+
+There is no second window to keep in step. The conversation is the lesson; the board is the part of it you read at a glance.
 
 ## Install
 
-You need [Obsidian](https://obsidian.md) and [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness). The desktop build of DSH is the easiest route.
+You need [Obsidian](https://obsidian.md) and [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness).
 
 ```sh
 git clone https://github.com/tommyhedgerow/Mimir.git
@@ -55,25 +68,36 @@ cd Mimir
 ./scripts/install.sh
 ```
 
-Or import just the teacher, without cloning anything. Both presets are on Preset Square as single `.dshpreset` files, which DSH Desktop installs from Settings → Agent presets → Import:
+That does two things: it puts the preset in your DSH home, and it installs the board into your DSH profile. Both matter — a preset cannot carry the board's browser half, so an installation without the second step gives you a teacher who publishes to nothing.
+
+`./scripts/install.sh --lang zh-CN` installs the Simplified Chinese preset instead. Both can be installed at once; their ids differ, so they sit side by side in the session picker.
+
+Then:
+
+1. **Restart DSH.** A preset is composed once per process, so the new one is not visible until the harness comes back up.
+2. **Open the `Mimir` folder as the workspace**, and pick **Mimir Tutor** in the session picker.
+3. **Open the same folder as a vault in Obsidian.**
+4. **Say what you want to learn.** "Teach me plate tectonics." "I want to understand what Kant actually did." "Explain mycorrhiza."
+
+`./scripts/install.sh --dry-run` shows what it would do without touching anything. `./scripts/uninstall.sh` reverses it.
+
+### If you would rather just have the teacher
+
+Both presets are on Preset Square as single `.dshpreset` files, which DSH Desktop installs from Settings → Agent presets → Import:
 
 - **[Mimir Tutor](https://dshdesktop.com/preset/p/mimir-tutor-20d96e)** — teaches in English.
 - **[Mimir 导师](https://dshdesktop.com/preset/p/mimir-tutor-chinese-582526)** — teaches in Simplified Chinese.
 
-That route gives you the teacher; the vault, the theme and the plugins come from the clone.
+That route gives you the teacher and nothing else: no vault, no theme, no plugins, and no board. It is the right one if you already have a vault and only want the method.
 
-The installer copies the preset into your DSH home and registers the Lesson pane as a profile bundle. It backs up anything it replaces rather than overwriting it.
+### Running in a browser instead of the desktop app
 
-Then:
+Everything here works under `dsh web` exactly as it does in DSH Desktop — the same preset root, the same profile, the same board. Two things to know:
 
-1. **Restart DSH Desktop.** A preset is composed once per process, so the new one is not visible until the app comes back up.
-2. **Open the `Mimir` folder as the workspace** in DSH, and pick **Mimir Tutor** in the session picker.
-3. **Open the same folder as a vault in Obsidian.**
-4. **Say what you want to learn.** "Teach me plate tectonics." "I want to understand what Kant actually did." "Explain mycorrhiza."
+- **The board's row is composed once per process.** After installing, restart the server, not just the page.
+- **Importing a `.dshpreset` is a DSH Desktop feature.** The import route ships in the desktop shell, so under `dsh web` there is nothing to catch the file. Use `./scripts/install.sh`, or copy the preset to `<dsh home>/.agent-presets/mimir-tutor/` by hand — the layout is identical.
 
-`./scripts/install.sh --dry-run` shows what it would do without touching anything. `--no-pane` skips the Lesson pane if you only want the preset. `./scripts/uninstall.sh` reverses it.
-
-Fuller detail, including the manual path and how to build a `.dshpreset` to share, is in **[INSTALL.md](INSTALL.md)**.
+Fuller detail, including the manual path, the Windows notes and how to build a `.dshpreset` to share, is in **[INSTALL.md](INSTALL.md)**.
 
 <picture>
   <source media="(prefers-color-scheme: dark)"  srcset="assets/mark_well_256.png">
@@ -96,97 +120,48 @@ Fuller detail, including the manual path and how to build a `.dshpreset` to shar
 ## What is in the repository
 
 ```
-Learn/              the vault
-  How We Learn.md     the method, written for the learner rather than the machine
-  Learner Profile.md  a blank form: your floors, your edges, your misconceptions
-  Sessions/           one dated note per session, written live
-  Concepts/           atomic notes, one idea each, wikilinked into a graph
-  Maps/               one per strand, holding the dependency order and the frontier
-  Reviews/            the spaced-review queue
-  Glossary/           one note per niche word a lesson actually needed
-  Templates/          Session, Concept, Map
-  Viz/                generated SVG, drawn at the width of the reading column
-  Dashboard.base      live views: what is due, what is fragile, where each strand stands
+Learn/                the vault
+  How We Learn.md       the method, written for the learner rather than the machine
+  Learner Profile.md    a blank form: your floors, your edges, your misconceptions
+  Sessions/             one dated note per session, written live
+  Concepts/             atomic notes, one idea each, wikilinked into a graph
+  Maps/                 one per strand, holding the dependency order and the frontier
+  Reviews/              the spaced-review queue
+  Glossary/             one note per niche word a lesson actually needed
+  Templates/            Session, Concept, Map
+  Viz/                  generated SVG, drawn at the width of the reading column
+  Dashboard.base        live views: what is due, what is fragile, where each strand stands
 
-preset/             the DSH agent preset
-  preset.yml          the name and description the session picker shows
-  agent.cordis.yml    the persona, the tool rows, and the six specialists
-  skills/             the nine method skills, one directory each
-  lesson-pane/        the docked pane: host half and browser half
+preset/               the DSH agent preset, and the board
+  preset.yml            the name and description the session picker shows
+  agent.cordis.yml      the persona, the tool rows, and the six specialists
+  skills/               the nine method skills, one directory each
+  mimir-skin/           the board: its host half, its browser half and its layer
 
-.obsidian/          the theme and the three plugins, ready to use
-Tools/              the generators: vault-map, vault-chart, check-tokens, publish, sync-skills
-assets/             the artwork in this README, and the startup animation
-scripts/            install, uninstall, and preset packaging
+preset-zh/            the same teacher, in Simplified Chinese
+
+.obsidian/            the theme and the three plugins, ready to use
+Tools/                the generators, the board's build and tests, the checks
+assets/               the artwork in this README, and the startup animation
+scripts/              install, uninstall, plugin sync, and preset packaging
+docs/                 what is translated and what deliberately is not
 ```
 
-<picture>
-  <source media="(prefers-color-scheme: dark)"  srcset="assets/divider_1280.png">
-  <source media="(prefers-color-scheme: light)" srcset="assets/divider_light_1280.png">
-  <img alt="" src="assets/divider_1280.png" width="100%">
-</picture>
+## The checks
 
-<picture>
-  <source media="(prefers-color-scheme: dark)"  srcset="assets/mark_rune_256.png">
-  <source media="(prefers-color-scheme: light)" srcset="assets/mark_rune_light_256.png">
-  <img alt="" width="22" height="22" src="assets/mark_rune_256.png">
-</picture>
+Nothing here is trusted to stay in step by luck. Each of these fails loudly rather than drifting:
 
-## The six specialists
-
-The teacher delegates to narrow roles rather than one general assistant, each with its own persona and a tool allow-list so it cannot wander.
-
-| | |
-| --- | --- |
-| **Verifier** | A fast bounded fact-checker. Wikipedia is its instrument and it has a hard call budget, because an unbounded fact-check is how a lesson stalls for six minutes. Returns a verdict per claim, and corrects the question's premise when the premise is wrong. |
-| **Cartographer** | Maps a topic's conceptual terrain before anything is planned: the genuine foundations, what depends on what, the classic traps, and where the field itself is unsettled. |
-| **Diagram maker** | Turns one idea into one readable visual, mermaid or hand-written SVG. Cuts first: more than about seven nodes is usually a bad diagram. |
-| **Examiner** | Designs the questions. Distractors are built by mutating the correct claim into the specific misconception it resembles, so the options are even by construction rather than by effort. |
-| **Sophist** | The adversarial reader. Steelmans a claim, then attacks that version. Separates "this is false" from "this is contestable" from "this is a matter of definition". |
-| **Librarian** | Keeps the shelf: extends an existing note before creating a near-duplicate, keeps the maps current, fixes wikilinks when anything moves, and files review entries. |
-
-<picture>
-  <source media="(prefers-color-scheme: dark)"  srcset="assets/mark_axis_256.png">
-  <source media="(prefers-color-scheme: light)" srcset="assets/mark_axis_light_256.png">
-  <img alt="" width="22" height="22" src="assets/mark_axis_256.png">
-</picture>
-
-## The three plugins
-
-All three are MIT and installable by hand from their own repositories, which carry the source, a release workflow and a README:
-
-- **[Mimir Controls](https://github.com/tommyhedgerow/obsidian-mimir-controls)** — step the reading size and switch light or dark from the note header. Writes to exactly two of Obsidian's own settings and keeps no state of its own.
-- **[Mimir Splash](https://github.com/tommyhedgerow/obsidian-mimir-splash)** — plays the pixel-art animation above, once, over the vault as it opens. Any key dismisses it.
-- **[Lesson Publisher](https://github.com/tommyhedgerow/obsidian-lesson-publisher)** — publishes a finished note, and every file it embeds, into a second vault, mirroring the folder structure so wikilinks still resolve. Desktop only.
-
-The theme is **[Mimir](https://github.com/tommyhedgerow/obsidian-mimir-theme)**.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)"  srcset="assets/divider_1280.png">
-  <source media="(prefers-color-scheme: light)" srcset="assets/divider_light_1280.png">
-  <img alt="" src="assets/divider_1280.png" width="100%">
-</picture>
-
-## Requirements, and what it reaches for
-
-- **Obsidian** 1.5 or later. The vault, the theme and the two reading plugins work on desktop and mobile; Lesson Publisher is desktop only because it writes outside the vault.
-- **DeepSeek Harness**, with a model route configured. The preset composes against `@deepseek-ai/*` packages the harness already provides; it installs nothing and downloads nothing.
-- **Web search** for the verifier. The preset grants `web_search` and `web_fetch` and nothing else to that role, and caps it at eight calls.
-- **Node.js**, only for the vault's three generator scripts.
-
-## Other things worth knowing
-
-- **Nothing is loaded from the network by the theme.** No webfonts, no remote images: system fonts, local CSS. It works offline.
-- **The Lesson pane is optional.** The preset works without it; you read the lesson in the vault instead of in a docked tab.
-- **Everything is a plain file.** The preset is a directory you can read and edit, the skills are markdown, and the vault is markdown. Editing a skill takes effect on its next load; editing `agent.cordis.yml` needs a DSH restart, for the reason above.
-- **It ships in Simplified Chinese too.** A second preset, `mimir-tutor-zh`, teaches in Chinese, and every document the learner reads has a Chinese twin beside it in the vault. `docs/zh-CN-glossary.md` records what is translated and what is deliberately left in English.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)"  srcset="assets/badge_row_1280.png">
-  <source media="(prefers-color-scheme: light)" srcset="assets/badge_row_light_1280.png">
-  <img alt="" src="assets/badge_row_1280.png" width="100%">
-</picture>
+```sh
+node Tools/check-tokens.mjs                # one palette across the theme, the charts, the plugins and the board
+node Tools/vault-map.mjs                   # the maps in the notes are the maps the scripts draw
+node Tools/build-mimir-skin.mjs --check    # the board ships built, and the build is current
+node Tools/test-mimir-board.mjs            # the board's host half mounts, registers, and refuses a path it should
+node Tools/test-mimir-skin.mjs             # the board's browser half: contrast floors, token names, the shipped bundle
+node Tools/check-bilingual.mjs             # the two languages carry the same skills and the same composition
+node scripts/sync-plugins.mjs --check      # the vendored plugins are the ones their repositories released
+./scripts/pack-preset.sh --check           # both presets still build, and build reproducibly
+```
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE).
+MIT. The method is a port of [amosblomqvist/learn](https://github.com/amosblomqvist/learn), which is MIT too.

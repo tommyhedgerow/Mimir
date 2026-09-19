@@ -10,14 +10,24 @@
 #   ./scripts/pack-preset.sh --check      verify the existing file, write nothing
 #   ./scripts/pack-preset.sh --out FILE   write somewhere else
 #
-# WHY THE LESSON PANE'S BUILT `lib/` IS INCLUDED. It makes the package
-# self-contained: with it, the imported preset directory can install its own pane
-# with
+# WHAT IS IN THE PACKAGE, AND WHAT IS DELIBERATELY NOT. A `.dshpreset` carries the
+# TEACHER: the persona, the nine method skills and the tool rows. It does not carry
+# the lesson board, and it cannot — the board is two halves, and only one of them can
+# live in a preset. Its browser half reaches the page through the DSH profile, which a
+# preset archive has no way to write to. Shipping the host half alone would make the
+# tool register and draw nothing, which is worse than its absence because it looks
+# like it worked.
 #
-#   dsh plugin --profile web add "<dsh home>/.agent-presets/mimir-tutor/lesson-pane"
+# So the board comes from the clone, with
 #
-# and no clone of this repository is needed. Without it the preset still teaches,
-# but the docked pane cannot be installed from the imported copy.
+#   ./scripts/install.sh
+#
+# or by hand, from a checkout:
+#
+#   dsh plugin --profile web add "<repo>/preset/mimir-skin"
+#
+# An imported preset teaches without it; what is missing is the spine, the question
+# card in the transcript, and the vault's drawings.
 #
 # The format was checked against DSH Desktop's own preset transfer, which is
 # where `.dshpreset` comes from: `format` and `version` are compared exactly on
@@ -58,9 +68,6 @@ case "$PRESET_ID" in
 esac
 
 if [ -n "$PRESET_ID" ]; then
-  # The Chinese preset ships the same Lesson pane as the English one, and holds no
-  # copy of its own: two committed copies of a generated bundle is precisely the
-  # shape that drifts. It is staged in from `preset/lesson-pane` below.
   OUT="$HERE/dist/$ID.dshpreset"
 else
   OUT=""
@@ -114,30 +121,8 @@ mkdir -p "$STAGE/preset"
 # `/.` copies the contents, including dotfiles, without nesting a directory.
 cp -R "$PRESET_SRC/." "$STAGE/preset/"
 
-# The Lesson pane travels with whichever preset is being packed, and only one
-# copy of it is ever authored. See the note where PRESET_ID is resolved.
-if [ ! -d "$STAGE/preset/lesson-pane" ]; then
-  if [ -d "$HERE/preset/lesson-pane" ]; then
-    mkdir -p "$STAGE/preset/lesson-pane"
-    cp -R "$HERE/preset/lesson-pane/." "$STAGE/preset/lesson-pane/"
-  else
-    echo "pack-preset: no lesson-pane to stage in — the package would not mount the pane." >&2
-    exit 1
-  fi
-fi
-
-# The lesson pane's built halves are generated, not authored. Rebuild them if the
-# build script is present and runnable, so the package can never carry a stale
-# bundle; if it is not, carry on with what is committed and say so.
-if command -v node >/dev/null 2>&1 && [ -f "$HERE/Tools/build-lesson-pane.mjs" ]; then
-  if node "$HERE/Tools/build-lesson-pane.mjs" >/dev/null 2>&1; then
-    rm -rf "$STAGE/preset/lesson-pane"
-    mkdir -p "$STAGE/preset/lesson-pane"
-    cp -R "$HERE/preset/lesson-pane/." "$STAGE/preset/lesson-pane/"
-  else
-    echo "pack-preset: could not rebuild the Lesson pane; packaging what is committed." >&2
-  fi
-fi
+# The preset is the whole of what travels: persona, skills, tool rows. The board is a
+# profile plugin and stays in the repository — see the note at the top.
 
 # ── the things that differ between BSD and GNU userland ──────────────────────
 #
@@ -339,7 +324,10 @@ pack-preset: wrote $OUT
   sha256      $DIGEST
 
 Install it with DSH Desktop: Settings → Agent presets → Import.
-The Lesson pane is inside the package. To install it after importing:
 
-  dsh plugin --profile web add "<dsh home>/.agent-presets/$ID/lesson-pane"
+This is the teacher on its own. The lesson board — the spine, the question card in
+the conversation and the vault's drawings — is a DSH profile plugin and is not in
+this package. To add it, from a clone of the repository:
+
+  ./scripts/install.sh
 EOF
