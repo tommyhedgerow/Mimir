@@ -1,0 +1,66 @@
+{
+  "mimir-tutor": {
+    "artifact": "dist/mimir-tutor.dshpreset",
+    "title": "Mimir Tutor (English)",
+    "description": "A Socratic teacher for an Obsidian learning vault. It probes what you already understand, plans a dependency map of the subject and waits for your approval, then teaches one node at a time and writes sessions, concept notes, maps and review entries into the vault as it goes. Nine method skills, six specialist sub-agents, and a lesson board that publishes the spine, the question and the vault's drawings into the conversation.",
+    "contentLanguage": "en",
+    "localizations": {
+      "en": {
+        "title": "Mimir Tutor (English)",
+        "description": "A Socratic teacher for an Obsidian learning vault. It probes what you already understand, plans a dependency map of the subject and waits for your approval, then teaches one node at a time and writes sessions, concept notes, maps and review entries into the vault as it goes. Nine method skills, six specialist sub-agents, and a lesson board that publishes the spine, the question and the vault's drawings into the conversation."
+      },
+      "zh": {
+        "title": "Mimir Tutor（英文）",
+        "description": "面向 Obsidian 学习库的苏格拉底式导师。先探测你已经掌握什么，规划该学科的依赖图并等你确认，然后一个节点一个节点地讲授，同时把会话、概念笔记、图谱和复习条目写进库里。九项方法技能、六个专家子代理，以及一块把主干、题目和库里的图发布进对话的课程板。"
+      },
+      "ja": {
+        "title": "Mimir Tutor（英語）",
+        "description": "Obsidian 学習庫のためのソクラテス式チューター。すでに理解していることを探り、科目の依存関係マップを計画して承認を待ち、その後は一度に一つのノードを教えながら、セッション・概念ノート・マップ・復習項目を学習庫に書き込んでいきます。9 つのメソッド技能、6 つの専門サブエージェント、そして学習の背骨・問い・学習庫の図を会話に公開するレッスンボードを備えています。"
+      },
+      "ru": {
+        "title": "Mimir Tutor (английский)",
+        "description": "Сократический наставник для учебного хранилища Obsidian. Он выясняет, что вы уже понимаете, составляет карту зависимостей по теме и ждёт вашего одобрения, а затем объясняет по одному узлу за раз и записывает занятия, заметки о понятиях, карты и записи для повторения прямо в хранилище. Девять методических навыков, шесть специализированных субагентов и доска урока, публикующая опорный каркас, вопрос и рисунки из хранилища в беседу."
+      },
+      "es": {
+        "title": "Mimir Tutor (inglés)",
+        "description": "Un tutor socrático para un almacén de aprendizaje de Obsidian. Sondea lo que ya comprendes, planifica un mapa de dependencias de la materia y espera tu aprobación; después enseña un nodo cada vez y va escribiendo las sesiones, las notas de concepto, los mapas y las entradas de repaso en el almacén. Nueve habilidades de método, seis subagentes especializados y un tablero de lección que publica el esqueleto, la pregunta y los dibujos del almacén en la conversación."
+      },
+      "pt": {
+        "title": "Mimir Tutor (inglês)",
+        "description": "Um tutor socrático para um cofre de aprendizagem do Obsidian. Ele investiga o que você já entende, planeja um mapa de dependências do assunto e espera a sua aprovação; depois ensina um nó de cada vez e grava as sessões, as notas de conceito, os mapas e os itens de revisão no cofre. Nove habilidades de método, seis subagentes especializados e um quadro de lição que publica a espinha, a pergunta e os desenhos do cofre na conversa."
+      }
+    }
+  },
+  "mimir-tutor-zh": {
+    "artifact": "dist/mimir-tutor-zh.dshpreset",
+    "title": "Mimir Tutor (Simplified Chinese)",
+    "description": "A Socratic teacher for an Obsidian learning vault, teaching in Simplified Chinese. It probes what you already understand, plans a dependency map of the subject and waits for your approval, then teaches one node at a time and writes sessions, concept notes, maps and review entries into the vault as it goes. Nine method skills, six specialist sub-agents, and a lesson board that publishes the spine, the question and the vault's drawings into the conversation.",
+    "contentLanguage": "zh-CN",
+    "localizations": {
+      "en": {
+        "title": "Mimir Tutor (Simplified Chinese)",
+        "description": "A Socratic teacher for an Obsidian learning vault, teaching in Simplified Chinese. It probes what you already understand, plans a dependency map of the subject and waits for your approval, then teaches one node at a time and writes sessions, concept notes, maps and review entries into the vault as it goes. Nine method skills, six specialist sub-agents, and a lesson board that publishes the spine, the question and the vault's drawings into the conversation."
+      },
+      "zh": {
+        "title": "Mimir 导师（简体中文）",
+        "description": "面向 Obsidian 学习库的苏格拉底式导师，用简体中文讲授。先探测你已经掌握什么，规划该学科的依赖图并等你确认，然后一个节点一个节点地讲授，同时把会话、概念笔记、图谱和复习条目写进库里。九项方法技能、六个专家子代理，以及一块把主干、题目和库里的图发布进对话的课程板。"
+      },
+      "ja": {
+        "title": "Mimir Tutor（簡体字中国語）",
+        "description": "Obsidian 学習庫のためのソクラテス式チューター。簡体字中国語で教えます。すでに理解していることを探り、科目の依存関係マップを計画して承認を待ち、その後は一度に一つのノードを教えながら、セッション・概念ノート・マップ・復習項目を学習庫に書き込んでいきます。9 つのメソッド技能、6 つの専門サブエージェント、そして学習の背骨・問い・学習庫の図を会話に公開するレッスンボードを備えています。"
+      },
+      "ru": {
+        "title": "Mimir Tutor (упрощённый китайский)",
+        "description": "Сократический наставник для учебного хранилища Obsidian, преподающий на упрощённом китайском. Он выясняет, что вы уже понимаете, составляет карту зависимостей по теме и ждёт вашего одобрения, а затем объясняет по одному узлу за раз и записывает занятия, заметки о понятиях, карты и записи для повторения прямо в хранилище. Девять методических навыков, шесть специализированных субагентов и доска урока, публикующая опорный каркас, вопрос и рисунки из хранилища в беседу."
+      },
+      "es": {
+        "title": "Mimir Tutor (chino simplificado)",
+        "description": "Un tutor socrático para un almacén de aprendizaje de Obsidian, que enseña en chino simplificado. Sondea lo que ya comprendes, planifica un mapa de dependencias de la materia y espera tu aprobación; después enseña un nodo cada vez y va escribiendo las sesiones, las notas de concepto, los mapas y las entradas de repaso en el almacén. Nueve habilidades de método, seis subagentes especializados y un tablero de lección que publica el esqueleto, la pregunta y los dibujos del almacén en la conversación."
+      },
+      "pt": {
+        "title": "Mimir Tutor (chinês simplificado)",
+        "description": "Um tutor socrático para um cofre de aprendizagem do Obsidian, que ensina em chinês simplificado. Ele investiga o que você já entende, planeja um mapa de dependências do assunto e espera a sua aprovação; depois ensina um nó de cada vez e grava as sessões, as notas de conceito, os mapas e os itens de revisão no cofre. Nove habilidades de método, seis subagentes especializados e um quadro de lição que publica a espinha, a pergunta e os desenhos do cofre na conversa."
+      }
+    }
+  }
+}
