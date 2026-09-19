@@ -121,8 +121,20 @@ mkdir -p "$STAGE/preset"
 # `/.` copies the contents, including dotfiles, without nesting a directory.
 cp -R "$PRESET_SRC/." "$STAGE/preset/"
 
-# The preset is the whole of what travels: persona, skills, tool rows. The board is a
-# profile plugin and stays in the repository — see the note at the top.
+# THE BOARD'S SOURCE IS NOT PART OF THE PACKAGE, and shipping it was a mistake worth
+# naming. `preset/mimir-skin/` is a DSH plugin that happens to live inside the preset
+# directory, so a plain copy of `preset/` sweeps it in — 250 kB of source and a built
+# bundle for something this archive can never install: a `.dshpreset` carries no way
+# to touch the DSH profile, and a preset row would mount the host half and draw
+# nothing, which is worse than its absence because it looks like it worked. The board
+# travels through `dsh plugin add` and the release tarball, both of which carry the
+# package properly.
+#
+# It is also the thing a careful reader would ask about: forty kilobytes of JavaScript
+# inside a preset whose listing says it holds nine skills.
+rm -rf "$STAGE/preset/mimir-skin"
+
+# The preset is the whole of what travels: persona, skills, tool rows.
 
 # ── the things that differ between BSD and GNU userland ──────────────────────
 #
