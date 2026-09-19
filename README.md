@@ -85,8 +85,10 @@ Then:
 
 Both presets are on Preset Square as single `.dshpreset` files, which DSH Desktop installs from Settings → Agent presets → Import:
 
-- **[Mimir Tutor](https://dshdesktop.com/preset/p/mimir-tutor-20d96e)** — teaches in English.
-- **[Mimir 导师](https://dshdesktop.com/preset/p/mimir-tutor-chinese-582526)** — teaches in Simplified Chinese.
+- **[Mimir Tutor (English)](https://dshdesktop.com/preset/p/mimir-tutor-english-5e09de)** — teaches in English.
+- **[Mimir Tutor (Simplified Chinese)](https://dshdesktop.com/preset/p/mimir-tutor-simplified-chinese-51a04d)** — teaches in Simplified Chinese.
+
+Two older listings — `mimir-tutor-20d96e` and `mimir-tutor-chinese-582526` — are still on the square and are **out of date**: they predate the lesson board and still carry the retired pane. Preset Square has no update route, so a preset that changes is published again rather than edited. Use the two above.
 
 That route gives you the teacher and nothing else: no vault, no theme, no plugins, and no board. It is the right one if you already have a vault and only want the method.
 

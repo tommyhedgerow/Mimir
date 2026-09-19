@@ -164,6 +164,30 @@ still carries all six localisations of its own listing metadata.
 both and reports each separately; `--preset mimir-tutor-zh` does one, and
 `--check` verifies without writing.
 
+**Publishing them is a script, not a curl line.**
+`Tools/publish-to-preset-square.py --email <address>` reads
+[`docs/preset-square-listings.json`](docs/preset-square-listings.json) — the artifact
+path, title, content language and all six localisations for each listing — and posts
+them. `--dry-run` shows what would go without sending anything, and `--only <id>`
+does one. Two things about that endpoint are not guessable and both fail silently:
+**it requires a `User-Agent`** (Python's urllib sends none, and the bot filter
+answers with a bare `403 error code: 1010` naming no field), and **a successful
+publish returns `201`, not `200`**.
+
+The listings live now, and their slugs are what the READMEs link:
+
+| presetId | slug |
+| --- | --- |
+| `mimir-tutor` | `mimir-tutor-english-5e09de` |
+| `mimir-tutor-zh` | `mimir-tutor-simplified-chinese-51a04d` |
+
+Two earlier listings, `mimir-tutor-20d96e` and `mimir-tutor-chinese-582526`, are
+still on the square and cannot be removed or edited. They predate the board and
+still carry the retired pane, so the READMEs name them as out of date. Check every
+localisation of a new listing against **all** existing ones before publishing: the
+first pair collided on the bare `Mimir 导师`, which is why the titles above carry
+their language in every locale.
+
 **Make the two titles differ in every locale, not just the canonical one.**
 This was got wrong on the first pass and cannot now be corrected: Preset Square
 has no update or delete route — `PATCH` and `PUT` on a preset both return 404 —

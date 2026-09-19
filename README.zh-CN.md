@@ -72,8 +72,10 @@ cd Mimir
 
 也可以只装导师，不克隆任何东西。两个预设都在 Preset Square 上，各自是单个 `.dshpreset` 文件，在 DSH Desktop 的「设置 → Agent presets → 导入」里安装：
 
-- **[Mimir Tutor](https://dshdesktop.com/preset/p/mimir-tutor-20d96e)** —— 用英文讲授。
-- **[Mimir 导师](https://dshdesktop.com/preset/p/mimir-tutor-chinese-582526)** —— 用简体中文讲授。
+- **[Mimir Tutor (English)](https://dshdesktop.com/preset/p/mimir-tutor-english-5e09de)** —— 用英文讲授。
+- **[Mimir Tutor (Simplified Chinese)](https://dshdesktop.com/preset/p/mimir-tutor-simplified-chinese-51a04d)** —— 用简体中文讲授。
+
+广场上还留着两个旧条目——`mimir-tutor-20d96e` 与 `mimir-tutor-chinese-582526`——它们**已经过时**：早于课程板，并且仍然带着已删除的课程面板。Preset Square 没有更新接口，所以预设变了就重新发布一次，而不是就地修改。请用上面两条。
 
 那条路只给你导师：没有笔记库、没有主题、没有插件，也没有课程板。如果你已经有自己的库、只想要这套方法，那条路是对的。
 
