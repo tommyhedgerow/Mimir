@@ -7,6 +7,98 @@ own repositories.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] — 2026-09-26
+
+The method's biggest change since 1.0, and the lesson's two exits.
+
+### A question is asked alone, after its teaching
+
+- **The asking is now two messages, and the harness enforces it.** The teaching
+  goes in one message and ends with the board; the card goes in the message after
+  it and carries **no prose of any kind**. Both halves are load-bearing, and each
+  kills half of a real failure. A sentence written immediately above a question is
+  the sentence most likely to hand over the answer — that is what a preamble *is*,
+  and with the card alone there is no preamble. And a question with no teaching
+  above it has no text to be read against, which is how questions arrive that make
+  no sense at all.
+- **The probe into a new subject is the same shape, not an exception.** Nothing has
+  been taught yet, so the message carries the line of framing where the teaching
+  would be: what is being asked, and why — then the board, then the bare card.
+  What the rule forbids is a card with nothing above it, never a question asked
+  before the teaching exists.
+- **A check must ask you to use the node, not repeat it.** If the right option is a
+  sentence that was just taught, the check tests reading rather than understanding.
+  The teaching teaches, the card asks, and the sorting is yours — so the prose no
+  longer flags the answer either.
+
+### Verification gets cheaper and more honest
+
+- **The brief now carries the links.** Every claim in a verification brief arrives
+  with the Wikipedia article expected to settle it, and the verifier fetches rather
+  than searches. This is the single largest cost change in the preset: a search is
+  three auxiliary model-turns behind the scenes, so a run that searches comes back
+  with fewer pages read, for about 2.4x the money. One search remains as the whole
+  run's allowance, for a claim whose article can be neither named nor constructed.
+- **The verifier can be backgrounded again**, so a check that does not gate what is
+  about to be said no longer freezes the lesson while it works.
+- **The cartographer's budget is counted in queries, not calls**, because one call
+  carrying four questions costs four model-turns either way — and its effort is
+  pinned, since it was inheriting the session's.
+- **An `unverified` needs a disposition before it is taught**, and there are exactly
+  three: left out, taught as contested, or checked now. A verdict written in a
+  Sources list is not the same as a verdict reaching the prose.
+
+### Two exits from the vault
+
+- **A finished lesson prints to A4**, twice: the **record**, which is the session as
+  it stands, and the **study sheet**, which turns the checks into questions with the
+  answers moved to an appendix. It prints through a real browser engine, so the file
+  has a real text layer and can be searched, and it refuses to orphan a heading
+  across a page break.
+- **The card-shaped part of the vault becomes an Anki deck**, from a `## 🃏 Cards`
+  section beside the knowledge it tests, in the two shapes the note type
+  understands — `front :: back :: kind`, and a cloze card written `{{c1::…}}`. The
+  package carries both note types, their templates and their CSS, so importing one
+  file is the whole install. **A derivation never becomes a card**: a card turns
+  reconstruction into recognition, and the reviewing method is explicit that this
+  is worse than no review. A species card must carry the characters that tell it
+  apart, and a glossary entry is carded only when its own note says `card: true`.
+- Both templates gain the `## 🃏 Cards` section, in both languages, and `vault-craft`
+  gains the contract — including the three refusals that are deliberate rather than
+  omissions.
+
+### A link you can look at without leaving the lesson
+
+- **Hover card.** Rest the pointer on a link in the conversation and a card opens
+  with the page's title, its opening paragraph, its lead image and its host.
+  Wikipedia links get the article's own opening paragraph from Wikimedia's summary
+  API rather than a scrape.
+- **It has to be two halves, and the reason is worth knowing.** The conversation is
+  served under `connect-src 'self'`, so the page cannot fetch Wikipedia itself, and
+  an iframe is refused by `X-Frame-Options`. The host half fetches beside the
+  workspace and answers one loopback route; the browser half only listens for a
+  hover. The route is fenced like the server-side fetch it is — http and https only,
+  no credentials, no redirect into the machine, a capped body and a hard timeout —
+  and a refusal is an ordinary answer with a reason a person can read.
+
+### Fixed
+
+- **The probe and check scores reached no printed lesson.** The vault records them as
+  bare numbers in frontmatter (`probe_checks: 6`), the ledger parser read every
+  scalar as text, and the PDF's title block prints them only when they arrive as
+  numbers — so every score was silently dropped from every record. A bare integer or
+  decimal is now a number.
+- **Two card lines were accepted that should have thrown**: a card whose front was
+  empty (`- :: back :: fact` parses its front as `:: back`), and a card with an
+  unrecognised kind, which was tagged into a group nothing reads.
+- **The three tool suites are now self-contained.** They ran against the author's own
+  vault, so a fresh clone had nothing for them to pass against. They build a small
+  vault in a temporary directory, read it through the tools' new `--vault` switch,
+  and delete it — the PDF suite skipping the Chrome checks out loud where there is no
+  Chrome, rather than passing them silently.
+
+[1.1.0]: https://github.com/tommyhedgerow/Mimir/releases/tag/v1.1.0
+
 ## [1.0.0] — 2026-09-19
 
 The finished 1.0. This supersedes the 1.0.0 tagged on 2026-09-17 and replaces it as

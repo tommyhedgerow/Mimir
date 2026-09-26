@@ -44,6 +44,8 @@ The method is a port of [amosblomqvist/learn](https://github.com/amosblomqvist/l
 | **The vault** | A working Obsidian vault: session, concept and map templates, a spaced-review queue, generated SVG dependency maps, a glossary that grows only from words a lesson actually needed, and a reading list capped at two books a session. |
 | **The theme** | `Mimir` — warm paper and sage in daylight, a cold blue-black under cyan-and-magenta at night, a serif for what is read and a monospace for what is furniture. |
 | **Three plugins** | Reading-size and light/dark controls, a startup animation, and a publisher that copies a finished note and its diagrams into a second library vault. |
+| **Two exports** | A finished lesson printed to A4 as a record and as a study sheet, and the fact-shaped part of it collected into an Anki deck with its own note types. Both are two commands, and both read the notes. |
+| **Link previews** | Hover a link in the conversation and a card opens with the page's title, its opening paragraph and its lead image — Wikipedia's own summary where the link is an article. |
 
 ### The board
 
@@ -57,6 +59,27 @@ Every lesson is published as it happens. When the teacher teaches a node it call
 Two things about the drawings are worth knowing, because they are the reason the board exists as a tool rather than as a note. They travel to your interface and **never into the model's context** — the teacher is told their names and nothing else, so a lesson can carry four diagrams without four thousand tokens of path data entering the conversation. And a drawing that is missing, unreadable or too large comes back **named as missing**, on screen, rather than being silently absent: a lesson that refers to a picture you cannot see is worse than one that admits the picture is not there.
 
 There is no second window to keep in step. The conversation is the lesson; the board is the part of it you read at a glance.
+
+### Where a lesson goes afterwards
+
+The vault is the record; two commands get the record out of it.
+
+```sh
+node Tools/export-lesson-pdf.mjs --done --both   # A4 into Learn/Exports/
+node Tools/anki-cards.mjs --all                  # a deck into Learn/Exports/anki/
+```
+
+`export-lesson-pdf.mjs` prints each lesson twice. The **record** is the session as it stands — the plan, the nodes, the checks with what each one revealed. The **study sheet** is the same lesson with the checks turned into questions and the answers moved to an appendix, so it can be worked from rather than read. It measures what it can: a page that would orphan a heading breaks before it instead, and a lesson whose drawing is missing says so rather than printing a filename.
+
+`anki-cards.mjs` collects only what Anki is good at — a name, a date, a character, a wrong claim to be judged — into a `## 🃏 Cards` section beside the knowledge it tests, in the two shapes the note type understands: `front :: back :: kind`, and a cloze card written `{{c1::…}}`. **A derivation never becomes a card**, because a card turns reconstruction into recognition and the reviewing method is explicit that this is worse than no review. A species card must carry the characters that tell it apart, and a glossary entry is carded only when its note says `card: true`: a reference should be generous, and a deck should not. The package it writes carries both note types, their templates and their CSS, so importing the one file is the whole install.
+
+Both tools take `--vault DIR` to read a vault other than the one they live in.
+
+### The hover card
+
+A link in the conversation is a link you can look at without leaving the lesson. Rest the pointer on it for a moment and a card opens beside it; Wikipedia links get the article's own opening paragraph from Wikimedia's summary API rather than a scrape.
+
+It has to be two halves, and the reason is worth knowing. The conversation is served under a content-security policy of `connect-src 'self'`, so the page cannot fetch Wikipedia itself, and an iframe is refused by `X-Frame-Options`. So the **host half** fetches beside the workspace and answers one loopback route, and the **browser half** only listens for a hover. The route is fenced like the server-side fetch it is: http and https only, no credentials, no redirect into the machine, a capped body and a hard timeout — and a refusal is an ordinary answer with a reason a person can read, never a blank card.
 
 ## Install
 
@@ -143,7 +166,13 @@ preset/               the DSH agent preset, and the board
 preset-zh/            the same teacher, in Simplified Chinese
 
 .obsidian/            the theme and the three plugins, ready to use
-Tools/                the generators, the board's build and tests, the checks
+Tools/                the generators, the exports, the board's build and its tests
+  vault-map.mjs         validate the spines, and write the generated maps
+  vault-chart.mjs       draw every SVG in Learn/Viz from those spines
+  export-lesson-pdf.mjs a lesson to A4, as a record and as a study sheet
+  anki-cards.mjs        the card-shaped part of the vault into an Anki package
+  lib/                  the markdown reader, the Anki writer, the note types
+  link-preview/         the hover card's two halves, and its builder
 assets/               the artwork in this README, and the startup animation
 scripts/              install, uninstall, plugin sync, and preset packaging
 docs/                 what is translated and what deliberately is not
@@ -159,6 +188,9 @@ node Tools/vault-map.mjs                   # the maps in the notes are the maps 
 node Tools/build-mimir-skin.mjs --check    # the board ships built, and the build is current
 node Tools/test-mimir-board.mjs            # the board's host half mounts, registers, and refuses a path it should
 node Tools/test-mimir-skin.mjs             # the board's browser half: contrast floors, token names, the shipped bundle
+node Tools/test-anki-cards.mjs             # the deck: the glossary gate, the two card shapes, a real .apkg
+node Tools/test-export-lesson-pdf.mjs      # the print: A4, a text layer, links with brackets, embeds as drawings
+node Tools/test-link-preview.mjs           # the hover card: the route, the refusals, the shipped bundle
 node Tools/check-bilingual.mjs             # the two languages carry the same skills and the same composition
 node scripts/sync-plugins.mjs --check      # the vendored plugins are the ones their repositories released
 ./scripts/pack-preset.sh --check           # both presets still build, and build reproducibly

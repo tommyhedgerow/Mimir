@@ -1,0 +1,22 @@
+{
+  "name": "dsh-link-preview",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Link previews for the DSH conversation: hover a link and a card opens with the page's title, opening paragraph and lead image — Wikipedia's own summary when the link is an article.",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  }
+}

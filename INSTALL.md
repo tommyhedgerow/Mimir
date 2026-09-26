@@ -198,6 +198,10 @@ node Tools/vault-map.mjs        # validates the spines in the maps and session n
 node Tools/vault-chart.mjs      # redraws every SVG in Learn/Viz from those spines
 node Tools/check-tokens.mjs     # fails if the theme, the charts, the plugins and the board disagree on the palette
 node Tools/build-mimir-skin.mjs # rebuilds the board's two halves from their sources
+
+node Tools/export-lesson-pdf.mjs --done --both  # the finished lessons, to A4
+node Tools/anki-cards.mjs --all                 # the card-shaped part of the vault, to Anki
+node Tools/build-link-preview.mjs               # installs the hover card into your harness
 ```
 
 `vault-chart.mjs` measures label widths with the system text engine rather than counting characters, and refuses to write a drawing whose text does not fit its boxes. Run it after editing a `graph:` block.
@@ -207,6 +211,12 @@ node Tools/build-mimir-skin.mjs # rebuilds the board's two halves from their sou
 ```sh
 dsh plugin --profile web add "$PWD/preset/mimir-skin"
 ```
+
+`export-lesson-pdf.mjs` needs a Chrome, Chromium or Edge on the machine — it prints through the browser's own engine rather than re-implementing one, which is what gives the PDF a real text layer. Set `CHROME=/path/to/binary` if it is somewhere unusual. It writes into `Learn/Exports/`, which is **derived**: everything in it can be rebuilt from the notes, and the repository ignores it for that reason. `--record` is the session as it stands, `--sheet` turns the checks into questions with the answers in an appendix, and `--done` restricts it to the lessons you have marked finished. Pass `--vault DIR` to read a vault other than the one the tool lives in.
+
+`anki-cards.mjs` reads the `## 🃏 Cards` section of your session and concept notes. What it writes is a `.apkg` carrying both Mimir note types, their templates and their CSS, plus one `.tsv` per note type for reading and diffing. Import the `.apkg` in Anki; the `.tsv` files are for your eyes. A blank deck on a fresh vault is the correct result, not a failure — nothing is carded until a lesson has written something worth carding.
+
+`build-link-preview.mjs` installs the hover card's two halves into your harness home (`DSH_HOME`, or the desktop app's default) and adds its row to that profile's composition. `--check` reports whether the installed bundle is current and writes nothing. It is a separate command from the board because it is a separate plugin, and you can leave it out — nothing else in the vault depends on it.
 
 The command-line twin of Lesson Publisher:
 

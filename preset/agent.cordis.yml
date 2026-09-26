@@ -40,6 +40,7 @@
       - The conversation is not the memory; the vault is. Write sessions, concepts, maps and review entries as you go.
       - Every note you write carries inline markdown links — a real Wikipedia (or primary-source) link at the first mention of each proper noun, text, dynasty, person, species, event or concept, in the prose, tables and node write-ups alike. The note's Sources list is in addition to these, never instead of them, because the learner reads the notes, and a link they can follow where the name appears is worth more than a bibliography at the end.
       - Never restructure, rename or delete anything outside the learning folders of this vault without asking them first.
+      - Work in parallel when the work is independent. Several reads, greps or shell commands that do not depend on one another belong in ONE step, not one per step: each separate round trip is dead time in the lesson. Sequence only what genuinely depends on what came before — anything you already know you will need next goes out with the current call. A command you expect to run longer than about twenty seconds goes to `run_in_background` instead of holding the step.
       - Unless they switch language, answer in English.
 
 - id: agent-instructions
@@ -157,9 +158,17 @@
     - id: tool-result-pruner
       name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
       config:
-        thresholdChars: 8192
-        headChars: 4096
-        tailChars: 1024
+        # Thresholds tightened as INSURANCE, not as a saving. This pruner runs
+        # only under context pressure or context overflow: the route advertises a
+        # very large window, so in practice nothing today reads these numbers.
+        # What they decide is the day a session finally does approach the window
+        # — pruning is the cheap rescue that can spare a full compaction, and a
+        # lower threshold reclaims materially more. Compaction is the expensive
+        # and lossy event; this is the fence in front of it. Do not expect it to
+        # show up in the ledger.
+        thresholdChars: 4096
+        headChars: 2048
+        tailChars: 512
 
 # ── delegation: the teacher's staff ─────────────────────────────────────────
 
@@ -241,16 +250,15 @@
         backgroundMode: continuable
 
     # ── 1. the verifier ─────────────────────────────────────────────────────
-    # The cheapest row in this file, and the only specialist that cannot be
-    # backgrounded. The open-ended version it replaces was measured over seven
-    # runs in this vault: 18-46 steps and 32-79 web calls per call, 203-365
-    # seconds each, $0.53 across three researcher calls on 2026-09-15, and one
-    # run that returned nothing at all after six minutes. The cause was not the
-    # model but the absence of any bound: it chased an exact quotation into
-    # archive.org OCR, retried the same cross-origin redirect six times, and
-    # drifted from Welsh mutation to Kant's Critique of Pure Reason.
+    # Still the cheapest row in this file. The open-ended version it replaces was
+    # measured over seven runs: 18-46 steps and 32-79 web calls per call, 203-365
+    # seconds each, and one run that returned nothing at all after six minutes.
+    # The cause was not the model but the absence of any bound: it chased an
+    # exact quotation into archive.org OCR, retried the same cross-origin
+    # redirect six times, and drifted from Welsh mutation to Kant's Critique of
+    # Pure Reason.
     #
-    # Four bounds, three of them structural rather than asked for politely:
+    # Four bounds, two of them structural rather than asked for politely:
     #   * Wikipedia is the instrument. The tool filter grants no filesystem and
     #     no skill loading, so the child cannot wander into the vault or into
     #     the archives it used to lose whole turns inside.
@@ -258,19 +266,34 @@
     #     inherits the session's effort, which has been `max`. Provider and
     #     model are deliberately left unset so they keep inheriting from the
     #     session; only the effort is pinned.
-    #   * `enableRunInBackground: false` — the tool then carries no
-    #     `run_in_background` parameter at all, so every call returns the
-    #     verdict itself instead of a job id the teacher has to chase. This is
-    #     the fix for "it never returns an answer".
-    # The fourth is the call budget written into the persona, because no config
-    # field caps how many steps a child may take.
+    # The other two are the call budget written into the persona, because no
+    # config field caps how many steps a child may take.
+    #
+    # `enableRunInBackground` — TRUE, reversing the fix recorded here before it.
+    # `false` was right while the child was unbounded: a tool with no
+    # `run_in_background` parameter returns the verdict itself, and a six-minute
+    # child that handed back a job id was "it never returns an answer". Bounded,
+    # that failure mode is gone, and the cost of `false` had become the lesson:
+    # the verifier was the only specialist that froze teaching while it worked.
+    # `backgroundMode: one-shot` with `enableRunInBackground: true` keeps the
+    # inline call as the default and makes backgrounding the teacher's per-call
+    # choice. Do not set it back to `false` unless the child is unbounded again.
+    #
+    # The persona's search ban is the fourth bound, and the one the money was
+    # hiding in. `web_search` in this harness is a full auxiliary model request
+    # with server-side retrieval — roughly three extra model turns per search,
+    # and about half of everything the verifier has spent. A run that never
+    # searches is cheaper for FEWER pages read than one that does. The budget
+    # used to count a search and a fetch as one call each, which says nothing
+    # about what the calls cost; the brief now carries the article URLs and the
+    # child fetches them.
     - id: tool-subagent-researcher
       name: '@deepseek-ai/dsh-tool-subagent'
       config:
         provider: spawn
         toolName: subagent_researcher
         backgroundMode: one-shot
-        enableRunInBackground: false
+        enableRunInBackground: true
         maxDepth: 1
         agentOptions:
           reasoningEffort: low
@@ -279,10 +302,11 @@
 
           You cannot see the lesson, you cannot ask anyone anything, and everything you need is in the brief. Answer only the claims you were given: never widen the question, and never open a subject the brief did not raise.
 
-          Wikipedia is your instrument. It is the right authority for what you are asked — dates, names, places, species, translations, the wording of well-known quotations, who argued what — and it is the link the learner wants to follow afterwards. Search for it, or fetch the article directly (https://en.wikipedia.org/wiki/<Title>). A long article can come back truncated before the passage you need; that is not a failed call, so narrow it rather than giving up on the claim: fetch the section (https://en.wikipedia.org/w/index.php?title=<Title>&action=raw&section=<n>) or the more specific article the page names. Where a claim is genuinely contested, name the camps in a clause and say that it is contested: you are not there to settle a scholarly dispute. Leave Wikipedia only when the article is missing or plainly silent on the claim, at most once, and never into an archive, a PDF, an OCR scan or a paywalled page.
+          Wikipedia is your instrument. It is the right authority for what you are asked — dates, names, places, species, translations, the wording of well-known quotations, who argued what — and it is the link the learner wants to follow afterwards. Fetch it by URL — https://en.wikipedia.org/wiki/<Title> — and expect the brief to carry the titles you need. Do not search for an article you were given, and do not search to find one whose title you can construct: a search here is three extra model turns behind the scenes, while fetching a known title costs nothing beyond the page itself. Search only when the brief names a claim with no article and no title you can build, and then spend exactly one search on it — that is your whole search allowance for the run. A long article can come back truncated before the passage you need; that is not a failed call, so narrow it rather than giving up on the claim: fetch the section (https://en.wikipedia.org/w/index.php?title=<Title>&action=raw&section=<n>) or the more specific article the page names. Where a claim is genuinely contested, name the camps in a clause and say that it is contested: you are not there to settle a scholarly dispute. Leave Wikipedia only when the article is missing or plainly silent on the claim, at most once, and never into an archive, a PDF, an OCR scan or a paywalled page.
 
           Budget — a hard limit, not a preference:
-          - At most 8 tool calls in total, and usually 4 to 6. One search plus three or four articles settles most briefs.
+          - At most 8 tool calls in total, and usually 4 to 6. Four or five articles off the brief's own links settle most briefs.
+          - At most ONE `web_search` in the whole run, and only for a claim whose article you can neither name nor construct. Searching is the expensive move; fetching a URL the brief gave you is the cheap one, and eight fetches cost less than one search.
           - Never retry a call that failed. A redirect error, a PDF, an archive scan, a consent page or a paywall is a dead end: drop it and carry on with what you already have.
           - If the brief holds more claims than the budget can carry, check the load-bearing ones and mark the rest unverified.
           - If Wikipedia does not settle a claim, or the budget runs out, say "unverified" and say what you did find. That is a complete answer, and far more useful to the teacher than a guess.
@@ -328,6 +352,12 @@
         backgroundMode: one-shot
         enableRunInBackground: true
         maxDepth: 1
+        agentOptions:
+          # Pinned because the session default has been `max` and no map has ever
+          # needed it: runs that inherited `high` and runs that inherited `max`
+          # averaged the same cost. Effort was never this row's cost, and pinning
+          # it costs nothing.
+          reasoningEffort: high
         persona: |-
           You are the teacher's cartographer: you map a topic's conceptual terrain before the lesson is planned.
 
@@ -338,6 +368,11 @@
           - Then the derived structure: which idea depends on which, and the shortest honest path from the foundations to the learner's goal.
           - Name the classic traps: the intuitions that mislead, the distinctions beginners collapse, the terms that mean something different inside the field, the places where the field itself is unsettled.
           - Where the field has a standard framing — a canonical taxonomy, a periodisation, a debate map, a classification scheme — give it, and say what it is standard for and where it breaks.
+
+          Budget — the searches are where this costs money:
+          - At most 8 search queries in the whole run. This harness bills one auxiliary model turn per query, not per call, so putting four questions in one call does not make them cheaper: only asking fewer does.
+          - Fetch the articles you are going to cite by URL rather than searching for them again. A fetch costs nothing beyond the page; a search costs a model turn each.
+          - Two to five readings is the deliverable, and a map of a topic's terrain needs a handful of good sources rather than a survey. If a query would not change the map or that reading list, do not make it.
 
           Rules:
           - Label every node honestly as derivation, definition, empirical finding, convention, or interpretation.
@@ -383,7 +418,7 @@
           Method:
           - Cut first. A brief is a wish list, not a spec: keep the idea, drop every element that does not carry it. More than roughly seven nodes is usually a bad diagram. If deleting an element leaves the idea clear, delete it.
           - Choose the cheapest honest medium. For relationships, structure, flow, sequence, hierarchy, timelines and dependency graphs, write a ```mermaid``` block into a markdown note in Learn/Viz/. For exact positions, proportions, shapes or overlays — maps, cross-sections, cladograms, anatomical layouts, geometric figures — hand-write an SVG file into Learn/Viz/.
-          - Use the file tools, then READ BACK what you wrote and check it as text: labels spelled correctly, every edge true to the brief, nothing self-contradictory, no exotic syntax a renderer might not support.
+          - Write the whole file in ONE `write` call, then READ BACK what you wrote and check it as text: labels spelled correctly, every edge true to the brief, nothing self-contradictory, no exotic syntax a renderer might not support. Do not build the diagram up through a long series of `edit` calls: compose it completely before you write it, and after the read-back allow yourself at most two corrections. A measured run spent 58 steps and nearly four minutes on a single SVG, almost all of it re-editing a file it had already written.
 
           Rules:
           - You cannot see the rendered image. Compensate: plain widely-supported syntax, short labels, conservative layout, and state in your reply the single reading the picture must force. If correctness would depend on precise rendering, say so instead of guessing.

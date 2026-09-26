@@ -81,6 +81,26 @@ _Each node is published to the board as it is taught — `mimir_board`, once per
 - Map updated: 
 - Diagram: 
 - Review entries filed, first due: 
+- Cards written: _(_ facts, names, dates and characters this session introduced — they go in `## 🃏 Cards` below, and `Tools/anki-cards.mjs` collects them_)_
+
+## 🃏 Cards
+
+_What Anki can hold, and nothing else. **Two shapes, and the sentence decides which.** Collect with `node Tools/anki-cards.mjs --all`._
+
+_**A question, or a wrong claim to judge** — `front :: back :: kind` (kind optional; `trap`, `name`, `date`, `species`, `fact`):_
+
+- _A plausible wrong claim I might believe? — does that hold? :: **No** — and the reason, in one or two sentences._ :: trap
+- _A question with a short, checkable answer._ :: _The answer._
+- _A species to tell apart._ :: _The characters that do it, and the lookalikes it is confused with — a name alone is refused._ :: species
+
+_**A cloze card** — one missing token inside a true sentence. Put `{{c1::…}}` around the token and it goes to a note type of its own. Its kind is required, and a caveat goes in the middle: `sentence :: caveat :: kind`. Anki makes **one card per `{{cN::}}`**, so two gaps are two cards — worth it only when the facts are genuinely separate, since each gap is visible on the other's card._
+
+- _The First Emperor unified China in {{c1::221 BCE}}._ :: date
+- _{{c1::Gelasius I}} put the two-powers distinction to Anastasius in 494._ :: _Forty years before Justinian; the Latin West made the claim first._ :: name
+
+**And what does not go here at all.** A **derivation** — "why must this be so" — because a card converts reconstruction into recognition, which the `reviewing` skill calls worse than no review; those stay on [[Review Queue]]. A **cloze trap** is refused outright: a claim to be judged has to be stated in full. And a "fact" card with a *why* bolted onto it is a derivation wearing a fact's label — if the answer is a sentence of reasoning, it belongs on the queue.
+
+_Anything that does not fit one of those shapes is refused rather than silently mis-split._
 
 ## 📚 Reading
 

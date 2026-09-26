@@ -94,11 +94,19 @@ node Tools/check-bilingual.mjs               # the two languages still agree
 node Tools/build-mimir-skin.mjs --check      # the board ships built, and the build is current
 node Tools/test-mimir-board.mjs              # the board's host half mounts and registers
 node Tools/test-mimir-skin.mjs               # the board's browser half, loaded the way the page loads it
+node Tools/test-anki-cards.mjs               # the deck: the glossary gate, the two card shapes, a real .apkg
+node Tools/test-export-lesson-pdf.mjs        # the print: A4, a text layer, links with brackets, embeds as drawings
+node Tools/test-link-preview.mjs             # the hover card: the route, the refusals, the bundle as built
 ./scripts/pack-preset.sh                     # rebuild both .dshpreset files
 ./scripts/pack-preset.sh --check             # and prove they are current
 ./scripts/pack-plugin.sh                     # rebuild the board's tarball, and install it for real
 ./scripts/pack-plugin.sh --check             # and prove it is current
 ```
+
+The three new suites build their own vault in a temporary directory and read it through the
+tools' `--vault` switch, so they pass on a fresh clone with no lessons in it. The PDF suite
+prints for real where a Chrome is present and says `SKIP` for those checks where it is not —
+it never reports a silent pass.
 
 `check-bilingual.mjs` is the one that matters most after any edit to either
 language. It reads the pairing table out of `docs/zh-CN-glossary.md`, so the

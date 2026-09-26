@@ -194,6 +194,19 @@ Each entry gives **title, author, year, one link, and one line on why**. The lin
 
 The session note mirrors what it contributed: the `books:` list in its frontmatter (one `"Title — Author (year)"` string each) and an `## 📚 Reading` section holding the same recommendation with its reason. `Dashboard.base` has a **Books** view reading `books`. The genre rule is their and is explicit: **published fiction and non-fiction books only — no academic papers, no journal articles.**
 
+## Cards — what Anki can hold, and what it must not
+
+`Learn/Templates/Session.md` and `Concept.md` both carry a `## 🃏 Cards` section, and `Tools/anki-cards.mjs` reads it. The rule that shapes everything here is the `reviewing` skill's: **reconstruction, not recognition.** A card converts a fact you could re-derive into one you merely recognise, so the deck holds only what cannot be re-derived — and the derivation stays in the note, on the queue.
+
+Two shapes, and the sentence decides which:
+
+- **`front :: back :: kind`** — a question with a short checkable answer, or a wrong claim to be judged (`trap`). Kind is optional and defaults to `fact`; the accepted kinds are `fact`, `trap`, `name`, `date`, `species`, `term`.
+- **`sentence with {{c1::…}} :: kind`** — a cloze card, one missing token in a true sentence, with an optional caveat in the middle (`sentence :: caveat :: kind`). Anki makes one card per `{{cN::}}`, so a name and its date in one sentence are two cards — worth it only when the facts are genuinely separate, since each gap is visible on the other card.
+
+Three refusals are deliberate rather than omissions. A **cloze trap** cannot exist: a claim to be judged has to be stated in full. A **species card** must carry the characters that tell it apart and the lookalikes it is confused with, because a name alone is not a determination — this is the vault's non-negotiable rule, and a short species back is rejected by name. And a **glossary entry is not a card**: a term is carded only when its note says `card: true`, because a reference should be generous and a deck should not.
+
+A malformed line throws rather than being dropped — a missing separator, a fourth field, an empty side or an unknown kind is a mistake in the note, and silently losing it would lose a card the session believed it had written.
+
 ## The write-back at the end of a session
 
 In order:
@@ -202,6 +215,7 @@ In order:
 2. **Concept notes** for the durable ideas only. One note per idea that will be reused. Link each one from the session note and from every concept it depends on.
 2b. **Glossary terms** — a note for every *niche* word the session used and had to define, and an entry in the session's `terms:` list. Correct any existing term whose meaning the session changed, in this same turn. The bar and the format are in *The glossary* above.
 2c. **The reading list** — at most two books, appended to `Learn/Reading List.md` under the right strand with title, author, year, link and one line on why, and mirrored into the session's `books:` list and its `## 📚 Reading` section. Verify each book is real first. A session that taught nothing gets no books.
+2d. **Cards** — the fact-shaped residue of the session into the session note's or the concept note's `## 🃏 Cards` section, in one of the two shapes `Tools/anki-cards.mjs` accepts, and a count in the session note's *Cards written* line. Only what Anki can hold: a name, a date, a character, or the wrong claim the note already records. **A derivation is never a card** — see *Cards* below.
 3. **The map** for the strand: add the new concepts, move the frontier, and declare each one in the map's `nodes:` block. Then run `node Tools/vault-map.mjs --write`, so the graph's state matches the notes. The graph is generated, not drawn.
 4. **`Learner Profile.md`**: confirmed floors (what they got right and now own), found ceilings (where it ran out), misconceptions found and whether they were dislodged, and their preferences as they became visible (wants more Socratic, dislikes long preambles, prefers a diagram early, and so on).
 5. **`Backlog.md`**: tick what is done, add what the session revealed as newly interesting, and note what the session made obvious is needed next.

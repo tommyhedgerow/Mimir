@@ -68,3 +68,29 @@ node Tools/check-tokens.mjs     # fails if the theme and the charts disagree on 
 ```
 
 `vault-chart.mjs` measures its label widths with the system text engine rather than counting characters, and refuses to write a drawing whose text does not fit its boxes.
+
+## Getting a lesson out of the vault
+
+Two commands take a finished lesson out of the notes, and both read the notes rather than a copy of them:
+
+```sh
+node Tools/export-lesson-pdf.mjs --done --both   # A4 into Learn/Exports/
+node Tools/anki-cards.mjs --all                  # a deck into Learn/Exports/anki/
+```
+
+**PDF.** `--record` is the session as it stands; `--sheet` is the same lesson with the checks turned into questions and the answers moved to an appendix, so it can be worked from rather than read. It prints through a real browser engine, which is why the file has a real text layer and can be searched. Needs Chrome, Chromium or Edge — set `CHROME=/path/to/binary` if it is somewhere unusual.
+
+**Anki.** The card-shaped part of the vault — a name, a date, a character, a wrong claim to be judged — lives in a `## 🃏 Cards` section beside the knowledge it tests, in one of two shapes:
+
+- `front :: back :: kind` — a question with a short answer, or a wrong claim to be judged (`trap`). Kind is optional.
+- `sentence with {{c1::…}} :: kind` — one missing token in a true sentence. Anki makes one card per gap.
+
+**A derivation never becomes a card**, because a card turns reconstruction into recognition, and `reviewing` is explicit that this is worse than no review — those stay on [[Review Queue]]. A species card must carry the characters that tell it apart, and a glossary entry is carded only when its own note says `card: true`.
+
+`Learn/Exports/` is **derived** and is ignored by git: every file in it can be rebuilt from the notes by those two commands, and nothing is lost by leaving it out.
+
+Either tool takes `--vault DIR` to read another vault.
+
+## The hover card
+
+`node Tools/build-link-preview.mjs` installs one more plugin into DSH: rest the pointer on a link in the conversation and a card opens with the page's title, its opening paragraph and its lead image. Wikipedia links get the article's own opening paragraph. It is optional — nothing else in the vault needs it — and `--check` says whether the installed copy is current.
